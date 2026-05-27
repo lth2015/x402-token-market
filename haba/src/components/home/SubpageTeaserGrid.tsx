@@ -85,7 +85,7 @@ function Teaser({
   return (
     <Link
       href={href}
-      className="group flex flex-col rounded-2xl border border-border-subtle bg-surface-base p-6 shadow-e1 transition-all hover:shadow-e2"
+      className="group flex flex-col rounded-2xl border border-border-subtle bg-surface-base p-6 shadow-e1 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-e3 hover:border-brand-primary/15"
     >
       <div className="flex items-baseline justify-between gap-2">
         <span className="text-caption uppercase tracking-widest text-ink-tertiary">{eyebrow}</span>

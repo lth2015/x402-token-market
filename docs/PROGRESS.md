@@ -1,7 +1,7 @@
 # X402 Token Market — 项目进度
 
-**最后更新**: 2026-05-27 (第三轮)
-**当前阶段**: 真实 Solana Devnet USDC 支付上线：server-side 演示钱包签名 · 链上广播 · Explorer 链接 · 金额上限 $9
+**最后更新**: 2026-05-27 (第四轮)
+**当前阶段**: Demo 视觉精品化：Hero 双栏生态图 · 动态指标栏 · 链上结算戏剧化成功页 · 全站 hover/入场动画 · 明天办公室配置 TODO
 
 ---
 
@@ -104,6 +104,16 @@ token-api 的 `/v1/recent-activity` 可见所有事件；Netstars Console Live A
 - [x] `/agent` 第 3 个剧本: **B2B 多渠道频次场景** — 药局 / 医院营养科 / 独立营养师 / 合作电商 4 频道 × 3 轮 = 12 次调用，含自动充值触发。见 `AgentRunner.tsx: B2B_CHANNEL_PROMPTS`。
 - [x] `/cart` **订单持久化**: 成功页写入 `localStorage`（key: `haba_last_order`，24h TTL）；再次进入 `/cart` 时顶部显示「上次订单」横幅，支持查看 / 忽略 / 新建订单三种操作。
 - [x] **产品卡片视觉升级**: `ProductCard.tsx` 新增 h-40 渐变色图片区块（按 category 自动选色：液体甜味料=天空蓝、粉末=琥珀黄、料理辅助=橙色、果酱=玫瑰红、糖果=紫色），emoji 升至 text-6xl，`DemoBadge` 移至右上角。
+
+### P3 — ✅ 本轮完成
+- [x] **Demo 精品化 (耳目一新)**:
+  - `HabaHero.tsx` 全面重写：双栏布局，左 = 标题/标语/分群 chip/实时指标；右 = `EcosystemFlowCard`（深森绿卡片，三方节点 + CSS 流动动画）
+  - `EcosystemFlowCard.tsx` (NEW)：暗色主题，HABA → 支付协议 → Solana USDC，traveling-dot 连接线，三方状态实时点
+  - `LiveMetricsBar.tsx` (NEW)：客户端组件拉取余额 API，展示 Token余额 / SKU数 / Devnet状态，带骨架屏
+  - `CheckoutFlow.tsx` 成功页分两态：devnet = 脉冲环确认动画 + 深色链上证明卡（tx高亮）+ 大号 Explorer 按钮；dev = 简洁版
+  - `globals.css`：5 个 keyframes (haba-fade-up / pulse-ring / flow-dot / shimmer / breathe) + 8 个 utility 类
+  - 全站 hover/入场动画：产品卡 `-translate-y-0.5 hover:shadow-e3`；Teaser 格同步；TopBar Logo 渐变升级
+  - Footer 新增技术栈行：HABA · x402 Protocol · Solana USDC chip
 
 ### P3 — 下次继续
 - [ ] 钱包 connect UI 真接 Phantom / Solflare (现在签名是 server-side mock)

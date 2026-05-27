@@ -17,18 +17,19 @@ import { LocaleSwitcher } from "./LocaleSwitcher";
 export async function HabaTopBar() {
   const t = await getTranslations("brand");
   return (
-    <header className="sticky top-0 z-30 border-b border-border-subtle bg-surface-base/85 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b border-border-subtle bg-surface-base/90 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-3 lg:px-12">
-        <Link href="/" className="flex items-baseline gap-3 outline-none focus-visible:ring-2 focus-visible:ring-brand-primary rounded-md">
+        <Link href="/" className="flex items-center gap-3 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-brand-primary">
+          {/* Logo mark: gradient background */}
           <span
             aria-hidden
-            className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-primary text-base font-semibold text-white"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-primary to-emerald-700 text-[15px] font-bold text-white shadow-sm"
           >
             H
           </span>
           <div className="leading-tight">
-            <div className="text-body font-semibold text-brand-ink">{habaMerchant.displayName}</div>
-            <div className="text-caption text-ink-tertiary">{t("productLine")}</div>
+            <div className="text-[14px] font-bold text-brand-ink">{habaMerchant.displayName}</div>
+            <div className="text-[10px] uppercase tracking-wider text-ink-tertiary">{t("productLine")}</div>
           </div>
         </Link>
         <div className="flex items-center gap-3">

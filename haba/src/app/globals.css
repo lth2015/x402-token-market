@@ -31,6 +31,75 @@
   }
 }
 
+/* ── Animation keyframes ─────────────────────────────────────────────────── */
+
+/* Entrance: fade + slide up — for hero content staggered reveal */
+@keyframes haba-fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Pulse ring — for the checkout success checkmark */
+@keyframes haba-pulse-ring {
+  0%   { transform: scale(0.9); opacity: 1; }
+  70%  { transform: scale(1.6); opacity: 0; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* Traveling dot along ecosystem connector line */
+@keyframes haba-flow-dot {
+  0%   { transform: translateY(-10px); opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { transform: translateY(10px);  opacity: 0; }
+}
+
+/* Shimmer sweep for skeleton loaders */
+@keyframes haba-shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+/* Soft scale breathe for live indicator dots */
+@keyframes haba-breathe {
+  0%, 100% { transform: scale(1);   opacity: 1; }
+  50%       { transform: scale(1.5); opacity: 0.6; }
+}
+
+/* ── Animation utility classes ───────────────────────────────────────────── */
+@layer utilities {
+  .animate-fade-up {
+    animation: haba-fade-up 0.4s ease-out both;
+  }
+  .animate-fade-up-delay-1 {
+    animation: haba-fade-up 0.4s ease-out 0.08s both;
+  }
+  .animate-fade-up-delay-2 {
+    animation: haba-fade-up 0.4s ease-out 0.16s both;
+  }
+  .animate-fade-up-delay-3 {
+    animation: haba-fade-up 0.4s ease-out 0.24s both;
+  }
+  .animate-fade-up-delay-4 {
+    animation: haba-fade-up 0.4s ease-out 0.32s both;
+  }
+  .animate-pulse-ring {
+    animation: haba-pulse-ring 1.4s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+  }
+  .animate-flow-dot {
+    animation: haba-flow-dot 1.6s ease-in-out infinite;
+  }
+  .animate-breathe {
+    animation: haba-breathe 2s ease-in-out infinite;
+  }
+  .skeleton {
+    background: linear-gradient(90deg, #e5e7df 25%, #eef0e8 50%, #e5e7df 75%);
+    background-size: 400px 100%;
+    animation: haba-shimmer 1.4s ease-in-out infinite;
+    border-radius: 4px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

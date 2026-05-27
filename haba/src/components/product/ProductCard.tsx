@@ -46,19 +46,20 @@ export function ProductCard({ product, className }: { product: MarvieProduct; cl
   return (
     <article
       className={cn(
-        "group flex flex-col overflow-hidden rounded-2xl border border-border-subtle bg-surface-base shadow-e1 transition-shadow hover:shadow-e2",
+        "group flex flex-col overflow-hidden rounded-2xl border border-border-subtle bg-surface-base shadow-e1",
+        "transition-all duration-200 hover:-translate-y-0.5 hover:shadow-e3 hover:border-brand-primary/20",
         className,
       )}
     >
       {/* ── Image tile — gradient + large emoji ───────────────── */}
       <div
         className={cn(
-          "relative flex h-40 items-center justify-center",
+          "relative flex h-40 items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-[1.02]",
           style.bg,
           style.ring,
         )}
       >
-        <span className="text-6xl leading-none drop-shadow-sm" aria-hidden>
+        <span className="text-6xl leading-none drop-shadow-sm transition-transform duration-300 group-hover:scale-110" aria-hidden>
           {product.imageEmoji}
         </span>
         <div className="absolute right-3 top-3">

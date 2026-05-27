@@ -315,7 +315,7 @@ function ProcessingView() {
 }
 
 // ────────────────────────────────────────────────────────────────────
-// success state — show real order ids + tx hash + optional explorer link
+// success state — dramatic Solana proof view (devnet) + clean dev fallback
 // ────────────────────────────────────────────────────────────────────
 function SuccessView({
   phase,
@@ -326,83 +326,218 @@ function SuccessView({
 }) {
   const isRealChain = phase.chainMode === "devnet";
 
-  return (
-    <div className="mt-10 space-y-6">
-      <div className="rounded-2xl border border-semantic-success/40 bg-semantic-success/5 p-6">
+  if (isRealChain) {
+    return <DevnetSuccessView phase={phase} onNewOrder={onNewOrder} />;
+  }
+  return <DevSuccessView phase={phase} onNewOrder={onNewOrder} />;
+}
 
-        {/* Header */}
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-body font-semibold text-semantic-success">
-            <CheckCircle className="h-5 w-5" aria-hidden /> 订单已确认
+/** Full-drama Devnet success — used when a real Solana tx was confirmed */
+function DevnetSuccessView({
+  phase,
+  onNewOrder,
+}: {
+  phase: Extract<Phase, { kind: "success" }>;
+  onNewOrder: () => void;
+}) {
+  return (
+    <div className="mt-8 space-y-5 animate-fade-up">
+
+      {/* ── TOP BANNER ─────────────────────────────────────── */}
+      <div className="overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-50/80 via-white to-emerald-50/40 p-6 shadow-e2">
+
+        {/* Confirmation header */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          {/* Left: animated checkmark */}
+          <div className="flex items-center gap-4">
+            <div className="relative flex h-14 w-14 shrink-0 items-center justify-center">
+              {/* Pulse ring */}
+              <span className="animate-pulse-ring absolute inline-block h-14 w-14 rounded-full border-2 border-emerald-400/50" />
+              <span className="relative inline-flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-lg">
+                <CheckCircle className="h-6 w-6 text-white" aria-hidden />
+              </span>
+            </div>
+            <div>
+              <p className="text-[18px] font-bold text-emerald-700">订单已确认</p>
+              <p className="mt-0.5 text-small text-ink-secondary">
+                真实 SPL USDC 交易 · Solana Devnet
+              </p>
+            </div>
           </div>
-          {isRealChain && (
-            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-600">
+
+          {/* Right: chain badge */}
+          <div className="flex flex-col items-start gap-1.5 sm:items-end">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-emerald-700">
               <Link2 className="h-3 w-3" aria-hidden />
-              真实 Devnet 链上交易
+              真实链上交易
             </span>
-          )}
+            <span className="text-[10px] text-ink-tertiary">Devnet · 非真实资金</span>
+          </div>
         </div>
 
-        <p className="mt-2 text-small text-ink-secondary">
-          {isRealChain
-            ? "已广播真实 SPL USDC 交易至 Solana Devnet，链上确认后 HABA Token 余额自动入账。"
-            : "USDC 结算回调已就绪，HABA 收到你的订单并开始处理。"}
-        </p>
-
-        {/* KV grid */}
-        <dl className="mt-5 grid grid-cols-1 gap-2 text-caption sm:grid-cols-2">
-          <KV label="订单号" value={phase.orderId} mono />
-          <KV label="支付订单号" value={phase.paymentOrderId} mono />
-          <KV
-            label="链上 tx"
-            value={phase.txHash ?? "—"}
-            mono
-            badge={isRealChain ? "Devnet" : undefined}
-          />
-          <KV label="支付金额" value={`${phase.amountUsdc.toFixed(4)} USDC · ${formatJpy(phase.totalJpy)}`} />
-          <KV label="下单时间" value={new Date(phase.placedAt).toLocaleString("zh-CN")} />
-        </dl>
-
-        {/* Demo note */}
-        <p className="mt-4 text-caption text-ink-tertiary">
-          {isRealChain
-            ? "演示备注：使用 Devnet USDC (非真实资金)。tx_hash 可在 Solana Explorer 验证。HABA Token 余额在确认后上涨。"
-            : "演示备注：DEV 模式下 admin-confirm 直接返回模拟的 tx_hash，无链上广播。HABA Token 余额作为副作用上涨。"}
-        </p>
+        {/* Amount highlight */}
+        <div className="mt-5 rounded-xl border border-emerald-500/15 bg-white/60 px-5 py-4">
+          <div className="flex items-baseline gap-3">
+            <span className="text-[28px] font-extrabold tabular-nums text-brand-ink">
+              {phase.amountUsdc.toFixed(4)}
+            </span>
+            <span className="text-[15px] font-semibold text-emerald-600">USDC</span>
+            <span className="ml-1 text-small text-ink-tertiary">
+              ≈ {formatJpy(phase.totalJpy)}
+            </span>
+          </div>
+          <p className="mt-1 text-[11px] text-ink-tertiary">
+            结算时间：{new Date(phase.placedAt).toLocaleString("zh-CN")}
+          </p>
+        </div>
       </div>
 
-      {/* CTA buttons */}
+      {/* ── CHAIN PROOF CARD (dark) ─────────────────────── */}
+      <div className="overflow-hidden rounded-2xl border border-brand-ink/15 bg-brand-ink shadow-e2">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-white/8 px-5 py-3.5">
+          <div className="flex items-center gap-2">
+            <span className="animate-breathe inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
+            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-white/50">
+              链上确认证明 · Solana Devnet
+            </p>
+          </div>
+          <span className="text-[10px] text-emerald-400/70">已广播</span>
+        </div>
+
+        {/* KV rows */}
+        <div className="divide-y divide-white/5 px-5">
+          <ChainKV label="订单号"   value={phase.orderId}        mono />
+          <ChainKV label="支付订单" value={phase.paymentOrderId} mono />
+          <ChainKV label="链上 Tx"  value={phase.txHash ?? "—"} mono highlight />
+          <ChainKV label="结算链"   value="Solana Devnet" />
+          <ChainKV label="协议"     value="SPL TransferChecked + x402" />
+        </div>
+
+        {/* Note */}
+        <div className="px-5 py-3 text-[10px] text-white/25">
+          Devnet USDC 为测试代币，非真实资金。tx_hash 可通过 Solana Explorer 独立验证。
+        </div>
+      </div>
+
+      {/* ── CTA BUTTONS ────────────────────────────────── */}
       <div className="flex flex-wrap gap-3">
+        {/* PRIMARY: Explorer link — most important for demo */}
+        {phase.explorerUrl && (
+          <a
+            href={phase.explorerUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-xl bg-brand-ink px-5 py-3 text-small font-bold text-white shadow-e2 transition-all hover:scale-[1.02] hover:shadow-e3 active:scale-[0.98]"
+          >
+            <ExternalLink className="h-4 w-4" aria-hidden />
+            在 Solana Explorer 验证
+          </a>
+        )}
         <Link
           href="/"
-          className="rounded-lg bg-brand-primary px-4 py-2 text-small font-semibold text-white hover:bg-brand-primary-hover"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-border-default bg-surface-base px-5 py-3 text-small font-medium text-ink-secondary transition-colors hover:border-brand-primary/40 hover:text-brand-primary"
         >
           继续购物
         </Link>
         <button
           type="button"
           onClick={onNewOrder}
-          className="rounded-lg border border-border-default bg-surface-base px-4 py-2 text-small font-medium text-ink-secondary hover:border-brand-primary/40 hover:text-brand-primary"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-border-default bg-surface-base px-5 py-3 text-small font-medium text-ink-secondary transition-colors hover:border-brand-primary/40 hover:text-brand-primary"
         >
           新建订单
         </button>
-        {/* Solana Explorer link — only when a real tx exists */}
-        {isRealChain && phase.explorerUrl && (
-          <a
-            href={phase.explorerUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/40 bg-emerald-500/5 px-4 py-2 text-small font-medium text-emerald-600 transition-colors hover:bg-emerald-500/10"
-          >
-            <ExternalLink className="h-3.5 w-3.5" aria-hidden />
-            在 Solana Explorer 查看
-          </a>
-        )}
         <Link
           href="/topup"
-          className="rounded-lg border border-border-default bg-surface-base px-4 py-2 text-small font-medium text-ink-secondary hover:border-brand-primary/40 hover:text-brand-primary"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-border-default bg-surface-base px-5 py-3 text-small font-medium text-ink-secondary transition-colors hover:border-brand-primary/40 hover:text-brand-primary"
         >
-          看 AI Token 充值流程
+          看 Token 充值流程
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+/** Chain KV row inside the dark proof card */
+function ChainKV({
+  label, value, mono, highlight,
+}: {
+  label: string; value: string; mono?: boolean; highlight?: boolean;
+}) {
+  return (
+    <div className="flex items-start gap-3 py-2.5">
+      <dt className="w-20 shrink-0 text-[10px] uppercase tracking-wider text-white/30">{label}</dt>
+      <dd className="min-w-0 flex-1">
+        <span
+          className={
+            highlight
+              ? "block truncate font-mono text-[11px] font-semibold text-emerald-300"
+              : mono
+              ? "block truncate font-mono text-[11px] text-white/60"
+              : "text-[12px] text-white/60"
+          }
+        >
+          {value}
+        </span>
+      </dd>
+    </div>
+  );
+}
+
+/** Dev mode success — clean, no chain drama */
+function DevSuccessView({
+  phase,
+  onNewOrder,
+}: {
+  phase: Extract<Phase, { kind: "success" }>;
+  onNewOrder: () => void;
+}) {
+  return (
+    <div className="mt-8 space-y-5 animate-fade-up">
+      <div className="rounded-2xl border border-semantic-success/35 bg-semantic-success/4 p-6">
+        <div className="flex items-center gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-semantic-success/15">
+            <CheckCircle className="h-5 w-5 text-semantic-success" aria-hidden />
+          </span>
+          <div>
+            <p className="text-[15px] font-bold text-semantic-success">订单已确认</p>
+            <p className="text-small text-ink-secondary">DEV 演示模式 · admin-confirm</p>
+          </div>
+        </div>
+
+        <dl className="mt-5 grid grid-cols-1 gap-2 text-caption sm:grid-cols-2">
+          <KV label="订单号"   value={phase.orderId}        mono />
+          <KV label="支付订单" value={phase.paymentOrderId} mono />
+          <KV label="链上 tx"  value={phase.txHash ?? "—"} mono />
+          <KV label="金额"     value={`${phase.amountUsdc.toFixed(4)} USDC · ${formatJpy(phase.totalJpy)}`} />
+          <KV label="下单时间" value={new Date(phase.placedAt).toLocaleString("zh-CN")} />
+        </dl>
+
+        <p className="mt-4 rounded-lg bg-surface-muted/60 px-3 py-2 text-caption text-ink-tertiary">
+          DEV 模式：admin-confirm 直接返回模拟 tx_hash，无链上广播。
+          配置 DEMO_PAYER_PRIVATE_KEY_B64 后可升级为真实 Devnet 链上交易。
+        </p>
+      </div>
+
+      <div className="flex flex-wrap gap-3">
+        <Link
+          href="/"
+          className="rounded-xl bg-brand-primary px-5 py-2.5 text-small font-semibold text-white hover:bg-brand-primary-hover"
+        >
+          继续购物
+        </Link>
+        <button
+          type="button"
+          onClick={onNewOrder}
+          className="rounded-xl border border-border-default bg-surface-base px-5 py-2.5 text-small font-medium text-ink-secondary hover:border-brand-primary/40 hover:text-brand-primary"
+        >
+          新建订单
+        </button>
+        <Link
+          href="/topup"
+          className="rounded-xl border border-border-default bg-surface-base px-5 py-2.5 text-small font-medium text-ink-secondary hover:border-brand-primary/40 hover:text-brand-primary"
+        >
+          看 Token 充值流程
         </Link>
       </div>
     </div>
