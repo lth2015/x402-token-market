@@ -1,30 +1,32 @@
 """
-X402 Gateway · v0.2.0 (real chain edition)
+X402 Gateway · v0.3.0 (real Devnet USDC edition)
 
 Endpoints:
-    POST /v1/payments                       create payment order (idempotent, internal-auth only)
-    GET  /v1/payments/{id}                  query order
-    POST /v1/payments/{id}/proof            verify signed USDC tx + broadcast to Solana RPC
-    POST /v1/admin/payments/{id}/confirm    DEV: skip chain, mark confirmed + credit token
+    POST /v1/payments                          create payment order (idempotent, internal-auth only)
+    GET  /v1/payments/{id}                     query order
+    POST /v1/payments/{id}/proof               verify signed USDC tx + broadcast to Solana RPC
+    POST /v1/payments/{id}/dev-checkout        DEV: server-side sign + broadcast real devnet USDC tx
+    POST /v1/admin/payments/{id}/confirm       DEV: skip chain entirely, mark confirmed + credit token
 
 Background:
     Confirmer task — polls broadcasting orders, transitions to confirmed
     when on-chain status is 'confirmed'/'finalized', then calls
     token-api /internal/credit and finalizes to token_credited.
 
-What was a stub last round and is now real:
-    - /proof actually parses + verifies the SPL TransferChecked + Memo
-    - /proof actually broadcasts via Solana JSON-RPC
-    - Confirmer worker polls + completes the order on-chain
+Real chain path (v0.3.0):
+    - dev-checkout builds + signs a real SPL TransferChecked + Memo tx
+      using DEMO_PAYER_PRIVATE_KEY_B64 (a pre-funded devnet wallet)
+    - Broadcasts to Solana Devnet (SOLANA_RPC_URL=https://api.devnet.solana.com)
+    - Polls on-chain status and completes the full token-credit cycle
+    - Returns real tx_hash + Solana Explorer URL
 
-Still pending for next round:
-    - Real Wea payout (custodian → merchant settlements)
-    - VersionedTransaction + Address Lookup Tables
-    - Webhook delivery + retry
+Setup: run scripts/setup-devnet-wallet.py once to generate keypairs +
+get the funding instructions (airdrop SOL + Circle USDC faucet).
 """
 from __future__ import annotations
 
 import asyncio
+import base64
 import hmac as _hmac
 import logging
 import os
@@ -38,12 +40,15 @@ import structlog
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
+from solders.hash import Hash
+from solders.pubkey import Pubkey
 from sqlalchemy import select, text
 
 from . import db
 from .orders import OrderService, OrderStateConflictError
 from .proof import ProofError, verify_proof
 from .solana_rpc import SolanaRpc, SolanaRpcError
+from .tx_builder import TxBuildError, build_x402_payment_tx, keypair_from_b64
 from .webhooks import (
     DEFAULT_SIGNING_SECRET,
     DEFAULT_TARGET_URL,
@@ -75,16 +80,24 @@ REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
 TOKEN_API_BASE_URL = os.environ.get("TOKEN_API_BASE_URL", "http://token-api:8080")
 INTERNAL_AUTH_SECRET = os.environ.get("INTERNAL_AUTH_SECRET", "internal_localdev_token")
 
-# Solana / USDC config. Defaults target the in-compose local validator.
-SOLANA_RPC_URL = os.environ.get("SOLANA_RPC_URL", "http://solana:8899")
+# Solana / USDC config.
+# Default SOLANA_RPC_URL is Devnet so the stack works without a local validator.
+# For fully-local testing with solana-test-validator set SOLANA_RPC_URL=http://solana:8899.
+SOLANA_RPC_URL = os.environ.get("SOLANA_RPC_URL", "https://api.devnet.solana.com")
 USDC_MINT = os.environ.get(
     "USDC_MINT",
-    "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",  # Circle devnet USDC; override for local
+    "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",  # Circle devnet USDC
 )
 DEPOSIT_RECIPIENT = os.environ.get(
     "DEPOSIT_RECIPIENT_ADDRESS",
-    "5dHJpDeM4kvNSnSqkA2D9wmJZ5fHZ3iH3a6CkZxJ2hYz",  # placeholder; replace per env
+    "5dHJpDeM4kvNSnSqkA2D9wmJZ5fHZ3iH3a6CkZxJ2hYz",  # replace with real merchant wallet
 )
+
+# Demo payer keypair for dev-checkout (server-side signing).
+# Base64-encoded 64-byte Solana keypair (seed || pubkey).
+# Generate with: python scripts/setup-devnet-wallet.py
+# Then fund the payer with devnet SOL (airdrop) and USDC (Circle faucet).
+DEMO_PAYER_PRIVATE_KEY_B64: Optional[str] = os.environ.get("DEMO_PAYER_PRIVATE_KEY_B64") or None
 
 CONFIRMER_POLL_INTERVAL_SECS = float(os.environ.get("CONFIRMER_POLL_INTERVAL_SECS", "2.0"))
 CONFIRMER_BATCH_SIZE = int(os.environ.get("CONFIRMER_BATCH_SIZE", "50"))
@@ -92,11 +105,16 @@ CONFIRMER_BATCH_SIZE = int(os.environ.get("CONFIRMER_BATCH_SIZE", "50"))
 # 1 USDC = 1,000,000 AI Token (must match token-api)
 TOKEN_PER_USDC = 1_000_000
 
+# Solana Explorer base URL for devnet links
+_SOLANA_EXPLORER_BASE = "https://explorer.solana.com/tx"
+_SOLANA_NETWORK_PARAM = "devnet"   # change to "mainnet-beta" for production
+
 
 # ── Lifespan ───────────────────────────────────────────────────────
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     log.info("startup", env=ENV, solana_rpc=SOLANA_RPC_URL, usdc_mint=USDC_MINT,
+             demo_payer_configured=bool(DEMO_PAYER_PRIVATE_KEY_B64),
              webhook_default_url=DEFAULT_TARGET_URL or "(none)")
     app.state.db = db.make_engine(DATABASE_URL)
     app.state.redis = aioredis.from_url(REDIS_URL, decode_responses=True)
@@ -447,17 +465,177 @@ async def dev_webhook_sink(request: Request):
     return {"ok": True, "event": event, "delivery": delivery, "signature_valid": True}
 
 
+@app.post("/v1/payments/{order_id}/dev-checkout")
+async def dev_checkout(order_id: str) -> dict:
+    """
+    DEV/QA: Build, sign, and broadcast a real Solana Devnet USDC payment
+    using the DEMO_PAYER_PRIVATE_KEY_B64 keypair, then wait for on-chain
+    confirmation and credit tokens.
+
+    Returns the final order state + tx_hash + Solana Explorer URL.
+    Useful for demos on machines without a user wallet (Phantom/Solflare).
+
+    Prerequisites:
+      - DEMO_PAYER_PRIVATE_KEY_B64 configured in .env (run setup-devnet-wallet.py)
+      - Payer ATA funded with at least [order amount] USDC on Devnet
+      - SOLANA_RPC_URL pointing to Devnet (default: https://api.devnet.solana.com)
+    """
+    if ENV not in ("local", "qa"):
+        raise HTTPException(403, "dev-checkout is dev-only (ENV must be local or qa)")
+
+    if not DEMO_PAYER_PRIVATE_KEY_B64:
+        raise HTTPException(
+            503,
+            "DEMO_PAYER_PRIVATE_KEY_B64 not configured. "
+            "Run scripts/setup-devnet-wallet.py and add the key to .env",
+        )
+
+    # ── 1. Fetch order ───────────────────────────────────────────────
+    async with app.state.db.connect() as conn:
+        order = await OrderService.fetch(conn, order_id)
+    if not order:
+        raise HTTPException(404, f"order {order_id} not found")
+    if order["status"] != "created":
+        raise HTTPException(
+            409,
+            f"order is in state {order['status']!r}; "
+            "dev-checkout only works from 'created' state",
+        )
+
+    # ── 2. Get latest blockhash from Solana ──────────────────────────
+    try:
+        blockhash_data = await app.state.solana_rpc.get_latest_blockhash()
+    except SolanaRpcError as e:
+        raise HTTPException(502, f"Solana RPC unreachable: {e}") from e
+
+    # ── 3. Build + sign transaction ──────────────────────────────────
+    try:
+        payer_kp = keypair_from_b64(DEMO_PAYER_PRIVATE_KEY_B64)
+    except TxBuildError as e:
+        raise HTTPException(500, f"demo keypair decode error: {e}") from e
+
+    try:
+        tx_bytes = build_x402_payment_tx(
+            payer_keypair=payer_kp,
+            recipient_owner=Pubkey.from_string(DEPOSIT_RECIPIENT),
+            mint=Pubkey.from_string(USDC_MINT),
+            amount_micro=order["amount_usdc_micro"],
+            nonce=order["nonce"],
+            recent_blockhash=Hash.from_string(blockhash_data["blockhash"]),
+            ensure_dest_ata=True,
+        )
+    except (TxBuildError, Exception) as e:
+        raise HTTPException(500, f"tx build failed: {e}") from e
+
+    signed_tx_b64 = base64.b64encode(tx_bytes).decode()
+
+    # ── 4. Self-verify proof (catch tx_builder bugs early) ───────────
+    try:
+        proof_result = verify_proof(
+            signed_tx_b64=signed_tx_b64,
+            expected_recipient_owner=DEPOSIT_RECIPIENT,
+            expected_amount_usdc_micro=order["amount_usdc_micro"],
+            expected_nonce=order["nonce"],
+            usdc_mint=USDC_MINT,
+        )
+    except ProofError as e:
+        raise HTTPException(500, f"self-verification failed (tx_builder bug): {e}") from e
+
+    # ── 5. Persist proof + transition created → pending ──────────────
+    async with app.state.db.begin() as conn:
+        await conn.execute(db.payment_proofs.insert().values(
+            payment_order_id=order_id,
+            signed_tx_b64=signed_tx_b64,
+            parsed_tx=None,
+            verification_result={
+                "verified": True,
+                "payer": proof_result.payer,
+                "memo": proof_result.memo,
+                "signature": proof_result.signature_b58,
+                "mode": "dev-checkout",
+            },
+        ))
+        try:
+            order = await OrderService.transition(
+                conn, order_id, from_status="created", to_status="pending",
+            )
+        except OrderStateConflictError as e:
+            raise HTTPException(409, str(e)) from e
+
+    # ── 6. Broadcast to Solana ───────────────────────────────────────
+    try:
+        rpc_sig = await app.state.solana_rpc.send_transaction(signed_tx_b64)
+    except SolanaRpcError as e:
+        async with app.state.db.begin() as conn:
+            try:
+                await OrderService.transition(
+                    conn, order_id, from_status="pending", to_status="failed",
+                    updates={"status_reason": f"rpc_broadcast: {str(e)[:200]}"},
+                )
+            except OrderStateConflictError:
+                pass
+        log.error("dev_checkout.broadcast_failed", order_id=order_id, err=str(e))
+        raise HTTPException(502, f"Solana RPC broadcast failed: {e}") from e
+
+    # ── 7. Transition pending → broadcasting ─────────────────────────
+    async with app.state.db.begin() as conn:
+        try:
+            order = await OrderService.transition(
+                conn, order_id, from_status="pending", to_status="broadcasting",
+                updates={"tx_hash": rpc_sig},
+            )
+        except OrderStateConflictError as e:
+            raise HTTPException(409, str(e)) from e
+
+    log.info("dev_checkout.broadcasting",
+             order_id=order_id, tx_hash=rpc_sig, payer=proof_result.payer,
+             amount_micro=order["amount_usdc_micro"])
+
+    # ── 8. Poll for on-chain confirmation (max 30 seconds, 15 × 2 s) ─
+    # We call _confirmer_advance_one directly so we don't have to wait
+    # for the background loop's next tick.
+    for attempt in range(15):
+        await asyncio.sleep(2.0)
+        try:
+            await _confirmer_advance_one(app, order_id, rpc_sig)
+        except Exception as poll_err:
+            log.warning("dev_checkout.poll_error",
+                        attempt=attempt, order_id=order_id, err=str(poll_err))
+        async with app.state.db.connect() as conn:
+            order = await OrderService.fetch(conn, order_id) or order
+        if order["status"] in ("token_credited", "failed"):
+            break
+        log.debug("dev_checkout.awaiting_confirmation",
+                  attempt=attempt + 1, status=order["status"])
+
+    explorer_url = f"{_SOLANA_EXPLORER_BASE}/{rpc_sig}?cluster={_SOLANA_NETWORK_PARAM}"
+    log.info("dev_checkout.complete",
+             order_id=order_id, final_status=order["status"], tx_hash=rpc_sig)
+
+    return {
+        "ok": True,
+        "order": order,
+        "tx_hash": rpc_sig,
+        "payer": proof_result.payer,
+        "explorer_url": explorer_url,
+        "chain": _SOLANA_NETWORK_PARAM,
+    }
+
+
 @app.get("/")
 async def root():
     return {
         "service": "x402-api",
-        "version": "0.2.0",
+        "version": "0.3.0",
         "endpoints": [
-            "POST /v1/payments              (internal)",
+            "POST /v1/payments                         (internal)",
             "GET  /v1/payments/{id}",
-            "POST /v1/payments/{id}/proof   (real chain)",
-            "POST /v1/admin/payments/{id}/confirm   (DEV ONLY — skip chain)",
+            "POST /v1/payments/{id}/proof              (real chain — client wallet)",
+            "POST /v1/payments/{id}/dev-checkout       (DEV — server-side Devnet signing)",
+            "POST /v1/admin/payments/{id}/confirm      (DEV — skip chain entirely)",
         ],
+        "demo_payer_configured": bool(DEMO_PAYER_PRIVATE_KEY_B64),
+        "solana_rpc": SOLANA_RPC_URL,
     }
 
 

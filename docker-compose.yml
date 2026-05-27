@@ -27,7 +27,9 @@ x-app-defaults: &app-defaults
     LOG_FORMAT: json
     OTEL_EXPORTER_OTLP_ENDPOINT: ""        # disabled locally
     SOLANA_NETWORK: devnet
-    SOLANA_RPC_URL: http://solana:8899
+    # Default to public Devnet RPC so Apple Silicon Macs don't need a local validator.
+    # Override in .env: SOLANA_RPC_URL=http://solana:8899 to use the in-compose validator.
+    SOLANA_RPC_URL: ${SOLANA_RPC_URL:-https://api.devnet.solana.com}
     USDC_MINT: 4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU
 
 services:
@@ -103,9 +105,14 @@ services:
       WEA_API_BASE_URL: http://wea-api:8080
       TOKEN_API_BASE_URL: http://token-api:8080
       INTERNAL_AUTH_SECRET: ${INTERNAL_AUTH_SECRET:-internal_localdev_token}
-      SOLANA_RPC_URL: http://solana:8899
+      # x402-api uses its own SOLANA_RPC_URL (not the x-app-defaults one)
+      # so we can independently point it to Devnet while wea-api still uses mock.
+      SOLANA_RPC_URL: ${SOLANA_RPC_URL:-https://api.devnet.solana.com}
       USDC_MINT: ${USDC_MINT:-4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU}
       DEPOSIT_RECIPIENT_ADDRESS: ${DEPOSIT_RECIPIENT_ADDRESS:-5dHJpDeM4kvNSnSqkA2D9wmJZ5fHZ3iH3a6CkZxJ2hYz}
+      # Demo payer keypair for dev-checkout real Devnet USDC payments.
+      # Run scripts/setup-devnet-wallet.py to generate + get funding instructions.
+      DEMO_PAYER_PRIVATE_KEY_B64: ${DEMO_PAYER_PRIVATE_KEY_B64:-}
       # Webhook delivery. Default URL loops back to this service's /dev/webhook-sink
       # so a single-compose demo can show the full delivery round-trip in logs.
       WEBHOOK_DEFAULT_URL:    ${WEBHOOK_DEFAULT_URL:-http://x402-api:8080/dev/webhook-sink}
@@ -114,12 +121,9 @@ services:
     depends_on:
       mysql:    { condition: service_healthy }
       redis:    { condition: service_healthy }
-      # Solana is intentionally a soft dep: on Apple Silicon the validator
-      # image is amd64-only and crashes under QEMU (no AVX). x402-api will
-      # boot fine and only contact Solana when REAL CHAIN mode is enabled
-      # (see LOCAL-DEV.md). To run real chain on M-series Macs, install
-      # solana-cli on the host and run `solana-test-validator` outside docker.
-      solana:   { condition: service_started }
+      # Solana validator is now optional: x402-api defaults to public Devnet RPC.
+      # On Apple Silicon (no AVX) the local validator crashes under QEMU.
+      # To use the local validator: set SOLANA_RPC_URL=http://solana:8899 in .env.
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8080/healthz || exit 1"]
       interval: 5s
@@ -207,12 +211,13 @@ services:
     environment:
       ENV: local
       DATABASE_URL: mysql://wea_app:wea_app_dev@mysql:3306/wea_qa
-      SOLANA_RPC_URL: http://solana:8899
+      # wea-api uses MockRpc internally; SOLANA_RPC_URL is not actively called.
+      # Defaults to Devnet for consistency; local validator can be set via .env.
       X402_CALLBACK_BASE_URL: http://x402-api:8080
     depends_on:
-      mysql:  { condition: service_healthy }
-      # See x402-api note: Solana is a soft dep so the stack can boot on arm64.
-      solana: { condition: service_started }
+      mysql: { condition: service_healthy }
+      # Solana validator dependency removed — wea-api uses MockRpc and does not
+      # call the RPC directly. No AVX required.
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8080/healthz || exit 1"]
       interval: 5s

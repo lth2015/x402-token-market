@@ -1,7 +1,7 @@
 # X402 Token Market — 项目进度
 
-**最后更新**: 2026-05-27 (第二轮)
-**当前阶段**: P2/P3 体验迭代完成：B2B 月度统计实时化 · /agent 第 3 剧本 · /cart 订单持久化 · 产品卡片视觉升级
+**最后更新**: 2026-05-27 (第三轮)
+**当前阶段**: 真实 Solana Devnet USDC 支付上线：server-side 演示钱包签名 · 链上广播 · Explorer 链接 · 金额上限 $9
 
 ---
 
@@ -86,8 +86,19 @@ token-api 的 `/v1/recent-activity` 可见所有事件；Netstars Console Live A
 - [x] **B2B 调用计费实时化**: 新增 `GET /api/payment/b2b-stats` 路由（从 ledger 聚合当月 ai_call 次数）；新建 `B2BCallNotice.tsx` 组件替代 `AgentChatDemo` 内的静态文案，每次 `haba:balance-refresh` 事件后自动刷新。月度上限 50,000 次（growth 套餐演示值）。
 - [x] **`.env` 创建**: 从 `.env.example` 复制，保留 DUMMY key 结构，docker-compose 可正常 `up`。将真实 `ANTHROPIC_API_KEY` 填入后 stub 模式自动切换为真实 LLM 调用。
 
+### P2 — ✅ 本轮完成
+- [x] **Solana Devnet 真实 USDC 支付**:
+  - `netstars/x402/src/x402/tx_builder.py` — 构建 SPL TransferChecked + Memo 交易
+  - x402-api `POST /v1/payments/{id}/dev-checkout` — server-side 签名 + 广播 + 等待确认
+  - HABA checkout 优先走真实链，失败自动降级 admin-confirm（无缝 fallback）
+  - 金额上限改为 MAX_USDC = $9（原错误值 10,000）
+  - 成功页展示 "真实 Devnet 链上交易" 徽章 + "在 Solana Explorer 查看" 按钮
+  - `SOLANA_RPC_URL` 默认改为 `https://api.devnet.solana.com`（不再依赖本地 validator）
+  - `scripts/setup-devnet-wallet.py` — 一键生成演示钱包 + 充值指引
+
 ### P2 — 下次开工继续
 - [ ] **真 LLM key 接入**: 把 `ANTHROPIC_API_KEY` 填入 `.env`（已创建），`token-api/providers/` 框架完备，无需改代码，只需 key。
+- [ ] **Devnet 钱包充值**: 在办公室运行 `python scripts/setup-devnet-wallet.py`，将输出填入 `.env`，然后从 https://faucet.circle.com 获取 devnet USDC。
 
 ### P3 — ✅ 本轮完成
 - [x] `/agent` 第 3 个剧本: **B2B 多渠道频次场景** — 药局 / 医院营养科 / 独立营养师 / 合作电商 4 频道 × 3 轮 = 12 次调用，含自动充值触发。见 `AgentRunner.tsx: B2B_CHANNEL_PROMPTS`。
@@ -128,7 +139,7 @@ open claude/demo-runner.html
 
 ## 7. 已知约束
 
-- **Solana**: Apple Silicon 跑不动 validator，DEV 模式用 admin-confirm shortcut 跳过广播。生产或 Linux 上跑要把 `solana` service 起来。
+- **Solana**: Apple Silicon 跑不动 validator，但现在默认走公网 Devnet RPC（无需本地 validator）。x402-api 和 wea-api 都已去掉对 `solana` service 的 `depends_on`。若需要全离线测试，设 `SOLANA_RPC_URL=http://solana:8899`。
 - **KMS**: 项目约定只用 AWS KMS ap-northeast-1 直接调，**禁** CloudHSM / Netstars 内部 KMS (见 memory: `feedback_kms_aws_direct`)。当前 demo 未涉及 KMS 调用；若 P2 接真 LLM key 涉及 secret 存储，遵守该约束。
 - **PR 审批**: 对外材料避免点名需 PR 审批的合作伙伴 (见 memory: `feedback_no_pr_exposure`)；presentation.html 与 demo-runner.html 是内部 demo 工具，已加 disclaimer。
 - **演示语**: 中文为主，但术语保留英文 (x402 / USDC / Token / Solana / API)。

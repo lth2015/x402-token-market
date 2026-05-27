@@ -1,35 +1,41 @@
 /**
- * POST /api/checkout/order — fires a real (DEV-mode) consumer checkout.
+ * POST /api/checkout/order — consumer USDC checkout with real Solana Devnet support.
  *
- * From HABA's product viewpoint, this is "consumer pays USDC for MARVIE
- * goods". Under the hood we reuse the same two-step token-purchase +
- * admin-confirm chain as /api/payment/topup — that's the demo backend's
- * only USDC settlement path. The amount comes from the cart total (JPY
- * → USDC at 1 USDC = 150 JPY).
+ * Payment path (in priority order):
+ *   1. REAL CHAIN  — x402-api dev-checkout builds + signs + broadcasts a real
+ *                    SPL TransferChecked transaction on Solana Devnet.
+ *                    Requires DEMO_PAYER_PRIVATE_KEY_B64 in .env (setup-devnet-wallet.py).
+ *   2. DEV BYPASS  — admin-confirm shortcut: no on-chain activity, instant mock tx_hash.
+ *                    Used when the demo wallet is not configured or Solana RPC is down.
  *
- * The HABA Token balance will increment as a side-effect because the
- * backend is a Token sale endpoint. We accept the mild semantic blur in
- * exchange for showing a real on-chain confirmation + a tx_hash in the
- * order success panel.
+ * Amount:
+ *   Cart total in JPY → USDC at 150 JPY/USDC, clamped to [MIN_USDC, MAX_USDC].
+ *   MAX_USDC = 9 keeps every demo transaction well under $10 as requested.
  *
  * Body: { items: Array<{ productId: string; qty: number }>;
  *         totalUsdc?: number; idempotencyKey?: string }
  */
 import { NextResponse } from "next/server";
 import { randomBytes } from "node:crypto";
-import { adminConfirm, createTokenPurchase, NetstarsError } from "@/lib/netstars/client";
+import {
+  adminConfirm,
+  createTokenPurchase,
+  devCheckout,
+  NetstarsError,
+} from "@/lib/netstars/client";
 import { getProductById } from "@/lib/haba";
 
 export const dynamic = "force-dynamic";
 
 const USDC_RATE_JPY = 150;
-// Backend enforces a minimum order value; clamp tiny demo carts so the
-// USDC amount stays sensible without rejecting the demo flow.
-const MIN_USDC = 1;
-const MAX_USDC = 10_000;
+// Keep every demo payment under $10 USDC as instructed.
+const MIN_USDC = 0.10;   // 10¢ floor so tiny demo carts still trigger real tx
+const MAX_USDC = 9.00;   // $9 ceiling — well within the "under $10" requirement
 
 type ItemIn = { productId?: unknown; qty?: unknown };
 type Body = { items?: ItemIn[]; totalUsdc?: unknown; idempotencyKey?: unknown };
+
+type ChainMode = "devnet" | "dev";
 
 export async function POST(req: Request) {
   let body: Body = {};
@@ -44,10 +50,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "cart is empty" }, { status: 400 });
   }
 
-  // Recompute totals server-side rather than trusting the client number,
-  // so a tampered cart can't move arbitrary amounts.
+  // Recompute totals server-side to prevent client-side tampering.
   let totalJpy = 0;
-  const lineSummary: Array<{ productId: string; qty: number; sku: string; nameShort: string; priceJpy: number }> = [];
+  const lineSummary: Array<{
+    productId: string; qty: number; sku: string; nameShort: string; priceJpy: number;
+  }> = [];
+
   for (const it of items) {
     const productId = typeof it.productId === "string" ? it.productId : "";
     const qty = typeof it.qty === "number" && it.qty > 0 ? Math.floor(it.qty) : 0;
@@ -56,8 +64,7 @@ export async function POST(req: Request) {
     if (!product) continue;
     totalJpy += product.priceJpy * qty;
     lineSummary.push({
-      productId,
-      qty,
+      productId, qty,
       sku: product.sku,
       nameShort: product.shortName,
       priceJpy: product.priceJpy,
@@ -68,6 +75,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "no valid line items" }, { status: 400 });
   }
 
+  // JPY → USDC conversion, clamped to [MIN_USDC, MAX_USDC].
   let amountUsdc = +(totalJpy / USDC_RATE_JPY).toFixed(4);
   if (amountUsdc < MIN_USDC) amountUsdc = MIN_USDC;
   if (amountUsdc > MAX_USDC) amountUsdc = MAX_USDC;
@@ -77,21 +85,50 @@ export async function POST(req: Request) {
     : `haba-checkout-${randomBytes(6).toString("hex")}`;
 
   try {
+    // Step 1: Create payment order via token-api → x402-api.
     const order = await createTokenPurchase({ amountUsdc, idempotencyKey: idem });
-    const confirm = await adminConfirm({ paymentOrderId: order.payment_order_id });
+
+    // Step 2: Attempt real Devnet USDC payment; fall back to admin-confirm.
+    let chainMode: ChainMode = "dev";
+    let txHash: string | null = null;
+    let explorerUrl: string | undefined;
+    let finalStatus: string | null = null;
+
+    try {
+      // 45-second timeout is set inside devCheckout (AbortSignal.timeout).
+      const devResult = await devCheckout({ paymentOrderId: order.payment_order_id });
+      txHash       = devResult.tx_hash;
+      chainMode    = "devnet";
+      explorerUrl  = devResult.explorer_url;
+      finalStatus  = (devResult.order as { status?: string }).status ?? null;
+    } catch (devErr) {
+      // Graceful fallback: log the reason and continue with admin-confirm.
+      const reason = devErr instanceof NetstarsError
+        ? `${devErr.message} (HTTP ${devErr.status})`
+        : devErr instanceof Error ? devErr.message : String(devErr);
+      console.warn(`[checkout] dev-checkout unavailable, falling back to admin-confirm: ${reason}`);
+
+      const adminResult = await adminConfirm({ paymentOrderId: order.payment_order_id });
+      txHash      = (adminResult.order as { tx_hash?: string }).tx_hash ?? null;
+      finalStatus = (adminResult.order as { status?: string }).status ?? null;
+    }
 
     const orderInternalId = `ord_${randomBytes(5).toString("hex")}`;
+
     return NextResponse.json({
       ok: true,
-      order_id: orderInternalId,
-      payment_order_id: order.payment_order_id,
-      tx_hash: (confirm.order as { tx_hash?: string }).tx_hash ?? null,
-      status: (confirm.order as { status?: string }).status ?? null,
-      amount_usdc: amountUsdc,
-      total_jpy: totalJpy,
-      items: lineSummary,
-      placed_at: new Date().toISOString(),
+      order_id:          orderInternalId,
+      payment_order_id:  order.payment_order_id,
+      tx_hash:           txHash,
+      chain_mode:        chainMode,
+      explorer_url:      explorerUrl ?? null,
+      status:            finalStatus,
+      amount_usdc:       amountUsdc,
+      total_jpy:         totalJpy,
+      items:             lineSummary,
+      placed_at:         new Date().toISOString(),
     });
+
   } catch (e) {
     if (e instanceof NetstarsError) {
       return NextResponse.json(
