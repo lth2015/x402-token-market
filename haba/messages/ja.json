@@ -1,0 +1,87 @@
+{
+  "brand": {
+    "name": "HABA",
+    "fullName": "HABA / ハーバー研究所",
+    "productLine": "MARVIE Medical Foods",
+    "tagline": "AI アドバイザーで、ご家族にもっとスマートな食を"
+  },
+  "nav": {
+    "home": "ホーム",
+    "topup": "AI Token チャージ",
+    "resale": "AI Advisor 提携プラン",
+    "b2b": "B2B パートナー"
+  },
+  "agent": {
+    "eyebrow": "AI 商品アドバイザー",
+    "sectionTitle": "5 つの健康ニーズを、AI が商品でこたえる",
+    "sectionDescription": "左のシナリオをクリックすると、HABA AI Advisor が MARVIE 商品を 3 つの軸(カロリー・甘さ・利用シーン)で推薦します。",
+    "userLabel": "お客様",
+    "agentLabel": "HABA AI Advisor",
+    "b2bCallNotice": "1 回呼び出し → HABA 月額 Token プランへ計上(デモ値 18,432 / 100,000)"
+  },
+  "products": {
+    "eyebrow": "MARVIE カタログ",
+    "sectionTitle": "MARVIE Medical Foods 全シリーズ",
+    "sectionDescription": "液体 / 粉末甘味料、料理用代替糖、低カロリージャム、低カロリーキャンディーをカバー。すべて「低カロリー + 砂糖無添加」を基準に設計。",
+    "count": "{n} SKU"
+  },
+  "home": {
+    "teaser": {
+      "eyebrow": "HABA AI コマースの完全ループ",
+      "title": "3 つのストーリー · HABA が AI をビジネスに組み込む",
+      "description": "下記の 3 枚はそれぞれ独立ページ:AI Token 自動チャージの 8 ステップ、HABA が AI を呼び出し量で提携先に再販するビジネス、4 つのパートナー組み込み例。",
+      "topup": {
+        "eyebrow": "AI Token 自動チャージ",
+        "title": "残高低下を SDK が自動補充",
+        "desc": "HABA AI Advisor の Token 残高が閾値を割ると、SDK が USDC マイクロペイメントで自動補充 → 数秒で入金。署名はブラウザ側のみ、HABA サーバは秘密鍵を保持しない。",
+        "cta": "8 ステップを見る",
+        "metricCaption": "全工程 < 1s · クライアント署名"
+      },
+      "resale": {
+        "eyebrow": "AI 能力提携",
+        "title": "HABA AI Advisor 再販",
+        "desc": "HABA は AI Advisor を月額呼び出し量でパッケージ化し、薬局 / 病院 / 栄養士 / EC 提携先に販売。提携先が消費するのは HABA 自社の Token 枠。",
+        "cta": "ビジネスモデルを見る",
+        "metricCaption": "デモデータ"
+      },
+      "b2b": {
+        "eyebrow": "B2B パートナー",
+        "title": "4 ペルソナ · 4 つの組み込み",
+        "desc": "薬局カウンター SDK、病院栄養科 API、独立栄養士 MCP、提携 EC の Web ウィジェット — 同じ Advisor、4 つの皮膚。",
+        "cta": "呼び出し例を見る",
+        "metricCaption": "クリックで切替"
+      }
+    }
+  },
+  "topup": {
+    "backHome": "ホームへ戻る",
+    "eyebrow": "AI Token 自動チャージ",
+    "sectionTitle": "USDC マイクロペイメントが Token 入金まで流れる仕組み",
+    "sectionDescription": "HABA AI Advisor の残高が閾値を割ると、SDK が自動で 10,000 Token チャージを起動。下記の 8 ステップがリアルタイムにハイライト、行クリックで一時停止可能。",
+    "flowTitle": "8 ステップ · 発注から Token 入金まで",
+    "flowSubtitle": "1.6 秒ごとに進行;行をクリックで停止 / 切替",
+    "noteAutopilotTitle": "フルオート",
+    "noteAutopilotBody": "残高が閾値を割ると SDK が自動起動。HABA 運用人の手介入は不要。",
+    "noteNoKeyTitle": "クライアント署名 · HABA は秘密鍵を保持しない",
+    "noteNoKeyBody": "ウォレット署名はブラウザ側のみで発生し、HABA サーバには署名済の USDC tx しか届かない。",
+    "noteWebhookTitle": "Webhook で入金通知",
+    "noteWebhookBody": "Token 入金後、HABA AI Advisor は即座に B2B / C 向け呼び出しを再開、ユーザは意識しない。"
+  },
+  "resale": {
+    "backHome": "ホームへ戻る",
+    "eyebrow": "HABA AI Advisor 提携プラン",
+    "description": "HABA は AI Advisor を月額呼び出し量でパッケージ化し、薬局 / 病院 / 栄養士 / EC 提携先に販売。提携先は使用量で Token 枠を前払い、HABA が自動集計と精算を行う。",
+    "plansHeading": "3 段階プラン",
+    "plansSubtitle": "月額 Token 枠で課金、超過分は単価。実契約価格は商務調整による。"
+  },
+  "b2b": {
+    "backHome": "ホームへ戻る",
+    "eyebrow": "B2B パートナー",
+    "sectionTitle": "同じ HABA AI Advisor · 4 つの呼び出し形態",
+    "sectionDescription": "ペルソナをクリックすると、実際の呼び出し時のプロンプト + Advisor 応答が表示されます。1 回の呼び出しは HABA の月額 Token プランへ計上。"
+  },
+  "footer": {
+    "disclaimer": "本ページは HABA 社内 demo 用です。未公開の商品計画・提携意向を含み、外部公開は両社書面合意に基づきます。",
+    "demoData": "デモデータ"
+  }
+}

@@ -1,0 +1,1132 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/teh9f0",
+    "id": "teh9f0",
+    "slide": 2,
+    "layoutId": "24f31b55-bb51-4e6a-8795-b940d8db7383",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "cc253390-b288-46ff-b017-fbd8a87f18c4",
+    "masterLayoutName": "Master",
+    "backgroundColor": "#F7F3EA",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "typefaces": [
+      "Hiragino Sans"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "24f31b55-bb51-4e6a-8795-b940d8db7383",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "cc253390-b288-46ff-b017-fbd8a87f18c4",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "cc253390-b288-46ff-b017-fbd8a87f18c4",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/wval87ed",
+      "id": "1",
+      "bbox": [
+        54,
+        34,
+        260,
+        28
+      ],
+      "geometry": "rect",
+      "text": "WHY NOW",
+      "textPreview": "WHY NOW",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "fontSize": 12,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "WHY NOW"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "WHY NOW",
+          "runs": [
+            {
+              "index": 1,
+              "text": "WHY NOW",
+              "fontSize": 12,
+              "typeface": "Hiragino Sans",
+              "color": "#0891B2",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#F7F3EA",
+      "lineColor": "#F7F3EA",
+      "lineWidth": 0
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/7adsji5s",
+      "id": "2",
+      "bbox": [
+        54,
+        70,
+        900,
+        92
+      ],
+      "geometry": "rect",
+      "text": "支付需求正在从“人点击结账”迁移到“Agent 在任务中连续付费”。",
+      "textPreview": "支付需求正在从“人点击结账”迁移到“Agent 在任务中连续付费”。",
+      "resolvedFontSize": 32,
+      "resolvedTextStyle": {
+        "fontSize": 32,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "支付需求正在从“人点击结账”迁移到“Agent"
+          },
+          {
+            "index": 2,
+            "text": "在任务中连续付费”。"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "支付需求正在从“人点击结账”迁移到“Agent 在任务中连续付费”。",
+          "runs": [
+            {
+              "index": 1,
+              "text": "支付需求正在从“人点击结账”迁移到“Agent 在任务中连续付费”。",
+              "fontSize": 32,
+              "typeface": "Hiragino Sans",
+              "color": "#111827",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#F7F3EA",
+      "lineColor": "#F7F3EA",
+      "lineWidth": 0
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/epkzupwb",
+      "id": "3",
+      "bbox": [
+        54,
+        166,
+        1172,
+        1
+      ],
+      "geometry": "rect",
+      "fillColor": "#D8D2C4",
+      "lineColor": "#D8D2C4",
+      "lineWidth": 0
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/psfil0rq",
+      "id": "4",
+      "bbox": [
+        1180,
+        38,
+        46,
+        22
+      ],
+      "geometry": "rect",
+      "text": "02",
+      "textPreview": "02",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "fontSize": 12,
+        "typeface": "Hiragino Sans",
+        "alignment": "right"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "02"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "02",
+          "runs": [
+            {
+              "index": 1,
+              "text": "02",
+              "fontSize": 12,
+              "typeface": "Hiragino Sans",
+              "color": "#5B6472"
+            }
+          ]
+        }
+      ],
+      "fillColor": "#F7F3EA",
+      "lineColor": "#F7F3EA",
+      "lineWidth": 0
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/w7mp0bi9",
+      "id": "5",
+      "bbox": [
+        100,
+        210,
+        280,
+        34
+      ],
+      "geometry": "rect",
+      "text": "传统支付任务",
+      "textPreview": "传统支付任务",
+      "resolvedFontSize": 20,
+      "resolvedTextStyle": {
+        "fontSize": 20,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "传统支付任务"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "传统支付任务",
+          "runs": [
+            {
+              "index": 1,
+              "text": "传统支付任务",
+              "fontSize": 20,
+              "typeface": "Hiragino Sans",
+              "color": "#111827",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#F7F3EA",
+      "lineColor": "#F7F3EA",
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/7mp0bi9s",
+      "id": "6",
+      "bbox": [
+        824,
+        210,
+        280,
+        34
+      ],
+      "geometry": "rect",
+      "text": "Agent 支付任务",
+      "textPreview": "Agent 支付任务",
+      "resolvedFontSize": 20,
+      "resolvedTextStyle": {
+        "fontSize": 20,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Agent 支付任务"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Agent 支付任务",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Agent 支付任务",
+              "fontSize": 20,
+              "typeface": "Hiragino Sans",
+              "color": "#111827",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#F7F3EA",
+      "lineColor": "#F7F3EA",
+      "lineWidth": 0
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/e1w7mp0b",
+      "id": "7",
+      "bbox": [
+        86,
+        260,
+        360,
+        260
+      ],
+      "geometry": "rect",
+      "fillColor": "#FFFDFC",
+      "lineColor": "#D8D2C4",
+      "lineWidth": 1
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/l0rqd4vm",
+      "id": "8",
+      "bbox": [
+        794,
+        260,
+        360,
+        260
+      ],
+      "geometry": "rect",
+      "fillColor": "#EFF9FA",
+      "lineColor": "#B7E3E7",
+      "lineWidth": 1
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/wfyxobm5",
+      "id": "9",
+      "bbox": [
+        118,
+        288,
+        280,
+        28
+      ],
+      "geometry": "rect",
+      "text": "人工发起",
+      "textPreview": "人工发起",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "Hiragino Sans",
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "人工发起"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "人工发起",
+          "runs": [
+            {
+              "index": 1,
+              "text": "人工发起",
+              "fontSize": 18,
+              "typeface": "Hiragino Sans",
+              "color": "#5B6472"
+            }
+          ]
+        }
+      ],
+      "fillColor": "#FFFDFC",
+      "lineColor": "#FFFDFC",
+      "lineWidth": 0
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ixczed8v",
+      "id": "10",
+      "bbox": [
+        118,
+        330,
+        280,
+        28
+      ],
+      "geometry": "rect",
+      "text": "订单金额较高",
+      "textPreview": "订单金额较高",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "Hiragino Sans",
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "订单金额较高"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "订单金额较高",
+          "runs": [
+            {
+              "index": 1,
+              "text": "订单金额较高",
+              "fontSize": 18,
+              "typeface": "Hiragino Sans",
+              "color": "#5B6472"
+            }
+          ]
+        }
+      ],
+      "fillColor": "#FFFDFC",
+      "lineColor": "#FFFDFC",
+      "lineWidth": 0
+    },
+    {
+      "order": 11,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/bi9s36hc",
+      "id": "11",
+      "bbox": [
+        118,
+        372,
+        280,
+        28
+      ],
+      "geometry": "rect",
+      "text": "页面跳转确认",
+      "textPreview": "页面跳转确认",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "Hiragino Sans",
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "页面跳转确认"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "页面跳转确认",
+          "runs": [
+            {
+              "index": 1,
+              "text": "页面跳转确认",
+              "fontSize": 18,
+              "typeface": "Hiragino Sans",
+              "color": "#5B6472"
+            }
+          ]
+        }
+      ],
+      "fillColor": "#FFFDFC",
+      "lineColor": "#FFFDFC",
+      "lineWidth": 0
+    },
+    {
+      "order": 12,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/032lszqt",
+      "id": "12",
+      "bbox": [
+        118,
+        414,
+        280,
+        28
+      ],
+      "geometry": "rect",
+      "text": "按订单对账",
+      "textPreview": "按订单对账",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "Hiragino Sans",
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "按订单对账"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "按订单对账",
+          "runs": [
+            {
+              "index": 1,
+              "text": "按订单对账",
+              "fontSize": 18,
+              "typeface": "Hiragino Sans",
+              "color": "#5B6472"
+            }
+          ]
+        }
+      ],
+      "fillColor": "#FFFDFC",
+      "lineColor": "#FFFDFC",
+      "lineWidth": 0
+    },
+    {
+      "order": 13,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/tovahoza",
+      "id": "13",
+      "bbox": [
+        118,
+        456,
+        280,
+        28
+      ],
+      "geometry": "rect",
+      "text": "失败由人处理",
+      "textPreview": "失败由人处理",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "Hiragino Sans",
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "失败由人处理"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "失败由人处理",
+          "runs": [
+            {
+              "index": 1,
+              "text": "失败由人处理",
+              "fontSize": 18,
+              "typeface": "Hiragino Sans",
+              "color": "#5B6472"
+            }
+          ]
+        }
+      ],
+      "fillColor": "#FFFDFC",
+      "lineColor": "#FFFDFC",
+      "lineWidth": 0
+    },
+    {
+      "order": 14,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/i9s36hcr",
+      "id": "14",
+      "bbox": [
+        826,
+        288,
+        280,
+        28
+      ],
+      "geometry": "rect",
+      "text": "机器发起",
+      "textPreview": "机器发起",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "机器发起"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "机器发起",
+          "runs": [
+            {
+              "index": 1,
+              "text": "机器发起",
+              "fontSize": 18,
+              "typeface": "Hiragino Sans",
+              "color": "#111827",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#EFF9FA",
+      "lineColor": "#EFF9FA",
+      "lineWidth": 0
+    },
+    {
+      "order": 15,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/bulwval8",
+      "id": "15",
+      "bbox": [
+        826,
+        330,
+        280,
+        28
+      ],
+      "geometry": "rect",
+      "text": "小额高频",
+      "textPreview": "小额高频",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "小额高频"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "小额高频",
+          "runs": [
+            {
+              "index": 1,
+              "text": "小额高频",
+              "fontSize": 18,
+              "typeface": "Hiragino Sans",
+              "color": "#111827",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#EFF9FA",
+      "lineColor": "#EFF9FA",
+      "lineWidth": 0
+    },
+    {
+      "order": 16,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/0fepkzup",
+      "id": "16",
+      "bbox": [
+        826,
+        372,
+        280,
+        28
+      ],
+      "geometry": "rect",
+      "text": "API 即时确认",
+      "textPreview": "API 即时确认",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "API 即时确认"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "API 即时确认",
+          "runs": [
+            {
+              "index": 1,
+              "text": "API 即时确认",
+              "fontSize": 18,
+              "typeface": "Hiragino Sans",
+              "color": "#111827",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#EFF9FA",
+      "lineColor": "#EFF9FA",
+      "lineWidth": 0
+    },
+    {
+      "order": 17,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/p0bi9s36",
+      "id": "17",
+      "bbox": [
+        826,
+        414,
+        280,
+        28
+      ],
+      "geometry": "rect",
+      "text": "按调用计费",
+      "textPreview": "按调用计费",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "按调用计费"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "按调用计费",
+          "runs": [
+            {
+              "index": 1,
+              "text": "按调用计费",
+              "fontSize": 18,
+              "typeface": "Hiragino Sans",
+              "color": "#111827",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#EFF9FA",
+      "lineColor": "#EFF9FA",
+      "lineWidth": 0
+    },
+    {
+      "order": 18,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/idonyd0z",
+      "id": "18",
+      "bbox": [
+        826,
+        456,
+        280,
+        28
+      ],
+      "geometry": "rect",
+      "text": "失败需自动恢复",
+      "textPreview": "失败需自动恢复",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "失败需自动恢复"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "失败需自动恢复",
+          "runs": [
+            {
+              "index": 1,
+              "text": "失败需自动恢复",
+              "fontSize": 18,
+              "typeface": "Hiragino Sans",
+              "color": "#111827",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#EFF9FA",
+      "lineColor": "#EFF9FA",
+      "lineWidth": 0
+    },
+    {
+      "order": 19,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/byhgn29g",
+      "id": "19",
+      "bbox": [
+        470,
+        386,
+        286,
+        2
+      ],
+      "geometry": "rect",
+      "fillColor": "#0891B2",
+      "lineColor": "#0891B2",
+      "lineWidth": 0
+    },
+    {
+      "order": 20,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/3q5o7qpg",
+      "id": "20",
+      "bbox": [
+        752,
+        380,
+        14,
+        14
+      ],
+      "geometry": "triangle",
+      "fillColor": "#0891B2",
+      "lineColor": "#0891B2",
+      "lineWidth": 0
+    },
+    {
+      "order": 21,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/e9cvixcz",
+      "id": "21",
+      "bbox": [
+        492,
+        330,
+        250,
+        34
+      ],
+      "geometry": "rect",
+      "text": "支付 job-to-be-done 改变",
+      "textPreview": "支付 job-to-be-done 改变",
+      "resolvedFontSize": 20,
+      "resolvedTextStyle": {
+        "fontSize": 20,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "支付 job-to-be-done"
+          },
+          {
+            "index": 2,
+            "text": "改变"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "支付 job-to-be-done 改变",
+          "runs": [
+            {
+              "index": 1,
+              "text": "支付 job-to-be-done 改变",
+              "fontSize": 20,
+              "typeface": "Hiragino Sans",
+              "color": "#0891B2",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#F7F3EA",
+      "lineColor": "#F7F3EA",
+      "lineWidth": 0
+    },
+    {
+      "order": 22,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/lwval87e",
+      "id": "22",
+      "bbox": [
+        170,
+        560,
+        940,
+        56
+      ],
+      "geometry": "rect",
+      "text": "Agent Commerce 要求支付系统同时支持低摩擦、实时状态、细粒度计费和完整留痕。x402 只是入口，商业产品必须覆盖后续 Token 与账务闭环。",
+      "textPreview": "Agent Commerce 要求支付系统同时支持低摩擦、实时状态、细粒度计费和完整留痕。x402 只是入口，商业产品必须覆盖后续 Token 与账务闭环。",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Agent Commerce 要求支付系统同时支持低摩擦、实时状态、细粒度计费和完整留痕。x402"
+          },
+          {
+            "index": 2,
+            "text": "只是入口，商业产品必须覆盖后续 Token 与账务闭环。"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Agent Commerce 要求支付系统同时支持低摩擦、实时状态、细粒度计费和完整留痕。x402 只是入口，商业产品必须覆盖后续 Token 与账务闭环。",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Agent Commerce 要求支付系统同时支持低摩擦、实时状态、细粒度计费和完整留痕。x402 只是入口，商业产品必须覆盖后续 Token 与账务闭环。",
+              "fontSize": 18,
+              "typeface": "Hiragino Sans",
+              "color": "#111827",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#F7F3EA",
+      "lineColor": "#F7F3EA",
+      "lineWidth": 0
+    },
+    {
+      "order": 23,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/wb2hwfyx",
+      "id": "23",
+      "bbox": [
+        54,
+        666,
+        1172,
+        1
+      ],
+      "geometry": "rect",
+      "fillColor": "#D8D2C4",
+      "lineColor": "#D8D2C4",
+      "lineWidth": 0
+    },
+    {
+      "order": 24,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/3itgfmlk",
+      "id": "24",
+      "bbox": [
+        54,
+        674,
+        760,
+        22
+      ],
+      "geometry": "rect",
+      "text": "Source: proposal.md, codex reference deck, claude reference deck | Internal discussion draft",
+      "textPreview": "Source: proposal.md, codex reference deck, claude reference deck | Internal discussion draft",
+      "resolvedFontSize": 10,
+      "resolvedTextStyle": {
+        "fontSize": 10,
+        "typeface": "Hiragino Sans",
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Source: proposal.md, codex reference deck, claude reference deck | Internal discussion draft"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Source: proposal.md, codex reference deck, claude reference deck | Internal discussion draft",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Source: proposal.md, codex reference deck, claude reference deck | Internal discussion draft",
+              "fontSize": 10,
+              "typeface": "Hiragino Sans",
+              "color": "#5B6472"
+            }
+          ]
+        }
+      ],
+      "fillColor": "#F7F3EA",
+      "lineColor": "#F7F3EA",
+      "lineWidth": 0
+    },
+    {
+      "order": 25,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ex0nuxc3",
+      "id": "25",
+      "bbox": [
+        990,
+        674,
+        236,
+        22
+      ],
+      "geometry": "rect",
+      "text": "X402 Token Market  |  02",
+      "textPreview": "X402 Token Market  |  02",
+      "resolvedFontSize": 10,
+      "resolvedTextStyle": {
+        "fontSize": 10,
+        "typeface": "Hiragino Sans",
+        "alignment": "right"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "X402 Token Market  |  02"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "X402 Token Market  |  02",
+          "runs": [
+            {
+              "index": 1,
+              "text": "X402 Token Market  |  02",
+              "fontSize": 10,
+              "typeface": "Hiragino Sans",
+              "color": "#5B6472"
+            }
+          ]
+        }
+      ],
+      "fillColor": "#F7F3EA",
+      "lineColor": "#F7F3EA",
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

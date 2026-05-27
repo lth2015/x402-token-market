@@ -1,0 +1,65 @@
+# =====================================================================
+# Token · NetworkPolicies
+# =====================================================================
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: token-api-allow, namespace: token }
+spec:
+  podSelector: { matchLabels: { app: token-api } }
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - {}                                    # from ALB
+    - from:
+        - podSelector: {}                   # intra-ns
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: x402 } }
+          podSelector: { matchLabels: { app: x402-api } }   # x402 → token internal calls
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: x402 } }
+          podSelector: { matchLabels: { app: x402-worker } }
+  egress:
+    - to: [ { namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: kube-system } } } ]
+      ports: [ { protocol: UDP, port: 53 } ]
+    - to: [ { ipBlock: { cidr: 10.0.48.0/20 } } ]                # MySQL
+      ports: [ { protocol: TCP, port: 3306 } ]
+    - to: [ { ipBlock: { cidr: 10.0.48.0/20 } } ]                # Redis
+      ports: [ { protocol: TCP, port: 6379 } ]
+    - to:
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: x402 } }
+          podSelector: { matchLabels: { app: x402-api } }
+      ports: [ { protocol: TCP, port: 80 } ]
+    - to:
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: observability } }
+      ports: [ { protocol: TCP, port: 4317 } ]
+    - to: [ { ipBlock: { cidr: 0.0.0.0/0, except: [ 10.0.0.0/8 ] } } ]   # AI Providers
+      ports: [ { protocol: TCP, port: 443 } ]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: token-console-allow, namespace: token }
+spec:
+  podSelector: { matchLabels: { app: token-console } }
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - {}                                    # from ALB
+  egress:
+    - to: [ { namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: kube-system } } } ]
+      ports: [ { protocol: UDP, port: 53 } ]
+    - to:
+        - podSelector: { matchLabels: { app: token-api } }
+      ports: [ { protocol: TCP, port: 80 } ]
+    - to: [ { ipBlock: { cidr: 0.0.0.0/0, except: [ 10.0.0.0/8 ] } } ]   # SSO / OIDC
+      ports: [ { protocol: TCP, port: 443 } ]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: token-worker-allow, namespace: token }
+spec:
+  podSelector: { matchLabels: { app: token-worker } }
+  policyTypes: [Ingress, Egress]
+  ingress: []
+  egress:
+    - to: [ { namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: kube-system } } } ]
+      ports: [ { protocol: UDP, port: 53 } ]
+    - to: [ { ipBlock: { cidr: 10.0.48.0/20 } } ]
+      ports: [ { protocol: TCP, port: 3306 }, { protocol: TCP, port: 6379 } ]
+    - to: [ { ipBlock: { cidr: 0.0.0.0/0, except: [ 10.0.0.0/8 ] } } ]   # legacy systems + invoice
+      ports: [ { protocol: TCP, port: 443 } ]

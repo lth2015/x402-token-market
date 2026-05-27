@@ -1,0 +1,9 @@
+Initial author score before render:
+story 4.5, specificity 4.2, rhythm 4.2, whitespace 4.0, chart clarity 4.0, typography 4.0, restraint 4.2, precision 4.0, coherence 4.1, reference delta 4.2.
+
+Profile gates:
+- product-platform: pass, because the deck shows service stack, workflow, usage ledger, and product-to-commercial linkage.
+- gtm-growth: pass with caveat, because exact pipeline data is unavailable; wedge and expansion are qualitative.
+
+Known caveat:
+- No fabricated market size or pricing metrics. Add exact commercial numbers later when approved by management.

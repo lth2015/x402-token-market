@@ -1,0 +1,87 @@
+{
+  "brand": {
+    "name": "HABA",
+    "fullName": "HABA / ハーバー研究所",
+    "productLine": "MARVIE Medical Foods",
+    "tagline": "AI 智能顾问 · 帮你为家人挑更聪明的饮食"
+  },
+  "nav": {
+    "home": "首页",
+    "topup": "AI Token 充值",
+    "resale": "AI Advisor 合作计划",
+    "b2b": "B2B 合作方"
+  },
+  "agent": {
+    "eyebrow": "AI 商品顾问",
+    "sectionTitle": "5 种健康需求，AI 帮你选商品",
+    "sectionDescription": "点击左侧场景，看 HABA AI Advisor 根据用户需求挑选 MARVIE 商品并解释推荐理由。所有推荐都基于卡路里、甜度、适用场景三个维度。",
+    "userLabel": "消费者",
+    "agentLabel": "HABA AI Advisor",
+    "b2bCallNotice": "本次调用 1 次 → 计入 HABA 月度 Token 套餐(演示数据 18,432 / 100,000)"
+  },
+  "products": {
+    "eyebrow": "MARVIE 商品目录",
+    "sectionTitle": "MARVIE Medical Foods 全系列",
+    "sectionDescription": "覆盖液体 / 粉末甜味料、料理替糖、低卡果酱、低卡糖果。所有商品都以「低卡 + 无添加蔗糖」为基准设计。",
+    "count": "{n} 件 SKU"
+  },
+  "home": {
+    "teaser": {
+      "eyebrow": "看 HABA AI 商务的完整闭环",
+      "title": "3 条故事线 · 看 HABA 怎么把 AI 装进生意",
+      "description": "下面三块各自是一个完整页面：AI Token 自动充值的 8 步动画、HABA 把 AI 能力按调用量打包给合作方的商业模式、4 种 B2B 接入形态。",
+      "topup": {
+        "eyebrow": "AI Token 自动充值",
+        "title": "余额低？SDK 自动补",
+        "desc": "HABA AI Advisor 调用余额低于阈值 → SDK 自动用 USDC 钱包微支付补足 Token → 几秒内到账。全程客户端签名，HABA 服务器不持有用户钱包私钥。",
+        "cta": "看 8 步动画",
+        "metricCaption": "全程 < 1s · 客户端签名"
+      },
+      "resale": {
+        "eyebrow": "AI 能力合作计划",
+        "title": "HABA AI Advisor 转售",
+        "desc": "HABA 把 AI Advisor 按月度调用量打包，卖给药局 / 医院 / 营养师 / 合作电商。客户消耗的是 HABA 自有的 Token 配额。",
+        "cta": "看商业模式",
+        "metricCaption": "演示数据"
+      },
+      "b2b": {
+        "eyebrow": "B2B 合作方",
+        "title": "4 个画像 · 4 种调用形态",
+        "desc": "药局前台 SDK 嵌入、医院营养科 API 直调、独立营养师 MCP 工具、合作电商首页 Web widget — 同一个 Advisor，4 种皮肤。",
+        "cta": "看调用示例",
+        "metricCaption": "点击切换"
+      }
+    }
+  },
+  "topup": {
+    "backHome": "返回首页",
+    "eyebrow": "AI Token 自动充值",
+    "sectionTitle": "一笔 USDC 微支付怎么走完整个充值流程",
+    "sectionDescription": "HABA AI Advisor 调用余额低于阈值 → SDK 自动发起 10,000 Token 充值。下面 8 步实时高亮，鼠标点击任意步骤暂停查看细节。",
+    "flowTitle": "8 步 · 从下单到 Token 入账",
+    "flowSubtitle": "每 1.6 秒推进一步；点击行可暂停 / 切换查看",
+    "noteAutopilotTitle": "全自动",
+    "noteAutopilotBody": "Token 余额低于阈值时 SDK 自启动；HABA 运维零干预。",
+    "noteNoKeyTitle": "客户端签名 · HABA 不存私钥",
+    "noteNoKeyBody": "钱包签名只发生在浏览器端，HABA 服务器只看到已签名的 USDC 转账，不接触任何私钥。",
+    "noteWebhookTitle": "Webhook 入账",
+    "noteWebhookBody": "Token 入账后 HABA AI Advisor 即刻继续接收 B2B / C 端调用，无需用户感知。"
+  },
+  "resale": {
+    "backHome": "返回首页",
+    "eyebrow": "HABA AI Advisor 合作计划",
+    "description": "HABA 把 AI Advisor 按月度调用量打包，售给药局 / 医院 / 营养师 / 合作电商。合作方按使用量预付 Token 配额，HABA 自动统计与对账。",
+    "plansHeading": "3 档套餐",
+    "plansSubtitle": "按月度 Token 配额计费；超额部分按单价。具体合同价以商务对接为准。"
+  },
+  "b2b": {
+    "backHome": "返回首页",
+    "eyebrow": "B2B 合作方",
+    "sectionTitle": "同一个 HABA AI Advisor · 4 种调用形态",
+    "sectionDescription": "点击下方任一画像，查看它实际调用 HABA AI Advisor 时的 prompt + Advisor 输出。每次调用都记入 HABA 的月度 Token 套餐。"
+  },
+  "footer": {
+    "disclaimer": "本页面为 HABA 内部 demo 展示，含未公开商品规划与合作意向；外部披露以双方书面文件为准。",
+    "demoData": "演示数据"
+  }
+}

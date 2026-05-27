@@ -1,0 +1,169 @@
+# =====================================================================
+# Wea · Deployments (TEMPLATE — runs in wea-qa AWS account, not Netstars)
+# =====================================================================
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: wea-api
+  namespace: wea
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::REPLACE_WEA_ACCOUNT_ID:role/wea-api-role
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: wea-worker
+  namespace: wea
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::REPLACE_WEA_ACCOUNT_ID:role/wea-worker-role
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: wea-callback
+  namespace: wea
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::REPLACE_WEA_ACCOUNT_ID:role/wea-callback-role
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: { name: wea-config, namespace: wea }
+data:
+  ENV: "qa"
+  LOG_LEVEL: "info"
+  HTTP_PORT: "8080"
+  SOLANA_NETWORK: "devnet"
+  USDC_MINT: "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"
+  X402_CALLBACK_BASE_URL: "https://qa.gateway.netstars.jp"
+  KMS_KEY_ID: "REPLACE_WEA_KMS_KEY_ARN"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: wea-api, namespace: wea, labels: { app: wea-api } }
+spec:
+  replicas: 3
+  selector: { matchLabels: { app: wea-api } }
+  strategy: { type: RollingUpdate, rollingUpdate: { maxSurge: 25%, maxUnavailable: 0 } }
+  template:
+    metadata: { labels: { app: wea-api } }
+    spec:
+      serviceAccountName: wea-api
+      securityContext: { runAsNonRoot: true, runAsUser: 10001, seccompProfile: { type: RuntimeDefault } }
+      containers:
+        - name: api
+          image: REPLACE_WEA_ECR/wea/api:REPLACE_TAG
+          ports: [ { name: http, containerPort: 8080 } ]
+          envFrom:
+            - configMapRef: { name: wea-config }
+            - secretRef:    { name: wea-db-creds }
+            - secretRef:    { name: wea-hmac }
+          resources:
+            requests: { cpu: 500m, memory: 256Mi }   # Rust 比 Python 小
+            limits:   { cpu: 1000m, memory: 512Mi }
+          readinessProbe: { httpGet: { path: /readyz, port: http } }
+          livenessProbe:  { httpGet: { path: /healthz, port: http }, periodSeconds: 15 }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ALL] }
+---
+# Worker — MUST be single-leader for tx broadcast (no parallel writes)
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: wea-worker, namespace: wea, labels: { app: wea-worker } }
+spec:
+  replicas: 1
+  strategy: { type: Recreate }
+  selector: { matchLabels: { app: wea-worker } }
+  template:
+    metadata: { labels: { app: wea-worker } }
+    spec:
+      serviceAccountName: wea-worker
+      securityContext: { runAsNonRoot: true, runAsUser: 10001, seccompProfile: { type: RuntimeDefault } }
+      containers:
+        - name: worker
+          image: REPLACE_WEA_ECR/wea/worker:REPLACE_TAG
+          envFrom:
+            - configMapRef: { name: wea-config }
+            - secretRef:    { name: wea-db-creds }
+          resources:
+            requests: { cpu: 1000m, memory: 512Mi }
+            limits:   { cpu: 2000m, memory: 1Gi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ALL] }
+---
+# Callback — can scale horizontally (DB SKIP LOCKED)
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: wea-callback, namespace: wea, labels: { app: wea-callback } }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: wea-callback } }
+  template:
+    metadata: { labels: { app: wea-callback } }
+    spec:
+      serviceAccountName: wea-callback
+      securityContext: { runAsNonRoot: true, runAsUser: 10001, seccompProfile: { type: RuntimeDefault } }
+      containers:
+        - name: callback
+          image: REPLACE_WEA_ECR/wea/callback:REPLACE_TAG
+          envFrom:
+            - configMapRef: { name: wea-config }
+            - secretRef:    { name: wea-db-creds }
+            - secretRef:    { name: wea-hmac }
+          resources:
+            requests: { cpu: 250m, memory: 128Mi }
+            limits:   { cpu: 500m, memory: 256Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ALL] }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: wea-api, namespace: wea }
+spec:
+  type: ClusterIP
+  selector: { app: wea-api }
+  ports: [ { name: http, port: 80, targetPort: http } ]
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wea-api-internal
+  namespace: wea
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internal           # INTERNAL — only VPC + peered
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS13-1-2-2021-06
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-northeast-1:REPLACE_WEA_ACCOUNT_ID:certificate/REPLACE_CERT_ID
+    alb.ingress.kubernetes.io/inbound-cidrs: '10.0.0.0/16'   # only Netstars VPC (via peering)
+    external-dns.alpha.kubernetes.io/hostname: wea-api.wea-qa.internal
+spec:
+  ingressClassName: alb
+  rules:
+    - host: wea-api.wea-qa.internal
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend: { service: { name: wea-api, port: { number: 80 } } }
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata: { name: wea-api, namespace: wea }
+spec:
+  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: wea-api }
+  minReplicas: 3
+  maxReplicas: 15
+  metrics:
+    - { type: Resource, resource: { name: cpu, target: { type: Utilization, averageUtilization: 60 } } }
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata: { name: wea-api, namespace: wea }
+spec: { minAvailable: 1, selector: { matchLabels: { app: wea-api } } }

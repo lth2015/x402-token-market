@@ -1,0 +1,20 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata: { name: token-api, namespace: token }
+spec:
+  minAvailable: 2
+  selector: { matchLabels: { app: token-api } }
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata: { name: token-console, namespace: token }
+spec:
+  minAvailable: 1
+  selector: { matchLabels: { app: token-console } }
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata: { name: token-worker, namespace: token }
+spec:
+  minAvailable: 1
+  selector: { matchLabels: { app: token-worker } }

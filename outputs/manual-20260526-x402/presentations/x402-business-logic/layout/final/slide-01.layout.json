@@ -1,0 +1,755 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/bg95p3",
+    "id": "bg95p3",
+    "slide": 1,
+    "layoutId": "24f31b55-bb51-4e6a-8795-b940d8db7383",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "cc253390-b288-46ff-b017-fbd8a87f18c4",
+    "masterLayoutName": "Master",
+    "backgroundColor": "#0E1726",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "typefaces": [
+      "+mn-lt",
+      "Hiragino Sans"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "24f31b55-bb51-4e6a-8795-b940d8db7383",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "cc253390-b288-46ff-b017-fbd8a87f18c4",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "cc253390-b288-46ff-b017-fbd8a87f18c4",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/2hwfyxob",
+      "id": "1",
+      "bbox": [
+        64,
+        54,
+        360,
+        24
+      ],
+      "geometry": "rect",
+      "text": "X402 TOKEN MARKET",
+      "textPreview": "X402 TOKEN MARKET",
+      "resolvedFontSize": 13,
+      "resolvedTextStyle": {
+        "fontSize": 13,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "X402 TOKEN MARKET"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "X402 TOKEN MARKET",
+          "runs": [
+            {
+              "index": 1,
+              "text": "X402 TOKEN MARKET",
+              "fontSize": 13,
+              "typeface": "Hiragino Sans",
+              "color": "#92DCE5",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#0E1726",
+      "lineColor": "#0E1726",
+      "lineWidth": 0
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/94fu18jq",
+      "id": "2",
+      "bbox": [
+        64,
+        118,
+        900,
+        210
+      ],
+      "geometry": "rect",
+      "text": "x402 的价值不在“能收 USDC”，而在把 Agent 的 Token 消耗变成可销售、可结算、可审计的商户服务。",
+      "textPreview": "x402 的价值不在“能收 USDC”，而在把 Agent 的 Token 消耗变成可销售、可结算、可审计的商户服务。",
+      "resolvedFontSize": 38,
+      "resolvedTextStyle": {
+        "fontSize": 38,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 3,
+        "lines": [
+          {
+            "index": 1,
+            "text": "x402 的价值不在“能收 USDC”，而在把 Agent"
+          },
+          {
+            "index": 2,
+            "text": "的 Token"
+          },
+          {
+            "index": 3,
+            "text": "消耗变成可销售、可结算、可审计的商户服务。"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "x402 的价值不在“能收 USDC”，而在把 Agent 的 Token 消耗变成可销售、可结算、可审计的商户服务。",
+          "runs": [
+            {
+              "index": 1,
+              "text": "x402 的价值不在“能收 USDC”，而在把 Agent 的 Token 消耗变成可销售、可结算、可审计的商户服务。",
+              "fontSize": 38,
+              "typeface": "Hiragino Sans",
+              "color": "#FFFFFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#0E1726",
+      "lineColor": "#0E1726",
+      "lineWidth": 0
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/kjm1cfa9",
+      "id": "3",
+      "bbox": [
+        66,
+        344,
+        720,
+        32
+      ],
+      "geometry": "rect",
+      "text": "经营决策版 | Agent Commerce 支付与 AI Token 运营服务",
+      "textPreview": "经营决策版 | Agent Commerce 支付与 AI Token 运营服务",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "fontSize": 18,
+        "typeface": "Hiragino Sans",
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "经营决策版 | Agent Commerce 支付与 AI Token 运营服务"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "经营决策版 | Agent Commerce 支付与 AI Token 运营服务",
+          "runs": [
+            {
+              "index": 1,
+              "text": "经营决策版 | Agent Commerce 支付与 AI Token 运营服务",
+              "fontSize": 18,
+              "typeface": "Hiragino Sans",
+              "color": "#CBD5E1"
+            }
+          ]
+        }
+      ],
+      "fillColor": "#0E1726",
+      "lineColor": "#0E1726",
+      "lineWidth": 0
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ra5gbq1o",
+      "id": "4",
+      "bbox": [
+        66,
+        470,
+        330,
+        104
+      ],
+      "geometry": "rect",
+      "fillColor": "#172033",
+      "lineColor": "#2D3A53",
+      "lineWidth": 1
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/2p8nqxs7",
+      "id": "5",
+      "bbox": [
+        84,
+        488,
+        110,
+        20
+      ],
+      "geometry": "rect",
+      "text": "市场问题",
+      "textPreview": "市场问题",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "fontSize": 12,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "市场问题"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "市场问题",
+          "runs": [
+            {
+              "index": 1,
+              "text": "市场问题",
+              "fontSize": 12,
+              "typeface": "Hiragino Sans",
+              "color": "#92DCE5",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#172033",
+      "lineColor": "#172033",
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/9gr2p8nq",
+      "id": "6",
+      "bbox": [
+        84,
+        520,
+        286,
+        38
+      ],
+      "geometry": "rect",
+      "text": "Agent 发起小额高频支付",
+      "textPreview": "Agent 发起小额高频支付",
+      "resolvedFontSize": 20,
+      "resolvedTextStyle": {
+        "fontSize": 20,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Agent 发起小额高频支付"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Agent 发起小额高频支付",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Agent 发起小额高频支付",
+              "fontSize": 20,
+              "typeface": "Hiragino Sans",
+              "color": "#FFFFFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#172033",
+      "lineColor": "#172033",
+      "lineWidth": 0
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/gvy90je9",
+      "id": "7",
+      "bbox": [
+        440,
+        470,
+        330,
+        104
+      ],
+      "geometry": "rect",
+      "fillColor": "#172033",
+      "lineColor": "#2D3A53",
+      "lineWidth": 1
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/re1w7mp0",
+      "id": "8",
+      "bbox": [
+        458,
+        488,
+        110,
+        20
+      ],
+      "geometry": "rect",
+      "text": "核心优势",
+      "textPreview": "核心优势",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "fontSize": 12,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "核心优势"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "核心优势",
+          "runs": [
+            {
+              "index": 1,
+              "text": "核心优势",
+              "fontSize": 12,
+              "typeface": "Hiragino Sans",
+              "color": "#92DCE5",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#172033",
+      "lineColor": "#172033",
+      "lineWidth": 0
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/2t83itgf",
+      "id": "9",
+      "bbox": [
+        458,
+        520,
+        286,
+        38
+      ],
+      "geometry": "rect",
+      "text": "Web2 PSP + Web3 稳定币 + AI Token 销售",
+      "textPreview": "Web2 PSP + Web3 稳定币 + AI Token 销售",
+      "resolvedFontSize": 20,
+      "resolvedTextStyle": {
+        "fontSize": 20,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Web2 PSP + Web3 稳定币"
+          },
+          {
+            "index": 2,
+            "text": "+ AI Token 销售"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Web2 PSP + Web3 稳定币 + AI Token 销售",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Web2 PSP + Web3 稳定币 + AI Token 销售",
+              "fontSize": 20,
+              "typeface": "Hiragino Sans",
+              "color": "#FFFFFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#172033",
+      "lineColor": "#172033",
+      "lineWidth": 0
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/sneloj2t",
+      "id": "10",
+      "bbox": [
+        814,
+        470,
+        330,
+        104
+      ],
+      "geometry": "rect",
+      "fillColor": "#172033",
+      "lineColor": "#2D3A53",
+      "lineWidth": 1
+    },
+    {
+      "order": 11,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/l87ed8ba",
+      "id": "11",
+      "bbox": [
+        832,
+        488,
+        110,
+        20
+      ],
+      "geometry": "rect",
+      "text": "Demo 目的",
+      "textPreview": "Demo 目的",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "fontSize": 12,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Demo 目的"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Demo 目的",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Demo 目的",
+              "fontSize": 12,
+              "typeface": "Hiragino Sans",
+              "color": "#92DCE5",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#172033",
+      "lineColor": "#172033",
+      "lineWidth": 0
+    },
+    {
+      "order": 12,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ahoza1gv",
+      "id": "12",
+      "bbox": [
+        832,
+        520,
+        286,
+        38
+      ],
+      "geometry": "rect",
+      "text": "证明可销售、可结算、可追溯的商业闭环",
+      "textPreview": "证明可销售、可结算、可追溯的商业闭环",
+      "resolvedFontSize": 20,
+      "resolvedTextStyle": {
+        "fontSize": 20,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "证明可销售、可结算、可追溯"
+          },
+          {
+            "index": 2,
+            "text": "的商业闭环"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "证明可销售、可结算、可追溯的商业闭环",
+          "runs": [
+            {
+              "index": 1,
+              "text": "证明可销售、可结算、可追溯的商业闭环",
+              "fontSize": 20,
+              "typeface": "Hiragino Sans",
+              "color": "#FFFFFF",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#172033",
+      "lineColor": "#172033",
+      "lineWidth": 0
+    },
+    {
+      "order": 13,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/32lszqtc",
+      "id": "13",
+      "bbox": [
+        64,
+        612,
+        292,
+        30
+      ],
+      "geometry": "rect",
+      "text": "Netstars-facing commercial narrative",
+      "textPreview": "Netstars-facing commercial narrative",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "fontSize": 12,
+        "typeface": "+mn-lt",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Netstars-facing commercial narrative"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Netstars-facing commercial narrative",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Netstars-facing commercial narrative",
+              "fontSize": 12,
+              "color": "#0891B2",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#172033",
+      "lineColor": "#0891B2",
+      "lineWidth": 1
+    },
+    {
+      "order": 14,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/szqtcj6t",
+      "id": "14",
+      "bbox": [
+        54,
+        666,
+        1172,
+        1
+      ],
+      "geometry": "rect",
+      "fillColor": "#2C374D",
+      "lineColor": "#2C374D",
+      "lineWidth": 0
+    },
+    {
+      "order": 15,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/lkjm1cfa",
+      "id": "15",
+      "bbox": [
+        54,
+        674,
+        760,
+        22
+      ],
+      "geometry": "rect",
+      "text": "Source: proposal.md, codex reference deck, claude reference deck | Internal discussion draft",
+      "textPreview": "Source: proposal.md, codex reference deck, claude reference deck | Internal discussion draft",
+      "resolvedFontSize": 10,
+      "resolvedTextStyle": {
+        "fontSize": 10,
+        "typeface": "Hiragino Sans",
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Source: proposal.md, codex reference deck, claude reference deck | Internal discussion draft"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Source: proposal.md, codex reference deck, claude reference deck | Internal discussion draft",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Source: proposal.md, codex reference deck, claude reference deck | Internal discussion draft",
+              "fontSize": 10,
+              "typeface": "Hiragino Sans",
+              "color": "#97A2B7"
+            }
+          ]
+        }
+      ],
+      "fillColor": "#0E1726",
+      "lineColor": "#0E1726",
+      "lineWidth": 0
+    },
+    {
+      "order": 16,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/at47y1kr",
+      "id": "16",
+      "bbox": [
+        990,
+        674,
+        236,
+        22
+      ],
+      "geometry": "rect",
+      "text": "X402 Token Market  |  01",
+      "textPreview": "X402 Token Market  |  01",
+      "resolvedFontSize": 10,
+      "resolvedTextStyle": {
+        "fontSize": 10,
+        "typeface": "Hiragino Sans",
+        "alignment": "right"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "X402 Token Market  |  01"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "X402 Token Market  |  01",
+          "runs": [
+            {
+              "index": 1,
+              "text": "X402 Token Market  |  01",
+              "fontSize": 10,
+              "typeface": "Hiragino Sans",
+              "color": "#97A2B7"
+            }
+          ]
+        }
+      ],
+      "fillColor": "#0E1726",
+      "lineColor": "#0E1726",
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

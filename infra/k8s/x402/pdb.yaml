@@ -1,0 +1,17 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: x402-api
+  namespace: x402
+spec:
+  minAvailable: 1
+  selector: { matchLabels: { app: x402-api } }
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: x402-worker
+  namespace: x402
+spec:
+  minAvailable: 1
+  selector: { matchLabels: { app: x402-worker } }

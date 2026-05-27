@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "token-worker"
+version = "0.1.0"
+description = "Token System background worker · netstars/token/worker"
+authors = ["Netstars <dev@netstars.jp>"]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+sqlalchemy = "^2.0"
+aiomysql = "^0.2"
+redis = { extras = ["hiredis"], version = "^5.2" }
+httpx = "^0.27"
+apscheduler = "^3.10"
+structlog = "^24.4"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3"
+ruff = "^0.7"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

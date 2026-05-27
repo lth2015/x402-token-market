@@ -1,0 +1,87 @@
+{
+  "brand": {
+    "name": "HABA",
+    "fullName": "HABA / ハーバー研究所",
+    "productLine": "MARVIE Medical Foods",
+    "tagline": "AI advisor for smarter family food choices"
+  },
+  "nav": {
+    "home": "Home",
+    "topup": "AI Token top-up",
+    "resale": "AI Advisor partner plans",
+    "b2b": "B2B partners"
+  },
+  "agent": {
+    "eyebrow": "AI product advisor",
+    "sectionTitle": "5 health needs, picked for you by AI",
+    "sectionDescription": "Click a scenario on the left and see HABA AI Advisor recommend MARVIE products across three axes — calories, sweetness, and use case.",
+    "userLabel": "Customer",
+    "agentLabel": "HABA AI Advisor",
+    "b2bCallNotice": "1 call → counted toward HABA's monthly Token plan (demo: 18,432 / 100,000)"
+  },
+  "products": {
+    "eyebrow": "MARVIE catalog",
+    "sectionTitle": "MARVIE Medical Foods — full lineup",
+    "sectionDescription": "Liquid + powder sweeteners, cooking aids, low-cal jams, and low-cal candies. Every item is designed around 'low-cal + no added sugar'.",
+    "count": "{n} SKUs"
+  },
+  "home": {
+    "teaser": {
+      "eyebrow": "The full HABA AI commerce loop",
+      "title": "3 storylines from HABA AI commerce",
+      "description": "Each card opens its own page: an 8-step AI Token auto top-up animation, HABA reselling AI capacity by call volume to partners, and 4 B2B embedding modes.",
+      "topup": {
+        "eyebrow": "AI Token auto top-up",
+        "title": "Low balance? The SDK refills it",
+        "desc": "When HABA AI Advisor's Token balance dips below threshold, the SDK auto-pays a USDC micro-payment to refill — credited in seconds. Wallet signs client-side; HABA's server never holds the key.",
+        "cta": "See the 8 steps",
+        "metricCaption": "< 1s end-to-end · client-side signed"
+      },
+      "resale": {
+        "eyebrow": "AI capacity partnership",
+        "title": "HABA AI Advisor resale",
+        "desc": "HABA packages the AI Advisor by monthly call volume and sells to pharmacies, hospitals, dietitians, and EC partners. Partners consume HABA's own Token quota.",
+        "cta": "See the model",
+        "metricCaption": "Demo data"
+      },
+      "b2b": {
+        "eyebrow": "B2B partners",
+        "title": "4 personas · 4 embed forms",
+        "desc": "Pharmacy SDK, hospital API, dietitian MCP, EC web widget — the same Advisor wearing 4 different skins.",
+        "cta": "See call samples",
+        "metricCaption": "Click to switch"
+      }
+    }
+  },
+  "topup": {
+    "backHome": "Back to home",
+    "eyebrow": "AI Token auto top-up",
+    "sectionTitle": "How a USDC micro-payment flows into a Token credit",
+    "sectionDescription": "When HABA AI Advisor's Token balance dips below threshold, the SDK fires a 10,000-Token purchase. The 8 steps below auto-advance; click a row to pause and inspect.",
+    "flowTitle": "8 steps · from order to Token credit",
+    "flowSubtitle": "Advances every 1.6s; click a row to pause / pick",
+    "noteAutopilotTitle": "Autopilot",
+    "noteAutopilotBody": "The SDK kicks off when balance drops below threshold. Zero human intervention from HABA ops.",
+    "noteNoKeyTitle": "Client-side signed · HABA never holds the private key",
+    "noteNoKeyBody": "Wallet signing happens entirely in the browser; HABA's server only sees an already-signed USDC tx.",
+    "noteWebhookTitle": "Webhook credit",
+    "noteWebhookBody": "When Token lands, HABA AI Advisor resumes B2B / C-end calls immediately — invisible to end users."
+  },
+  "resale": {
+    "backHome": "Back to home",
+    "eyebrow": "HABA AI Advisor partner plans",
+    "description": "HABA packages the AI Advisor by monthly call volume and sells to pharmacies, hospitals, dietitians, and EC partners. Partners pre-pay a Token quota by usage; HABA handles metering and reconciliation automatically.",
+    "plansHeading": "3 plan tiers",
+    "plansSubtitle": "Priced per monthly Token quota; overage at unit price. Real contract prices set per commercial conversation."
+  },
+  "b2b": {
+    "backHome": "Back to home",
+    "eyebrow": "B2B partners",
+    "sectionTitle": "Same HABA AI Advisor · 4 embedding modes",
+    "sectionDescription": "Click any persona to see how it actually calls HABA AI Advisor (prompt + Advisor output). Every call counts toward HABA's monthly Token plan."
+  },
+  "footer": {
+    "disclaimer": "Internal HABA demo. Contains unreleased product plans and partnership intent; external disclosure requires written agreement.",
+    "demoData": "Demo data"
+  }
+}

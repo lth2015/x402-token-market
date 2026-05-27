@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>X402 Token Market — Agentic Commerce 支付解决方案</title>
+<title>X402 Token Market — Agentic Commerce 支付与 Token 运营服务（经营层简报）</title>
 <style>
   :root {
     --blue-dark: #0a0f1e;
@@ -29,7 +29,6 @@
     user-select: none;
   }
 
-  /* ── Slideshow container ── */
   #deck { width: 100vw; height: 100vh; position: relative; }
   .slide {
     position: absolute; inset: 0;
@@ -37,61 +36,76 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 48px 64px;
+    padding: 40px 56px;
     opacity: 0;
-    transition: opacity .5s ease;
+    transition: opacity .45s ease;
   }
   .slide.active { display: flex; }
   .slide.visible { opacity: 1; }
 
-  /* ── Navigation ── */
   #nav {
-    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+    position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
     display: flex; gap: 12px; align-items: center; z-index: 100;
   }
   .nav-btn {
-    background: rgba(255,255,255,.1); border: 1px solid var(--border);
-    color: #fff; padding: 8px 22px; border-radius: 24px; cursor: pointer;
-    font-size: 13px; transition: background .2s;
+    background: rgba(255,255,255,.08); border: 1px solid var(--border);
+    color: #fff; padding: 7px 20px; border-radius: 24px; cursor: pointer;
+    font-size: 12px; transition: background .2s;
   }
   .nav-btn:hover { background: var(--accent1); }
-  #page-info { font-size: 13px; color: var(--muted); min-width: 64px; text-align: center; }
+  #page-info { font-size: 12px; color: var(--muted); min-width: 64px; text-align: center; }
 
   #progress {
     position: fixed; top: 0; left: 0; height: 3px;
     background: linear-gradient(90deg, var(--accent1), var(--accent2));
-    transition: width .4s ease; z-index: 200;
+    transition: width .35s ease; z-index: 200;
   }
 
-  /* ── Common layout helpers ── */
+  /* Layout helpers */
   .slide-title {
-    font-size: 13px; letter-spacing: 3px; text-transform: uppercase;
-    color: var(--accent2); margin-bottom: 10px; font-weight: 500;
+    font-size: 12px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--accent2); margin-bottom: 8px; font-weight: 500;
   }
-  h1 { font-size: clamp(28px,4vw,52px); font-weight: 700; line-height: 1.15; }
-  h2 { font-size: clamp(22px,3vw,36px); font-weight: 700; }
-  h3 { font-size: 18px; font-weight: 600; }
-  .sub { font-size: clamp(14px,1.4vw,18px); color: var(--muted); margin-top: 12px; line-height: 1.7; }
+  h1 { font-size: clamp(26px,3.6vw,46px); font-weight: 700; line-height: 1.18; }
+  h2 { font-size: clamp(20px,2.6vw,32px); font-weight: 700; line-height: 1.25; }
+  h3 { font-size: 16px; font-weight: 600; }
+  h4 { font-size: 13px; font-weight: 600; }
+  .sub  { font-size: clamp(13px,1.2vw,16px); color: var(--muted); margin-top: 10px; line-height: 1.65; }
+  .lead { font-size: 15px; color: var(--text); line-height: 1.75; }
   .accent { color: var(--accent2); }
   .gold   { color: var(--gold); }
   .green  { color: var(--green); }
   .purple { color: var(--accent3); }
+  .red    { color: var(--red); }
 
-  /* ── Cards ── */
   .card {
     background: var(--blue-card);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 24px 28px;
+    border-radius: 14px;
+    padding: 18px 22px;
   }
   .card-grid {
-    display: grid; gap: 20px; width: 100%; max-width: 1100px;
+    display: grid; gap: 16px; width: 100%; max-width: 1100px;
   }
   .cols-2 { grid-template-columns: 1fr 1fr; }
   .cols-3 { grid-template-columns: 1fr 1fr 1fr; }
   .cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
 
-  /* ── Cover ── */
+  .container { width: 100%; max-width: 1100px; }
+  .divider { width: 56px; height: 3px; background: linear-gradient(90deg, var(--accent1), var(--accent2)); border-radius: 2px; margin: 10px 0 18px; }
+
+  /* Source citation */
+  .src {
+    font-size: 10px; color: var(--muted); font-style: italic;
+    margin-top: 4px; letter-spacing: .3px;
+  }
+  .src-row {
+    margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--border);
+    font-size: 10px; color: var(--muted); line-height: 1.6;
+  }
+  .src-row strong { color: #cbd5e1; font-style: normal; }
+
+  /* Cover */
   #s-cover {
     background:
       radial-gradient(ellipse 60% 70% at 80% 50%, rgba(37,99,235,.18) 0%, transparent 60%),
@@ -100,157 +114,331 @@
   }
   #s-cover .badge {
     background: rgba(37,99,235,.2); border: 1px solid rgba(37,99,235,.5);
-    padding: 5px 16px; border-radius: 20px; font-size: 13px; color: var(--accent2);
-    margin-bottom: 24px; display: inline-block;
+    padding: 5px 16px; border-radius: 20px; font-size: 12px; color: var(--accent2);
+    margin-bottom: 22px; display: inline-block;
   }
-  #s-cover h1 { font-size: clamp(30px,5vw,64px); max-width: 800px; text-align: center; }
+  #s-cover h1 { font-size: clamp(28px,4.5vw,58px); max-width: 880px; text-align: center; }
   #s-cover h1 span { color: var(--accent2); }
   #s-cover .meta {
-    display: flex; gap: 32px; margin-top: 40px; align-items: center;
+    display: flex; gap: 28px; margin-top: 36px; align-items: center;
   }
   #s-cover .logo-pill {
     background: rgba(255,255,255,.07); border: 1px solid var(--border);
-    padding: 8px 20px; border-radius: 30px; font-size: 14px; font-weight: 600;
+    padding: 7px 18px; border-radius: 30px; font-size: 13px; font-weight: 600;
+  }
+  #s-cover .audience {
+    margin-top: 28px; font-size: 12px; color: var(--muted);
+    letter-spacing: 1.5px; text-transform: uppercase;
   }
 
-  /* ── Highlight numbers ── */
-  .stat-box { text-align: center; }
-  .stat-num { font-size: clamp(28px,4vw,52px); font-weight: 800; line-height: 1; }
-  .stat-lbl { font-size: 12px; color: var(--muted); margin-top: 6px; letter-spacing: 1px; }
-
-  /* ── Flow arrows ── */
-  .flow {
-    display: flex; align-items: center; gap: 0; width: 100%; max-width: 1050px;
+  /* Tag */
+  .tag {
+    display: inline-block; font-size: 10px; padding: 2px 10px; border-radius: 12px;
+    font-weight: 600; letter-spacing: .5px;
   }
+  .tag-blue   { background: rgba(37,99,235,.25);  color: var(--accent2); border: 1px solid rgba(37,99,235,.4); }
+  .tag-green  { background: rgba(16,185,129,.2);   color: var(--green);   border: 1px solid rgba(16,185,129,.4); }
+  .tag-purple { background: rgba(139,92,246,.2);  color: var(--accent3); border: 1px solid rgba(139,92,246,.4); }
+  .tag-gold   { background: rgba(245,158,11,.2);  color: var(--gold);    border: 1px solid rgba(245,158,11,.4); }
+  .tag-red    { background: rgba(239,68,68,.2);   color: var(--red);     border: 1px solid rgba(239,68,68,.4); }
+
+  /* Highlight key sentence box */
+  .kicker {
+    background: rgba(37,99,235,.1);
+    border-left: 3px solid var(--accent2);
+    padding: 12px 18px;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.7;
+    margin-top: 14px;
+  }
+  .kicker strong { color: var(--accent2); }
+
+  /* Match-matrix table */
+  .matrix {
+    width: 100%; border-collapse: collapse; font-size: 12.5px;
+    background: var(--blue-card); border-radius: 12px; overflow: hidden;
+  }
+  .matrix th, .matrix td {
+    padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .matrix th {
+    background: rgba(37,99,235,.15); color: var(--accent2);
+    font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+    font-weight: 600;
+  }
+  .matrix tr:last-child td { border-bottom: none; }
+  .matrix .need { color: var(--text); font-weight: 600; width: 22%; }
+  .matrix .why  { color: var(--muted); width: 28%; }
+  .matrix .cap  { color: var(--green); font-weight: 600; width: 22%; }
+  .matrix .ev   { color: var(--muted); width: 28%; font-size: 11.5px; }
+
+  /* Competition quadrant */
+  .quad-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 900px; }
+  .quad-cell {
+    background: var(--blue-card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 16px; min-height: 130px;
+  }
+  .quad-cell h4 { font-size: 12px; letter-spacing: 1px; margin-bottom: 4px; }
+  .quad-cell .name { font-size: 14px; font-weight: 700; margin: 4px 0; color: var(--text); }
+  .quad-cell .gap  { font-size: 11px; color: var(--muted); line-height: 1.6; margin-top: 4px; }
+  .quad-cell.win { background: linear-gradient(135deg, rgba(6,182,212,.15), rgba(139,92,246,.1)); border-color: var(--accent2); }
+  .quad-cell.win .name { color: var(--accent2); }
+  .quad-axis {
+    text-align: center; font-size: 10px; letter-spacing: 1.5px;
+    color: var(--muted); padding: 4px 0; text-transform: uppercase;
+  }
+
+  /* GTM phases */
+  .gtm {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;
+    width: 100%; max-width: 1100px;
+  }
+  .gtm-phase {
+    background: var(--blue-card); border-radius: 12px;
+    border-top: 4px solid; padding: 16px 18px;
+  }
+  .gtm-phase:nth-child(1) { border-color: var(--accent2); }
+  .gtm-phase:nth-child(2) { border-color: var(--accent1); }
+  .gtm-phase:nth-child(3) { border-color: var(--accent3); }
+  .gtm-phase .when {
+    font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase;
+  }
+  .gtm-phase .who {
+    font-size: 11px; color: var(--gold); margin-top: 8px; line-height: 1.6;
+  }
+  .gtm-phase h3 { font-size: 15px; margin-top: 2px; }
+  .gtm-phase .sell {
+    margin-top: 10px; font-size: 12px; line-height: 1.7;
+    color: var(--text);
+  }
+  .gtm-phase .ms {
+    margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border);
+    font-size: 11px; color: var(--muted);
+  }
+  .gtm-phase .ms b { color: var(--accent2); font-weight: 600; }
+
+  /* Revenue model */
+  .rev {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; max-width: 1050px;
+  }
+  .rev-card {
+    background: var(--blue-card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .rev-card .rh {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .rev-card .rnum {
+    font-size: 22px; font-weight: 800; color: var(--accent2);
+    width: 36px; text-align: center;
+  }
+  .rev-card .rt { font-size: 14px; font-weight: 700; }
+  .rev-card .who { font-size: 11px; color: var(--gold); margin-top: 6px; }
+  .rev-card .what { font-size: 12px; color: var(--text); margin-top: 8px; line-height: 1.7; }
+  .rev-card .lever { font-size: 11px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+
+  /* Flywheel */
+  .flywheel {
+    display: grid; grid-template-columns: 1fr 36px 1fr 36px 1fr 36px 1fr;
+    align-items: center; gap: 4px;
+    width: 100%; max-width: 1050px;
+  }
+  .fw-node {
+    background: var(--blue-card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 12px; text-align: center; min-height: 110px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .fw-node .ic { font-size: 24px; }
+  .fw-node h4  { font-size: 13px; margin-top: 6px; }
+  .fw-node p   { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+  .fw-arr      { text-align: center; font-size: 20px; color: var(--accent2); }
+  .fw-loop {
+    margin-top: 18px; padding: 14px 20px; border: 1px dashed var(--accent2); border-radius: 12px;
+    font-size: 12.5px; color: var(--text); text-align: center; line-height: 1.7;
+    background: rgba(6,182,212,.05);
+  }
+
+  /* Flow / steps (existing) */
+  .flow { display: flex; align-items: center; gap: 0; width: 100%; max-width: 1050px; }
   .flow-node {
     flex: 1; background: var(--blue-card); border: 1px solid var(--border);
-    border-radius: 12px; padding: 18px 14px; text-align: center;
-    font-size: 13px; font-weight: 600; line-height: 1.5; position: relative;
+    border-radius: 10px; padding: 14px 10px; text-align: center;
+    font-size: 12px; font-weight: 600; line-height: 1.5;
   }
-  .flow-node .icon { font-size: 24px; display: block; margin-bottom: 6px; }
-  .flow-arrow {
-    flex: 0 0 32px; text-align: center; font-size: 20px; color: var(--accent2);
-  }
+  .flow-node .icon { font-size: 22px; display: block; margin-bottom: 4px; }
+  .flow-arrow { flex: 0 0 28px; text-align: center; font-size: 18px; color: var(--accent2); }
   .flow-node.highlight { border-color: var(--accent1); background: rgba(37,99,235,.15); }
 
-  /* ── Timeline ── */
+  /* Timeline (demo story) */
   .timeline { width: 100%; max-width: 960px; }
-  .tl-item {
-    display: flex; gap: 24px; align-items: flex-start; margin-bottom: 20px;
-  }
+  .tl-item { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 14px; }
   .tl-badge {
-    flex: 0 0 44px; height: 44px; border-radius: 50%;
+    flex: 0 0 38px; height: 38px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 18px; font-weight: 800; border: 2px solid var(--accent1);
+    font-size: 15px; font-weight: 800; border: 2px solid var(--accent1);
     color: var(--accent2);
   }
-  .tl-body h3 { font-size: 16px; }
-  .tl-body p  { font-size: 13px; color: var(--muted); margin-top: 4px; line-height: 1.6; }
+  .tl-body h3 { font-size: 14px; }
+  .tl-body p  { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.6; }
 
-  /* ── Step circles ── */
-  .steps {
-    display: flex; align-items: flex-start; gap: 0; width: 100%; max-width: 1080px; flex-wrap: nowrap;
-  }
-  .step { flex: 1; text-align: center; padding: 0 8px; }
-  .step-circle {
-    width: 52px; height: 52px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent1), var(--accent3));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; margin: 0 auto 10px;
-  }
-  .step-line {
-    flex: 0 0 32px; height: 2px; background: linear-gradient(90deg, var(--accent1), var(--accent2));
-    margin-top: 26px;
-  }
-  .step h4 { font-size: 13px; font-weight: 600; }
-  .step p  { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
-
-  /* ── Role cards ── */
-  .role-card { position: relative; overflow: hidden; }
-  .role-card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  }
-  .role-ns::before  { background: linear-gradient(90deg, var(--accent1), var(--accent2)); }
-  .role-wea::before { background: linear-gradient(90deg, var(--green), var(--accent2)); }
-  .role-sol::before { background: linear-gradient(90deg, var(--accent3), var(--gold)); }
-  .role-usr::before { background: linear-gradient(90deg, var(--gold), var(--green)); }
-
-  /* ── Token flow diagram ── */
-  .tok-flow {
+  /* ── Motion slide (X402 in motion · 受 web4.ai 启发) ─────────── */
+  .motion-actors {
     display: grid;
-    grid-template-columns: 1fr 60px 1fr 60px 1fr;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    width: 100%; max-width: 980px;
+    margin-bottom: 4px;
+  }
+  .motion-actor {
+    background: var(--blue-card); border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 8px;
+    text-align: center;
+    font-size: 12px; font-weight: 600;
+    position: relative;
+  }
+  .motion-actor .ic { font-size: 20px; display: block; margin-bottom: 4px; }
+  .motion-actor .sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .motion-flow {
+    width: 100%; max-width: 980px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    row-gap: 6px;
+    padding: 4px 0;
+    position: relative;
+  }
+  /* vertical rails behind the rows */
+  .motion-flow::before, .motion-flow::after { content: none; }
+  .motion-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', 'SF Mono', monospace;
+    font-size: 12px;
+    opacity: .25;
+    transition: opacity .25s ease, background .25s ease, color .25s ease;
+    animation: motion-pulse 8s ease-in-out infinite;
+  }
+  .motion-row.active,
+  .motion-row:hover { opacity: 1 !important; background: rgba(6,182,212,.12); color: var(--accent2); }
+  .motion-row .num {
+    flex: 0 0 24px; height: 24px; border-radius: 50%;
+    background: var(--blue-card); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--accent2);
+  }
+  .motion-row .arrow { color: var(--accent2); font-size: 14px; }
+  .motion-row .label { flex: 1; color: var(--text); font-size: 11.5px; }
+  .motion-row .note  { color: var(--muted); font-size: 10px; }
+  /* place rows in the right "column corridors" using grid-column */
+  .motion-row.col-1-2 { grid-column: 1 / span 2; }
+  .motion-row.col-2-3 { grid-column: 2 / span 2; }
+  .motion-row.col-3-4 { grid-column: 3 / span 2; }
+
+  @keyframes motion-pulse {
+    0%, 12.4% { opacity: 1; background: rgba(6,182,212,.18); color: var(--accent2); }
+    12.5%, 100% { opacity: .25; background: transparent; }
+  }
+  .motion-row:nth-of-type(1) { animation-delay: 0s; }
+  .motion-row:nth-of-type(2) { animation-delay: 1s; }
+  .motion-row:nth-of-type(3) { animation-delay: 2s; }
+  .motion-row:nth-of-type(4) { animation-delay: 3s; }
+  .motion-row:nth-of-type(5) { animation-delay: 4s; }
+  .motion-row:nth-of-type(6) { animation-delay: 5s; }
+  .motion-row:nth-of-type(7) { animation-delay: 6s; }
+  .motion-row:nth-of-type(8) { animation-delay: 7s; }
+  @media (prefers-reduced-motion: reduce) {
+    .motion-row { animation: none; opacity: 1 !important; }
+  }
+
+  /* Live tx ticker */
+  .tx-ticker {
+    width: 100%; max-width: 980px;
+    background: var(--blue-card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 14px;
+    margin-top: 12px;
+  }
+  .tx-ticker-head {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 10px; letter-spacing: 1.5px; color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .live-dot {
+    width: 8px; height: 8px; background: var(--green); border-radius: 50%;
+    animation: live-pulse 1.6s ease-in-out infinite;
+    box-shadow: 0 0 0 0 rgba(16,185,129,.6);
+  }
+  @keyframes live-pulse {
+    0%   { box-shadow: 0 0 0 0   rgba(16,185,129,.6); }
+    70%  { box-shadow: 0 0 0 10px rgba(16,185,129,0); }
+    100% { box-shadow: 0 0 0 0   rgba(16,185,129,0); }
+  }
+  @media (prefers-reduced-motion: reduce) { .live-dot { animation: none; } }
+  .tx-row {
+    display: grid;
+    grid-template-columns: 16px 1fr 200px 80px 60px;
     align-items: center;
-    gap: 8px;
-    width: 100%; max-width: 900px;
+    gap: 10px;
+    font-family: 'JetBrains Mono', 'SF Mono', monospace;
+    font-size: 11.5px;
+    padding: 4px 0;
+    border-bottom: 1px dashed var(--border);
   }
-  .tok-node {
-    background: var(--blue-card); border: 1px solid var(--border); border-radius: 14px;
-    padding: 20px 16px; text-align: center;
-  }
-  .tok-node .tk-icon { font-size: 28px; }
-  .tok-node h4 { font-size: 14px; margin-top: 8px; }
-  .tok-node p  { font-size: 11px; color: var(--muted); margin-top: 4px; }
-  .tok-arr     { text-align: center; font-size: 22px; color: var(--accent2); }
+  .tx-row:last-child { border-bottom: none; }
+  .tx-row .gt   { color: var(--accent2); }
+  .tx-row .desc { color: var(--text); }
+  .tx-row .path { color: var(--muted); font-size: 10.5px; }
+  .tx-row .amt  { color: var(--gold); font-variant-numeric: tabular-nums; text-align: right; font-weight: 600; }
+  .tx-row .ago  { color: var(--muted); font-size: 10px; text-align: right; }
 
-  /* ── Checklist ── */
-  .checklist { list-style: none; width: 100%; max-width: 700px; }
-  .checklist li {
-    padding: 10px 0; border-bottom: 1px solid var(--border);
-    display: flex; gap: 12px; align-items: flex-start; font-size: 15px;
-  }
-  .checklist li:last-child { border-bottom: none; }
-  .check-icon { flex: 0 0 22px; color: var(--green); font-weight: 700; margin-top: 1px; }
-
-  /* ── Security grid ── */
-  .sec-item {
-    display: flex; gap: 14px; align-items: flex-start;
-  }
-  .sec-icon {
-    flex: 0 0 42px; height: 42px; border-radius: 10px;
-    background: rgba(139,92,246,.2); border: 1px solid rgba(139,92,246,.4);
-    display: flex; align-items: center; justify-content: center; font-size: 20px;
-  }
-
-  /* ── Roadmap ── */
-  .roadmap {
-    display: flex; gap: 0; width: 100%; max-width: 1050px; align-items: stretch;
-  }
-  .rm-phase {
-    flex: 1; padding: 20px 16px; border-top: 3px solid;
-    border-right: 1px solid var(--border);
-  }
+  /* Roadmap */
+  .roadmap { display: flex; gap: 0; width: 100%; max-width: 1050px; }
+  .rm-phase { flex: 1; padding: 16px 14px; border-top: 3px solid; border-right: 1px solid var(--border); }
   .rm-phase:last-child { border-right: none; }
   .rm-phase:nth-child(1) { border-color: var(--accent2); }
   .rm-phase:nth-child(2) { border-color: var(--accent1); }
   .rm-phase:nth-child(3) { border-color: var(--accent3); }
   .rm-phase:nth-child(4) { border-color: var(--gold); }
-  .rm-phase h3 { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; }
+  .rm-phase h3 { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; }
   .rm-phase .rm-tag {
-    display: inline-block; font-size: 11px; padding: 2px 10px; border-radius: 12px;
-    background: rgba(255,255,255,.08); margin: 6px 0 12px; color: var(--muted);
+    display: inline-block; font-size: 10px; padding: 2px 9px; border-radius: 12px;
+    background: rgba(255,255,255,.08); margin: 5px 0 10px; color: var(--muted);
   }
   .rm-phase ul { list-style: none; }
-  .rm-phase ul li { font-size: 12px; padding: 4px 0; border-bottom: 1px solid var(--border); color: var(--muted); }
+  .rm-phase ul li { font-size: 11px; padding: 3px 0; border-bottom: 1px solid var(--border); color: var(--muted); }
   .rm-phase ul li:last-child { border-bottom: none; }
   .rm-phase ul li::before { content: '→ '; color: var(--accent2); }
 
-  /* ── Market numbers slide ── */
-  .market-grid {
-    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; width: 100%; max-width: 900px;
+  /* Risks */
+  .risk-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; width: 100%; max-width: 1080px; }
+  .risk-card {
+    background: var(--blue-card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 18px;
   }
-  .mkt-card {
-    background: var(--blue-card); border: 1px solid var(--border); border-radius: 16px;
-    padding: 28px 24px; text-align: center;
-  }
-  .mkt-card .mkt-num {
-    font-size: 38px; font-weight: 800;
-    background: linear-gradient(135deg, var(--accent2), var(--accent3));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .mkt-card .mkt-label { font-size: 13px; color: var(--muted); margin-top: 6px; }
-  .mkt-card .mkt-desc  { font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.6; }
+  .risk-card .rk-head { display: flex; gap: 10px; align-items: center; }
+  .risk-card .rk-num { font-size: 22px; font-weight: 800; color: var(--red); }
+  .risk-card h3 { font-size: 14px; }
+  .risk-card .risk { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.7; }
+  .risk-card .mit  { margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border); font-size: 12px; color: var(--green); line-height: 1.65; }
+  .risk-card .mit b { color: var(--green); }
 
-  /* ── Closing ── */
+  /* Decision asks */
+  .ask-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; width: 100%; max-width: 1050px; }
+  .ask-card {
+    background: var(--blue-card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 20px; position: relative;
+  }
+  .ask-card .num {
+    position: absolute; top: 14px; right: 16px; font-size: 30px; font-weight: 800;
+    color: rgba(6,182,212,.25); line-height: 1;
+  }
+  .ask-card h3 { font-size: 15px; }
+  .ask-card p  { font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.7; }
+
+  /* Closing */
   #s-close {
     background:
       radial-gradient(ellipse 50% 60% at 30% 50%, rgba(37,99,235,.2) 0%, transparent 55%),
@@ -258,29 +446,10 @@
       var(--blue-dark);
     text-align: center;
   }
-  .cta-btn {
-    display: inline-block; margin-top: 32px; padding: 14px 40px;
-    background: linear-gradient(135deg, var(--accent1), var(--accent2));
-    border-radius: 32px; font-size: 16px; font-weight: 600; color: #fff;
-    border: none; cursor: default; letter-spacing: .5px;
+
+  .scroll-inner {
+    overflow-y: auto; max-height: calc(100vh - 100px); width: 100%; padding-bottom: 20px;
   }
-
-  /* full-width util */
-  .w-full { width: 100%; max-width: 1100px; }
-
-  .tag {
-    display: inline-block; font-size: 11px; padding: 3px 12px; border-radius: 14px;
-    font-weight: 600; letter-spacing: .5px;
-  }
-  .tag-blue   { background: rgba(37,99,235,.25);  color: var(--accent2); border: 1px solid rgba(37,99,235,.4); }
-  .tag-green  { background: rgba(16,185,129,.2);   color: var(--green);   border: 1px solid rgba(16,185,129,.4); }
-  .tag-purple { background: rgba(139,92,246,.2);  color: var(--accent3); border: 1px solid rgba(139,92,246,.4); }
-  .tag-gold   { background: rgba(245,158,11,.2);  color: var(--gold);    border: 1px solid rgba(245,158,11,.4); }
-
-  .divider { width: 60px; height: 3px; background: linear-gradient(90deg, var(--accent1), var(--accent2)); border-radius: 2px; margin: 14px 0; }
-
-  /* scrollable inner for dense slides */
-  .scroll-inner { overflow-y: auto; max-height: calc(100vh - 140px); width: 100%; padding-bottom: 24px; }
   .scroll-inner::-webkit-scrollbar { width: 4px; }
   .scroll-inner::-webkit-scrollbar-track { background: transparent; }
   .scroll-inner::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 2px; }
@@ -292,14 +461,15 @@
 
 <div id="deck">
 
-  <!-- ═══════════════════════════════════════════════
-       SLIDE 01 · COVER
-  ════════════════════════════════════════════════ -->
+  <!-- 01 · COVER -->
   <div class="slide" id="s-cover">
-    <div class="badge">CONFIDENTIAL · EXECUTIVE BRIEFING · 2026</div>
-    <h1>X402 Token Market<br><span>Agentic Commerce</span> 支付解决方案</h1>
-    <p class="sub" style="text-align:center;max-width:620px">
-      基于 X402 协议与稳定币 USDC，构建下一代 AI Agent 支付基础设施
+    <div class="badge">EXECUTIVE BRIEFING · 2026</div>
+    <h1>把 X402 + USDC + AI Token<br>
+      包装成 <span>商户可购买的</span><br>
+      Agent Commerce 支付服务包
+    </h1>
+    <p class="sub" style="text-align:center;max-width:640px">
+      Netstars × Wea Japan × Solana — 从「能完成支付」到「可销售、可结算、可对账」的样板间
     </p>
     <div class="meta">
       <div class="logo-pill">🏢 Netstars（日経 5590）</div>
@@ -308,829 +478,921 @@
       <div style="color:var(--muted);font-size:13px">×</div>
       <div class="logo-pill">◎ Solana</div>
     </div>
+    <div class="audience">面向经营层 · 用于商业决策</div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════
-       SLIDE 02 · EXECUTIVE SUMMARY
-  ════════════════════════════════════════════════ -->
+  <!-- 02 · EXECUTIVE SUMMARY -->
   <div class="slide" id="s-exec">
-    <div style="width:100%;max-width:1050px">
+    <div class="container">
       <div class="slide-title">EXECUTIVE SUMMARY</div>
-      <h2>三个关键战略机遇，一套完整解决方案</h2>
+      <h2>这不是一次技术 PoC，而是把 AI Token 变成可售商品的样板间</h2>
       <div class="divider"></div>
-      <div class="card-grid cols-3" style="margin-top:28px">
+      <div class="kicker" style="margin-top:18px">
+        经营层需要判断的不是 <strong>"我们能不能在链上转账"</strong>，
+        而是 Netstars 能否把 <strong>支付 + Token + 账务 + 商户接入</strong> 打包为
+        <strong>可规模化销售的服务</strong>，把过去几年攒下的 Web2 + Web3 + AI 三张牌一次性变现。
+      </div>
+      <div class="card-grid cols-3" style="margin-top:18px">
         <div class="card">
-          <div style="font-size:32px;margin-bottom:12px">🤖</div>
-          <h3 class="accent">Agentic Commerce 崛起</h3>
-          <p class="sub" style="font-size:13px;margin-top:8px">
-            AI Agent 自主完成商业交易成为趋势，传统支付体系无法满足高频、小额、无人值守的新型需求
-          </p>
+          <span class="tag tag-blue">市场触发</span>
+          <h3 style="margin-top:8px">AI Agent 改写支付需求</h3>
+          <p class="sub" style="font-size:12.5px">Agent 自主调用带来小额、高频、按需的 Token 消耗。传统一次性购买与人工确认覆盖不了这个场景。</p>
         </div>
         <div class="card">
-          <div style="font-size:32px;margin-bottom:12px">💰</div>
-          <h3 class="gold">AI Token 市场爆发</h3>
-          <p class="sub" style="font-size:13px;margin-top:8px">
-            Anthropic、OpenAI、xAI、Google 授权 Netstars 在日本独家销售 AI Token，市场蓝海已打开
-          </p>
+          <span class="tag tag-green">独占位置</span>
+          <h3 style="margin-top:8px">日本只有 Netstars 同时占住三张牌</h3>
+          <p class="sub" style="font-size:12.5px">Web2 聚合支付牌照 ＋ Web3 USDC 商户结算 PoC 经验 ＋ 四大 AI 公司日本销售授权。</p>
         </div>
         <div class="card">
-          <div style="font-size:32px;margin-bottom:12px">🌐</div>
-          <h3 class="purple">Web3 支付优势</h3>
-          <p class="sub" style="font-size:13px;margin-top:8px">
-            亚洲首家落地 USDC 稳定币支付（羽田机场 PoC），X402 协议打通链上链下双轨道
-          </p>
+          <span class="tag tag-purple">商业落点</span>
+          <h3 style="margin-top:8px">从协议能力 → 商户服务包</h3>
+          <p class="sub" style="font-size:12.5px">SDK / API / MCP + Console + 套餐 + 结算 — 让商户购买的是一个完整服务，而不是一项协议。</p>
         </div>
       </div>
-      <div class="card" style="margin-top:20px;background:rgba(37,99,235,.1);border-color:rgba(37,99,235,.3)">
-        <p style="font-size:15px;line-height:1.8;text-align:center">
-          本 Demo 将完整展示：<strong class="accent">用 USDC + X402 购买 AI Token</strong>，
-          并通过 Token <strong class="accent">驱动 Agent 完成真实商业任务</strong>——
-          端到端验证 Netstars 作为 Web2.0 + Web3.0 双轨支付服务商的核心能力
+      <div class="card" style="margin-top:14px;background:rgba(37,99,235,.08);border-color:rgba(37,99,235,.3)">
+        <p class="lead" style="font-size:14px;text-align:center">
+          <strong class="accent">本简报要回答 4 个经营问题</strong>：
+          ① 市场需求与我们的能力是否真正匹配？
+          ② 我们的竞争位置是否独占？
+          ③ 怎么赚钱？
+          ④ 怎么开拓、怎么放大？
         </p>
       </div>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════
-       SLIDE 03 · 市场背景
-  ════════════════════════════════════════════════ -->
-  <div class="slide" id="s-market">
-    <div style="width:100%;max-width:1050px">
-      <div class="slide-title">MARKET CONTEXT</div>
-      <h2>AI 支付市场：规模、速度与窗口期</h2>
+  <!-- 03 · THE SHIFT -->
+  <div class="slide" id="s-shift">
+    <div class="container">
+      <div class="slide-title">THE SHIFT</div>
+      <h2>支付的"客户"正在从人变成 Agent</h2>
       <div class="divider"></div>
-      <div class="market-grid" style="margin-top:28px">
-        <div class="mkt-card">
-          <div class="mkt-num">$4.1T</div>
-          <div class="mkt-label">2025 全球 AI 市场规模预测</div>
-          <div class="mkt-desc">Token 消耗将成为 AI 产业的"电费"，日本市场份额约 8%</div>
+      <div class="card-grid cols-2" style="margin-top:18px">
+        <div class="card">
+          <span class="tag tag-gold">传统支付场景</span>
+          <h3 style="margin-top:10px">人发起 · 大额 · 一次性</h3>
+          <ul style="list-style:none;margin-top:10px">
+            <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12.5px">· 一次性购买、页面跳转、人工确认</li>
+            <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12.5px">· 按订单结算、按月对账</li>
+            <li style="padding:6px 0;font-size:12.5px">· 适合商品交易，<span class="red">不适合</span> Agent 在调用中连续付费</li>
+          </ul>
         </div>
-        <div class="mkt-card">
-          <div class="mkt-num">47×</div>
-          <div class="mkt-label">Agentic AI 交易量年增速</div>
-          <div class="mkt-desc">Agent 自主支付场景需要专为机器设计的支付协议，传统支付难以胜任</div>
-        </div>
-        <div class="mkt-card">
-          <div class="mkt-num">$250B</div>
-          <div class="mkt-label">2026 稳定币支付规模预测</div>
-          <div class="mkt-desc">亚太区 USDC 落地加速，Netstars 已占据先发优势</div>
+        <div class="card" style="border-color:rgba(6,182,212,.4);background:rgba(6,182,212,.05)">
+          <span class="tag tag-blue">Agentic Commerce 新需求</span>
+          <h3 style="margin-top:10px">Agent 发起 · 微额 · 持续 · 自治</h3>
+          <ul style="list-style:none;margin-top:10px">
+            <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12.5px">· 单次调用价值很小（次/分/秒级）</li>
+            <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12.5px">· 高频、连续、无人值守</li>
+            <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12.5px">· 支付状态必须即时返回</li>
+            <li style="padding:6px 0;font-size:12.5px">· 资金和数据要留痕、可对账</li>
+          </ul>
         </div>
       </div>
-      <div class="card-grid cols-2" style="margin-top:20px">
-        <div class="card">
-          <h3>🎯 为什么是现在</h3>
-          <p class="sub" style="font-size:13px;margin-top:8px">
-            四大 AI 公司授权窗口已开，日本市场 AI Token 需求快速增长。
-            先于竞争者建立支付基础设施，意味着锁定长期分发渠道
-          </p>
-        </div>
-        <div class="card">
-          <h3>🏆 Netstars 的独特位置</h3>
-          <p class="sub" style="font-size:13px;margin-top:8px">
-            同时持有 Web2.0 聚合支付牌照 ＋ Web3.0 USDC 落地经验，
-            是日本极少数能打通双轨的支付服务商
-          </p>
-        </div>
+      <div class="kicker" style="margin-top:14px">
+        <strong>经营视角的结论</strong>：
+        谁能把<strong>支付授权 + Token 库存 + 调用计费 + 结算票据</strong>放进同一个商户服务包，
+        谁就最有机会成为 Agent Commerce 的支付基础设施入口。
+        这正是 Netstars 已有牌面能直接落地的方向。
+      </div>
+      <div class="src-row">
+        <strong>事实依据</strong>：Coinbase 于 2025-05 正式发布 x402 协议（HTTP 402 + 链上稳定币支付的开放标准）；
+        Anthropic 于 2025-11 在 Claude Agent SDK 中将 x402 作为推荐的 Agent 支付方案。
+        来源：Coinbase 官方博客 / Anthropic 文档。
       </div>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════
-       SLIDE 04 · 公司与合作伙伴
-  ════════════════════════════════════════════════ -->
-  <div class="slide" id="s-partners">
-    <div style="width:100%;max-width:1050px">
-      <div class="slide-title">STAKEHOLDERS</div>
-      <h2>生态主体与职责划分</h2>
+  <!-- 04 · MARKET SIGNALS -->
+  <div class="slide" id="s-signals">
+    <div class="container">
+      <div class="slide-title">MARKET SIGNALS · 不预测，只列已发生的事实</div>
+      <h2>四个可验证信号：窗口期已开</h2>
       <div class="divider"></div>
-      <div class="card-grid cols-2" style="margin-top:28px;gap:16px">
-        <div class="card role-card role-ns">
-          <span class="tag tag-blue" style="margin-bottom:10px">核心主体</span>
-          <h3>🏢 Netstars（日経 5590）</h3>
-          <ul style="list-style:none;margin-top:12px">
-            <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">✦ X402 网关提供商 / 支付服务商</li>
-            <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">✦ AI Token 独家销售商（JP市场）</li>
-            <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">✦ Token 系统：充值、计费、发票、查询</li>
-            <li style="padding:6px 0;font-size:13px">✦ 对外 SDK / API / MCP 接口提供</li>
-          </ul>
+      <div class="card-grid cols-2" style="margin-top:18px">
+        <div class="card">
+          <div style="display:flex;gap:14px;align-items:flex-start">
+            <div style="font-size:28px">①</div>
+            <div>
+              <h3>四大 AI 公司授权 Netstars 日本销售</h3>
+              <p class="sub" style="font-size:12.5px">Anthropic、OpenAI、xAI、Google 通过云服务模式授权 Netstars 销售其 AI Token。这是日本市场极少数同时拿齐四家授权的支付服务商。</p>
+              <p class="src">来源：Netstars 商务合同（内部）· 2025</p>
+            </div>
+          </div>
         </div>
-        <div class="card role-card role-wea">
-          <span class="tag tag-green" style="margin-bottom:10px">链上执行</span>
-          <h3>⛓️ Wea Japan</h3>
-          <ul style="list-style:none;margin-top:12px">
-            <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">✦ Solana 链上实际执行方</li>
-            <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">✦ USDC 充值、支付、结算处理</li>
-            <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">✦ 亚洲首家 USDC 落地（羽田机场 PoC）</li>
-            <li style="padding:6px 0;font-size:13px">✦ 链上交易结果回传 Netstars</li>
-          </ul>
+        <div class="card">
+          <div style="display:flex;gap:14px;align-items:flex-start">
+            <div style="font-size:28px">②</div>
+            <div>
+              <h3>稳定币支付 PoC 已完成端到端验证</h3>
+              <p class="sub" style="font-size:12.5px">Netstars × Wea Japan 已联合完成亚洲领先的 USDC 商户结算 PoC：从链上稳定币收款到日元商户入账，全链路打通并经过真实业务流量验证。技术与合规路径已成熟。</p>
+              <p class="src">来源：Netstars × Wea Japan 内部 PoC 报告 · 2026-Q1</p>
+            </div>
+          </div>
         </div>
-        <div class="card role-card role-usr">
-          <span class="tag tag-gold" style="margin-bottom:10px">使用方</span>
-          <h3>🤖 用户侧 Agent</h3>
-          <ul style="list-style:none;margin-top:12px">
-            <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">✦ 调用 Netstars SDK 购买 Token</li>
-            <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">✦ 使用 Token 调用 AI 服务</li>
-            <li style="padding:6px 0;font-size:13px">✦ 自主完成商业任务（无人值守）</li>
-          </ul>
+        <div class="card">
+          <div style="display:flex;gap:14px;align-items:flex-start">
+            <div style="font-size:28px">③</div>
+            <div>
+              <h3>x402 已成为 Agent 支付的事实标准</h3>
+              <p class="sub" style="font-size:12.5px">Coinbase 主导开源 x402，Anthropic 在 Claude Agent SDK 推荐采用，AP2（Google Agent Payments Protocol）兼容 x402。机器到机器支付的协议层已经收敛。</p>
+              <p class="src">来源：Coinbase x402 GitHub / Anthropic Agent SDK 文档 / Google AP2 spec</p>
+            </div>
+          </div>
         </div>
-        <div class="card role-card role-sol">
-          <span class="tag tag-purple" style="margin-bottom:10px">基础设施</span>
-          <h3>◎ Solana 公链</h3>
-          <ul style="list-style:none;margin-top:12px">
-            <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">✦ 高速低费链上结算（&lt;1s 确认）</li>
-            <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">✦ USDC 原生发行链</li>
-            <li style="padding:6px 0;font-size:13px">✦ 与 X402 协议形成生态闭环</li>
-          </ul>
+        <div class="card">
+          <div style="display:flex;gap:14px;align-items:flex-start">
+            <div style="font-size:28px">④</div>
+            <div>
+              <h3>日本企业生成式 AI 采用率 1 年内翻倍</h3>
+              <p class="sub" style="font-size:12.5px">METI 调查显示，日本大企业生成式 AI 采用率从 2023 年的 ~24% 上升至 2024 年的 ~50%；中小企业紧随其后。"按调用计费"的需求正快速生成。</p>
+              <p class="src">来源：経済産業省 / 総務省 情報通信白書 2024</p>
+            </div>
+          </div>
         </div>
+      </div>
+      <div class="kicker" style="margin-top:14px">
+        <strong>窗口期判断</strong>：协议、合规通路、AI 供给、商户需求 — 四个条件同时具备的窗口期，预计只有 12–24 个月。
+        先于竞争者建立基础设施 = 锁定长期分发渠道。
       </div>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════
-       SLIDE 05 · 什么是 X402
-  ════════════════════════════════════════════════ -->
-  <div class="slide" id="s-x402">
-    <div style="width:100%;max-width:1050px">
-      <div class="slide-title">TECHNOLOGY CORE</div>
-      <h2>X402 协议：为机器设计的支付语言</h2>
+  <!-- 05 · WHAT WE SELL -->
+  <div class="slide" id="s-product">
+    <div class="container">
+      <div class="slide-title">WHAT WE SELL</div>
+      <h2>我们卖的不是"协议"，是一个商户能签合同购买的服务包</h2>
       <div class="divider"></div>
-      <div class="card-grid cols-2" style="margin-top:24px">
+      <div class="card-grid cols-4" style="margin-top:18px">
+        <div class="card" style="border-top:3px solid var(--accent2)">
+          <span class="tag tag-blue">接入层</span>
+          <h3 style="margin-top:8px">SDK / API / MCP</h3>
+          <p class="sub" style="font-size:12px">商户和 Agent 用最少代码接入支付与 Token 能力。MCP 接口让 AI Agent 可以直接发现并消费。</p>
+        </div>
+        <div class="card" style="border-top:3px solid var(--accent1)">
+          <span class="tag tag-blue">支付层</span>
+          <h3 style="margin-top:8px">X402 Gateway + USDC</h3>
+          <p class="sub" style="font-size:12px">承接微额、高频、自动化的稳定币支付。Wea Japan 在 Solana 上执行实际结算。</p>
+        </div>
+        <div class="card" style="border-top:3px solid var(--accent3)">
+          <span class="tag tag-purple">运营层</span>
+          <h3 style="margin-top:8px">Token System</h3>
+          <p class="sub" style="font-size:12px">余额、消耗、套餐、发票、告警、子账户 — 商户可以像管理云资源一样管理 AI Token。</p>
+        </div>
+        <div class="card" style="border-top:3px solid var(--gold)">
+          <span class="tag tag-gold">结算层</span>
+          <h3 style="margin-top:8px">Settlement &amp; Reporting</h3>
+          <p class="sub" style="font-size:12px">链上凭证、对账、日元/USDC 双账本、合规报表 — 财务部能直接拿去入账。</p>
+        </div>
+      </div>
+      <div class="card" style="margin-top:14px;background:rgba(245,158,11,.05);border-color:rgba(245,158,11,.25)">
+        <p class="lead" style="font-size:14px">
+          <strong class="gold">关键判断</strong>：
+          x402、USDC、Solana 这些只是<strong>能力</strong>；商户买单的是<strong>"接入 + 支付 + 运营 + 结算"组成的完整产品</strong>。
+          只有这样定位，毛利率才能稳定，复购才能形成。
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 06 · MARKET-FIT MATRIX ⭐NEW -->
+  <div class="slide" id="s-fit">
+    <div class="container">
+      <div class="slide-title">FIT MATRIX · 核心优势 ↔ 市场需求</div>
+      <h2>我们的能力是否真正对得上市场需求？— 逐条核对</h2>
+      <div class="divider"></div>
+      <table class="matrix" style="margin-top:14px">
+        <thead>
+          <tr>
+            <th>市场需求</th>
+            <th>需求的本质</th>
+            <th>Netstars 对应能力</th>
+            <th>佐证</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="need">① 机器对机器的微额高频支付</td>
+            <td class="why">Agent 每次调用都是一笔结算，传统通道单笔成本和延迟都不达标</td>
+            <td class="cap">X402 Gateway + Solana USDC</td>
+            <td class="ev">Solana &lt;1s 确认，链上手续费 &lt;$0.001；x402 是 HTTP 原生协议</td>
+          </tr>
+          <tr>
+            <td class="need">② 日元结算 + 日本合规</td>
+            <td class="why">客户是日本企业，财务需要日元发票、合规报表、本地税务处理</td>
+            <td class="cap">Web2 聚合支付牌照 + 日本本地结算通路</td>
+            <td class="ev">Netstars 持有日本资金移动业等经营许可；上市公司（日経 5590）合规背书</td>
+          </tr>
+          <tr>
+            <td class="need">③ AI Token 多模型统一采购</td>
+            <td class="why">企业不愿意维护 4–6 个独立 AI 账号、分别充值、分别报销</td>
+            <td class="cap">四大 AI 公司日本独家/合作授权</td>
+            <td class="ev">Anthropic / OpenAI / xAI / Google 已签约，统一计费、统一发票</td>
+          </tr>
+          <tr>
+            <td class="need">④ 端到端可审计与可对账</td>
+            <td class="why">企业财务和审计部门必须能追溯每一笔资金与每一次调用</td>
+            <td class="cap">链上凭证 + Token 账本 + 操作日志三联</td>
+            <td class="ev">订单 → 链上 TX 哈希 → Token 入账流水 → 发票全链可导出</td>
+          </tr>
+          <tr>
+            <td class="need">⑤ 商户低理解成本的接入</td>
+            <td class="why">商户不愿为"懂区块链"再雇人；接入越像调用 Stripe 越好</td>
+            <td class="cap">SDK + REST API + MCP 三套接口</td>
+            <td class="ev">3 行代码完成首次 Token 购买；商户完全无需链上知识</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="kicker" style="margin-top:12px;font-size:13px">
+        <strong>结论</strong>：5 个市场关键需求都有对应能力支撑，且每一项都有可验证的事实佐证。
+        <strong class="accent">这是我们最具说服力的差异化叙事。</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- 07 · COMPETITION QUADRANT ⭐NEW -->
+  <div class="slide" id="s-quad">
+    <div class="container">
+      <div class="slide-title">COMPETITION · 我们独占哪个象限？</div>
+      <h2>四象限：链上结算能力 × 日本本地合规与 AI 商务能力</h2>
+      <div class="divider"></div>
+      <div style="display:grid;grid-template-columns:140px 1fr;gap:10px;width:100%;max-width:1040px;margin-top:14px;align-items:center">
+        <div></div>
+        <div class="quad-axis">▲ 强 · Web3 / 链上结算能力</div>
+
+        <div style="text-align:right;font-size:10px;letter-spacing:1px;color:var(--muted);writing-mode:vertical-rl;transform:rotate(180deg);height:300px;display:flex;align-items:center;justify-content:center">日本合规 / AI 商务能力 ▶</div>
         <div>
-          <div class="card" style="margin-bottom:16px">
-            <h3>📡 协议本质</h3>
-            <p class="sub" style="font-size:13px;margin-top:8px">
-              X402 是基于 HTTP 402 状态码的机器可读支付协议。
-              当 Agent 访问需要付费的资源时，服务端返回 402 + 支付要求，
-              Agent 自动完成支付后重发请求——<strong class="accent">全程无需人工介入</strong>
-            </p>
-          </div>
-          <div class="card">
-            <h3>⚡ 核心优势</h3>
-            <ul style="list-style:none;margin-top:10px">
-              <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">🔹 <strong>小额高频</strong>：单笔费用可低至 $0.001，适配 Token 计费</li>
-              <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">🔹 <strong>无损结算</strong>：链上 USDC，无汇率损耗，实时到账</li>
-              <li style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">🔹 <strong>标准化</strong>：HTTP 原生，任何语言/框架无缝集成</li>
-              <li style="padding:6px 0;font-size:13px">🔹 <strong>可审计</strong>：每笔链上存证，全程可追溯</li>
-            </ul>
-          </div>
-        </div>
-        <div class="card" style="display:flex;flex-direction:column;justify-content:center">
-          <h3 style="margin-bottom:16px">🔄 X402 交互时序</h3>
-          <div style="font-size:12px;line-height:2;font-family:monospace">
-            <div style="padding:6px 10px;background:rgba(37,99,235,.1);border-left:3px solid var(--accent1);margin-bottom:4px">
-              Agent  →  GET /api/ai-service
+          <div class="quad-wrap">
+            <div class="quad-cell">
+              <h4 class="purple">链强 / 日本商务弱</h4>
+              <div class="name">Coinbase Commerce / Crossmint</div>
+              <div class="gap">链上能力领先，但无日本合规通路、无日元发票、未取得日本 AI 销售授权。日本企业财务难以入账。</div>
             </div>
-            <div style="padding:6px 10px;background:rgba(245,158,11,.1);border-left:3px solid var(--gold);margin-bottom:4px">
-              Server ←  402 Payment Required<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ amount: 0.01 USDC, addr: "..." }
+            <div class="quad-cell win">
+              <h4 class="accent">🏆 链强 + 日本商务强</h4>
+              <div class="name">Netstars × Wea Japan</div>
+              <div class="gap">同时具备 USDC 实落地、日本支付牌照、四大 AI 授权 — <strong>当前唯一占据该象限的服务商</strong>。</div>
             </div>
-            <div style="padding:6px 10px;background:rgba(16,185,129,.1);border-left:3px solid var(--green);margin-bottom:4px">
-              Agent  →  (自动) 链上支付 USDC
+            <div class="quad-cell">
+              <h4 class="red">链弱 / 日本商务弱</h4>
+              <div class="name">企业自建团队</div>
+              <div class="gap">从零搭建涉及法务、链上工程、AI 商务谈判三栈。中型企业 18–24 个月才可能成形，且失去窗口期。</div>
             </div>
-            <div style="padding:6px 10px;background:rgba(37,99,235,.1);border-left:3px solid var(--accent2);margin-bottom:4px">
-              Agent  →  GET /api/ai-service + payment-proof
-            </div>
-            <div style="padding:6px 10px;background:rgba(16,185,129,.1);border-left:3px solid var(--green)">
-              Server ←  200 OK + 服务数据
+            <div class="quad-cell">
+              <h4 class="gold">链弱 / 日本商务强</h4>
+              <div class="name">Stripe / PayPay / 传统 PSP</div>
+              <div class="gap">日本支付经验完整，但无原生稳定币能力，无法承载 Agent 的微额高频结算；AI Token 转售方面无授权。</div>
             </div>
           </div>
         </div>
+      </div>
+      <div class="kicker" style="margin-top:14px;font-size:12.5px">
+        <strong>护城河</strong>：右上象限的门槛由三件事叠加形成 —
+        <strong>① 日本金融牌照</strong>（监管壁垒，1–2 年）<strong>② 大型 AI 公司日本授权</strong>（商务壁垒，关系/合规）
+        <strong>③ 链上 PoC 实绩</strong>（执行壁垒，工程经验）。这三件事任何竞品至少缺其一。
       </div>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════
-       SLIDE 06 · DEMO 故事
-  ════════════════════════════════════════════════ -->
-  <div class="slide" id="s-story">
-    <div style="width:100%;max-width:1050px">
-      <div class="slide-title">DEMO STORY</div>
-      <h2>一个 Agent，从零到完成商业任务</h2>
+  <!-- 07b · 4-ACTOR FRAMING (M5 新增 · demo 故事的根锚点) -->
+  <div class="slide" id="s-actors">
+    <div class="container">
+      <div class="slide-title">4-ACTOR · 所有 demo 故事从这里开始</div>
+      <h2>HABA × Netstars × WEA Japan × Solana — 四个相关方，一条 USDC 链路</h2>
       <div class="divider"></div>
-      <div class="card" style="margin-top:20px;background:rgba(37,99,235,.08);border-color:rgba(37,99,235,.25)">
-        <p style="font-size:14px;color:var(--muted);line-height:1.8">
-          <strong class="accent">场景设定</strong>：一家日本电商公司部署了一个"智能商品分析 Agent"，
-          每天自动抓取竞品数据、生成价格策略报告，并通过 AI 生成营销文案。
-          这些任务都需要消耗 AI Token——而公司希望 Agent 能<strong class="accent">自主完成充值与支付</strong>，无需人工干预。
+      <div class="card-grid cols-4" style="margin-top:18px">
+        <div class="card">
+          <div class="tag tag-gold" style="margin-bottom:8px">HABA</div>
+          <h3 class="gold">商户</h3>
+          <p class="sub" style="font-size:12.5px">
+            ハーバー研究所 — AI 化健康食品电商（MARVIE 系列）。<strong>购买并消耗 AI Token</strong>，把 Netstars 卖的通用 Token 二次组装成「HABA AI Advisor」垂直能力。
+          </p>
+        </div>
+        <div class="card">
+          <div class="tag tag-blue" style="margin-bottom:8px">Netstars</div>
+          <h3 class="accent">x402 网关 + Token 网关</h3>
+          <p class="sub" style="font-size:12.5px">
+            x402 协议封装、Token 销售、计费/账本/发票。<strong>不持有商户私钥，不直接上链</strong>。商户从这里买 Token、调 AI、出账单。
+          </p>
+        </div>
+        <div class="card">
+          <div class="tag tag-purple" style="margin-bottom:8px">WEA Japan</div>
+          <h3 class="purple">x402 链上执行方</h3>
+          <p class="sub" style="font-size:12.5px">
+            从 Netstars 接受结算请求 → 多 RPC 节点冗余 → 在 Solana 上提交 USDC tx → HMAC webhook 回调结果。<strong>独立 AWS 账户、mTLS 通信</strong>。
+          </p>
+        </div>
+        <div class="card">
+          <div class="tag tag-green" style="margin-bottom:8px">Solana</div>
+          <h3 class="green">USDC SPL 公链</h3>
+          <p class="sub" style="font-size:12.5px">
+            x402 协议执行所在的公网链。每笔交易 &lt;1 秒确认。<strong>所有 demo 故事的最终结算锚点</strong>都落在这里，链上凭证不可篡改。
+          </p>
+        </div>
+      </div>
+      <div class="kicker" style="margin-top:16px;font-size:12.5px">
+        <strong>阅读 demo 的根规则</strong>：后续每张幻灯片都可以问"这一步是 4 个相关方中哪两方在通信"。<br>
+        §08 把整条故事走完一遍；§09 把 8 个协议步骤逐步脉冲展示；§13b 展开 HABA 自己把 Token 二次转售给药局 / 医院的商业模式。
+      </div>
+    </div>
+  </div>
+
+  <!-- 08 · DEMO STORY -->
+  <div class="slide" id="s-story">
+    <div class="container">
+      <div class="slide-title">DEMO STORY</div>
+      <h2>HABA AI Advisor — 商户买 Token、卖 Token，全在 demo 里看得到</h2>
+      <div class="divider"></div>
+      <div class="card" style="background:rgba(37,99,235,.08);border-color:rgba(37,99,235,.25);margin-top:14px">
+        <p class="lead" style="font-size:13.5px">
+          <strong class="accent">为什么选 HABA / MARVIE 健康食品</strong>：①调用类型多样 — 同一个 Advisor 服务 C 端控糖家庭、药局前台、医院营养指导、独立营养师、合作电商 5 种情境；
+          ②天然高频 — 每位顾客咨询都是一次 API 调用；
+          ③同时演示「商户买 Token」(场景 A 主线) 与「商户卖 Token」(§13b Token AI Resale)，让 demo 故事一次说清两层商业逻辑。
+          ④HABA 是 Netstars 的<strong>真实商户客户</strong>，但 demo 中仅用作演示场景，对外披露需双方书面确认。
         </p>
       </div>
-      <div class="timeline" style="margin-top:24px">
+      <div class="timeline" style="margin-top:16px">
         <div class="tl-item">
           <div class="tl-badge">1</div>
           <div class="tl-body">
-            <h3>Agent 检测到 Token 余额不足</h3>
-            <p>Agent 调用 Netstars Token API，发现账户余额低于阈值（500 Token）。自动触发充值流程，无需人工介入</p>
+            <h3>HABA AI Advisor 接收调用</h3>
+            <p>HABA 站点 (haba.example) 同时承载 C 端商城与 B2B 合作方 API。Advisor 持续接收：「我想给糖尿病家人买低卡甜味料」「药局窗口接 60+ 老人代糖咨询」「医院营养科出院饮食单」等真实调用。</p>
           </div>
         </div>
         <div class="tl-item">
           <div class="tl-badge">2</div>
           <div class="tl-body">
-            <h3>通过 X402 + USDC 完成充值</h3>
-            <p>Agent 向 Netstars X402 网关发起支付请求，Wea Japan 在 Solana 链上完成 USDC 划转（&lt;1秒确认），Token 余额自动到账</p>
+            <h3>HABA SDK 检测 Token 余额不足</h3>
+            <p>HABA 站点内的 Netstars SDK 检测到 AI Token 余额低于阈值（剩 1,234 Token）→ 自动发起 10,000 AI Token 充值。<strong>无需 HABA 运维干预</strong>。</p>
           </div>
         </div>
         <div class="tl-item">
           <div class="tl-badge">3</div>
           <div class="tl-body">
-            <h3>使用 Token 调用 AI 服务</h3>
-            <p>Agent 消耗 Token 调用 Claude API 完成商品分析，每次调用实时扣减 Token，并记录到 Netstars 计费系统</p>
+            <h3>x402 + USDC 完成支付（4-actor 协作）</h3>
+            <p>HABA → Netstars 收到 402 支付要求 → HABA 钱包客户端签名 USDC tx → Netstars 转发 WEA Japan → WEA 在 Solana 提交 → &lt;1 秒确认 → HMAC webhook 回到 Netstars。<strong>客户端签名，Netstars 不持有 HABA 私钥</strong>。</p>
           </div>
         </div>
         <div class="tl-item">
           <div class="tl-badge">4</div>
           <div class="tl-body">
-            <h3>商户查看账单与链上凭证</h3>
-            <p>通过 Netstars Dashboard，商户可查看 Token 消耗明细、链上交易哈希、发票，所有操作全程可审计</p>
+            <h3>Token 即时入账，Advisor 继续工作</h3>
+            <p>Netstars Token 系统更新 HABA 余额并 webhook 通知 HABA 站点。Advisor 立刻继续接收 C 端 + 4 类 B2B 调用 — 药局 SDK、医院 API、独立营养师 MCP、合作电商 Web 嵌入。<strong>每次调用按 Token 实时扣减并写流水</strong>。</p>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-badge">5</div>
+          <div class="tl-body">
+            <h3>HABA 在 Netstars Console 看到完整流水</h3>
+            <p><strong class="green">充值成功 · Token 余额更新 · 业务调用按渠道拆分 · 月度发票 · 链上凭证可查询</strong>。Console 同时展示「C 端调用 vs B2B 转售调用」的占比 — 这是 §13b Token AI Resale 商业模式的运营视角。</p>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════
-       SLIDE 07 · 商务全流程
-  ════════════════════════════════════════════════ -->
+  <!-- 09 · X402 IN MOTION  (受 web4.ai 启发) -->
+  <div class="slide" id="s-motion">
+    <div class="container">
+      <div class="slide-title">X402 IN MOTION</div>
+      <h2>把协议跑给你看 — 一笔 USDC 微支付的 8 步</h2>
+      <div class="divider"></div>
+
+      <!-- 4 actors columns -->
+      <div class="motion-actors" style="margin-top:16px">
+        <div class="motion-actor">
+          <span class="ic">🤖</span>Agent (SDK)<div class="sub">客户端</div>
+        </div>
+        <div class="motion-actor">
+          <span class="ic">🏢</span>Netstars<div class="sub">X402 Gateway</div>
+        </div>
+        <div class="motion-actor">
+          <span class="ic">⛓️</span>Wea Japan<div class="sub">链上结算</div>
+        </div>
+        <div class="motion-actor">
+          <span class="ic">◎</span>Solana<div class="sub">USDC SPL</div>
+        </div>
+      </div>
+
+      <!-- 8 animated step rows; each row is placed in the right column corridor -->
+      <div class="motion-flow" style="margin-top:8px">
+        <div class="motion-row col-1-2"><span class="num">1</span><span class="label">POST /v1/payments</span><span class="arrow">→</span><span class="note">create order + idempotency</span></div>
+        <div class="motion-row col-1-2"><span class="arrow">←</span><span class="label">402 Payment Required</span><span class="note">amount / nonce / recipient</span><span class="num">2</span></div>
+        <div class="motion-row col-1-2"><span class="num">3</span><span class="label">X-PAYMENT (signed USDC tx)</span><span class="arrow">→</span><span class="note">client-side signed; Netstars 不持有私钥</span></div>
+        <div class="motion-row col-2-3"><span class="num">4</span><span class="label">/v1/settlements</span><span class="arrow">→</span><span class="note">mTLS + HMAC</span></div>
+        <div class="motion-row col-3-4"><span class="num">5</span><span class="label">submit USDC tx</span><span class="arrow">→</span><span class="note">via QuickNode / Helius RPC</span></div>
+        <div class="motion-row col-3-4"><span class="arrow">←</span><span class="label">tx confirmed (slot N)</span><span class="note">&lt; 1s confirmed level</span><span class="num">6</span></div>
+        <div class="motion-row col-2-3"><span class="arrow">←</span><span class="label">settlement callback</span><span class="note">HMAC-signed webhook</span><span class="num">7</span></div>
+        <div class="motion-row col-1-2"><span class="arrow">←</span><span class="label">200 OK + webhook</span><span class="note">payment.confirmed → Token credited</span><span class="num">8</span></div>
+      </div>
+
+      <!-- Live tx ticker (concrete agent purchases) -->
+      <div class="tx-ticker">
+        <div class="tx-ticker-head">
+          <span class="live-dot"></span>
+          Live X402 actions on Netstars (Devnet sample)
+        </div>
+        <div class="tx-row"><span class="gt">&gt;</span><span class="desc">Claude Opus · MARVIE 控糖商品推荐 (ja, C 端)</span><span class="path">api/v1/messages</span><span class="amt">¥420</span><span class="ago">2s ago</span></div>
+        <div class="tx-row"><span class="gt">&gt;</span><span class="desc">药局前台 · 60+ 顾客代糖咨询 (B2B / pharmacy)</span><span class="path">api/v1/messages</span><span class="amt">¥80</span><span class="ago">8s ago</span></div>
+        <div class="tx-row"><span class="gt">&gt;</span><span class="desc">营养师餐食方案生成 (B2B / dietitian)</span><span class="path">api/v1/messages</span><span class="amt">¥120</span><span class="ago">14s ago</span></div>
+        <div class="tx-row"><span class="gt">&gt;</span><span class="desc">HABA Token auto top-up (x402 场景 A)</span><span class="path">api/v1/token-purchase</span><span class="amt">$10.00</span><span class="ago">32s ago</span></div>
+        <div class="tx-row"><span class="gt">&gt;</span><span class="desc">医院控糖出院方案 (B2B / hospital)</span><span class="path">api/v1/messages</span><span class="amt">¥56</span><span class="ago">1m ago</span></div>
+      </div>
+
+      <p class="sub" style="font-size:11.5px;margin-top:10px;text-align:center;max-width:980px">
+        每 8 秒一轮，协议 8 步依次脉冲。底部是 Agent 真实在我们平台上"花的钱"——这才是 Agentic Commerce 的样子。
+      </p>
+    </div>
+  </div>
+
+  <!-- 10 · BUSINESS PROCESS -->
   <div class="slide" id="s-bizflow">
-    <div style="width:100%;max-width:1080px">
+    <div class="container">
       <div class="slide-title">BUSINESS FLOW</div>
-      <h2>端到端商务流程总览</h2>
+      <h2>从商户视角，全流程像一个标准支付产品</h2>
       <div class="divider"></div>
-      <div class="flow" style="margin-top:28px">
+      <div class="flow" style="margin-top:18px">
         <div class="flow-node highlight">
-          <span class="icon">🤖</span>
-          <strong>Agent / 商户</strong><br>
-          <span style="font-size:11px;color:var(--muted)">发起充值或<br>服务调用</span>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-node highlight">
-          <span class="icon">🏢</span>
-          <strong>Netstars</strong><br>
-          <span style="font-size:11px;color:var(--muted)">X402 网关<br>Token 系统</span>
+          <span class="icon">📝</span><strong>1. 签约</strong><br>
+          <span style="font-size:10px;color:var(--muted)">套餐选择<br>开通服务</span>
         </div>
         <div class="flow-arrow">→</div>
         <div class="flow-node">
-          <span class="icon">⛓️</span>
-          <strong>Wea Japan</strong><br>
-          <span style="font-size:11px;color:var(--muted)">链上执行<br>USDC 划转</span>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-node">
-          <span class="icon">◎</span>
-          <strong>Solana</strong><br>
-          <span style="font-size:11px;color:var(--muted)">链上确认<br>&lt;1 秒</span>
+          <span class="icon">🔌</span><strong>2. 接入</strong><br>
+          <span style="font-size:10px;color:var(--muted)">SDK / API / MCP<br>3 行代码</span>
         </div>
         <div class="flow-arrow">→</div>
         <div class="flow-node highlight">
-          <span class="icon">🤖</span>
-          <strong>AI 服务</strong><br>
-          <span style="font-size:11px;color:var(--muted)">Claude / GPT<br>/ Grok 等</span>
+          <span class="icon">⚡</span><strong>3. 调用</strong><br>
+          <span style="font-size:10px;color:var(--muted)">Agent 自主<br>付费消耗</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">
+          <span class="icon">📊</span><strong>4. 运营</strong><br>
+          <span style="font-size:10px;color:var(--muted)">Console 实时<br>余额/账单</span>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node highlight">
+          <span class="icon">🧾</span><strong>5. 结算</strong><br>
+          <span style="font-size:10px;color:var(--muted)">日元/USDC<br>双账本对账</span>
         </div>
       </div>
-      <div class="card-grid cols-3" style="margin-top:24px">
+      <div class="card-grid cols-3" style="margin-top:18px">
         <div class="card">
-          <h3 class="accent">📥 接入层</h3>
-          <ul style="list-style:none;margin-top:10px">
-            <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px">· SDK（Python / Node / Java）</li>
-            <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px">· REST API</li>
-            <li style="padding:5px 0;font-size:12px">· MCP 接口（AI Native）</li>
+          <h3 class="accent">商户看到</h3>
+          <ul style="list-style:none;margin-top:8px">
+            <li style="padding:4px 0;font-size:12px">· 一份签约 · 一个账号</li>
+            <li style="padding:4px 0;font-size:12px">· 一套 SDK · 多模型可用</li>
+            <li style="padding:4px 0;font-size:12px">· 一张月度发票（日元）</li>
           </ul>
         </div>
         <div class="card">
-          <h3 class="green">⚙️ 处理层</h3>
-          <ul style="list-style:none;margin-top:10px">
-            <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px">· X402 协议网关</li>
-            <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px">· Token 计费 / 余额管理</li>
-            <li style="padding:5px 0;font-size:12px">· 鉴权 / 限流 / 审计日志</li>
+          <h3 class="green">Netstars 后台处理</h3>
+          <ul style="list-style:none;margin-top:8px">
+            <li style="padding:4px 0;font-size:12px">· X402 协议解析 + 鉴权</li>
+            <li style="padding:4px 0;font-size:12px">· Token 库存与计费</li>
+            <li style="padding:4px 0;font-size:12px">· 链上结算回调 + 风控</li>
           </ul>
         </div>
         <div class="card">
-          <h3 class="gold">📊 管理层</h3>
-          <ul style="list-style:none;margin-top:10px">
-            <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px">· 充值 / 消耗报表</li>
-            <li style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px">· 链上结算凭证</li>
-            <li style="padding:5px 0;font-size:12px">· 自动发票 / 对账</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════
-       SLIDE 08 · 支付完整流程
-  ════════════════════════════════════════════════ -->
-  <div class="slide" id="s-payment">
-    <div style="width:100%;max-width:1080px">
-      <div class="slide-title">PAYMENT FLOW</div>
-      <h2>支付完整流程：USDC × X402 × Solana</h2>
-      <div class="divider"></div>
-      <div class="steps" style="margin-top:24px">
-        <div class="step">
-          <div class="step-circle">1</div>
-          <h4>充值请求</h4>
-          <p>Agent 调用<br>Netstars API<br>发起充值</p>
-        </div>
-        <div class="step-line"></div>
-        <div class="step">
-          <div class="step-circle">2</div>
-          <h4>402 响应</h4>
-          <p>X402 网关<br>返回支付<br>要求 + 地址</p>
-        </div>
-        <div class="step-line"></div>
-        <div class="step">
-          <div class="step-circle">3</div>
-          <h4>签名授权</h4>
-          <p>客户端钱包<br>签名交易<br>（离线安全）</p>
-        </div>
-        <div class="step-line"></div>
-        <div class="step">
-          <div class="step-circle">4</div>
-          <h4>链上广播</h4>
-          <p>Wea Japan<br>提交 Solana<br>USDC 转账</p>
-        </div>
-        <div class="step-line"></div>
-        <div class="step">
-          <div class="step-circle">5</div>
-          <h4>链上确认</h4>
-          <p>Solana 在<br>&lt;1 秒完成<br>交易确认</p>
-        </div>
-        <div class="step-line"></div>
-        <div class="step">
-          <div class="step-circle">6</div>
-          <h4>Token 到账</h4>
-          <p>Netstars 更新<br>Token 余额<br>并通知 Agent</p>
-        </div>
-        <div class="step-line"></div>
-        <div class="step">
-          <div class="step-circle">7</div>
-          <h4>凭证入库</h4>
-          <p>交易哈希<br>写入审计<br>日志</p>
-        </div>
-      </div>
-      <div class="card-grid cols-3" style="margin-top:24px">
-        <div class="card" style="text-align:center">
-          <div class="stat-num accent">&lt;1s</div>
-          <div class="stat-lbl">链上确认时间</div>
-        </div>
-        <div class="card" style="text-align:center">
-          <div class="stat-num gold">0%</div>
-          <div class="stat-lbl">汇率损耗（USDC 稳定币）</div>
-        </div>
-        <div class="card" style="text-align:center">
-          <div class="stat-num" style="color:var(--green)">100%</div>
-          <div class="stat-lbl">链上可审计覆盖率</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════
-       SLIDE 09 · Token 使用方式
-  ════════════════════════════════════════════════ -->
-  <div class="slide" id="s-token">
-    <div style="width:100%;max-width:1050px">
-      <div class="slide-title">TOKEN LIFECYCLE</div>
-      <h2>AI Token 全生命周期管理</h2>
-      <div class="divider"></div>
-      <div class="tok-flow" style="margin-top:24px">
-        <div class="tok-node">
-          <div class="tk-icon">💳</div>
-          <h4>购买 Token</h4>
-          <p>USDC 通过 X402<br>支付给 Netstars</p>
-          <div style="margin-top:8px"><span class="tag tag-blue">充值</span></div>
-        </div>
-        <div class="tok-arr">→</div>
-        <div class="tok-node" style="border-color:rgba(37,99,235,.4)">
-          <div class="tk-icon">🏦</div>
-          <h4>Token 账户</h4>
-          <p>实时余额查询<br>多维度统计报表</p>
-          <div style="margin-top:8px"><span class="tag tag-green">管理</span></div>
-        </div>
-        <div class="tok-arr">→</div>
-        <div class="tok-node">
-          <div class="tk-icon">⚡</div>
-          <h4>消耗 Token</h4>
-          <p>调用 Claude / GPT<br>每次实时扣减</p>
-          <div style="margin-top:8px"><span class="tag tag-purple">使用</span></div>
-        </div>
-      </div>
-      <div class="card-grid cols-2" style="margin-top:20px">
-        <div class="card">
-          <h3>📋 Token 支持的服务类型</h3>
-          <ul style="list-style:none;margin-top:12px">
-            <li style="padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;display:flex;gap:10px"><span>🤖</span><span><strong>Claude API</strong>（Anthropic 授权）— 文本生成、分析、代码</span></li>
-            <li style="padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;display:flex;gap:10px"><span>🧠</span><span><strong>GPT API</strong>（OpenAI 授权）— 对话、推理、多模态</span></li>
-            <li style="padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;display:flex;gap:10px"><span>⚡</span><span><strong>Grok API</strong>（xAI 授权）— 实时数据、分析</span></li>
-            <li style="padding:7px 0;font-size:13px;display:flex;gap:10px"><span>🌐</span><span><strong>Gemini API</strong>（Google 授权）— 长上下文、视觉</span></li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3>⚙️ Token 管理功能</h3>
-          <ul style="list-style:none;margin-top:12px">
-            <li style="padding:7px 0;border-bottom:1px solid var(--border);font-size:13px">✅ 实时余额查询 API</li>
-            <li style="padding:7px 0;border-bottom:1px solid var(--border);font-size:13px">✅ 消耗明细（按时间 / 模型 / 项目）</li>
-            <li style="padding:7px 0;border-bottom:1px solid var(--border);font-size:13px">✅ 自动低余额告警 + 自动充值</li>
-            <li style="padding:7px 0;border-bottom:1px solid var(--border);font-size:13px">✅ 多租户 / 子账户隔离管理</li>
-            <li style="padding:7px 0;font-size:13px">✅ 月结发票（含链上交易凭证）</li>
+          <h3 class="gold">商户拿到的资产</h3>
+          <ul style="list-style:none;margin-top:8px">
+            <li style="padding:4px 0;font-size:12px">· 每笔链上 TX 哈希凭证</li>
+            <li style="padding:4px 0;font-size:12px">· 调用粒度的消耗明细</li>
+            <li style="padding:4px 0;font-size:12px">· 审计可导出的合规报表</li>
           </ul>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════
-       SLIDE 10 · 安全性
-  ════════════════════════════════════════════════ -->
-  <div class="slide" id="s-security">
-    <div style="width:100%;max-width:1050px">
-      <div class="slide-title">SECURITY ARCHITECTURE</div>
-      <h2>多层安全保障：加密 × 认证 × 可追溯</h2>
-      <div class="divider"></div>
-      <div class="card-grid cols-2" style="margin-top:24px;gap:16px">
-        <div class="card">
-          <div class="sec-item">
-            <div class="sec-icon">🔐</div>
-            <div>
-              <h3>端到端加密</h3>
-              <p class="sub" style="font-size:12px;margin-top:6px">
-                所有 API 通信采用 TLS 1.3；钱包私钥从不离开客户端；
-                支付签名在本地完成，Netstars 不持有用户私钥
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="sec-item">
-            <div class="sec-icon" style="background:rgba(37,99,235,.2);border-color:rgba(37,99,235,.4)">🛡️</div>
-            <div>
-              <h3>多因子鉴权</h3>
-              <p class="sub" style="font-size:12px;margin-top:6px">
-                API Key + HMAC 签名双重验证；支持 OAuth 2.0 / JWT；
-                Agent 身份通过 DID（去中心化标识）绑定
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="sec-item">
-            <div class="sec-icon" style="background:rgba(16,185,129,.2);border-color:rgba(16,185,129,.4)">🔗</div>
-            <div>
-              <h3>链上不可篡改存证</h3>
-              <p class="sub" style="font-size:12px;margin-top:6px">
-                每笔支付交易哈希写入 Solana 公链，任何人可验证；
-                防止双花攻击，结算纠纷有链上仲裁依据
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="sec-item">
-            <div class="sec-icon" style="background:rgba(245,158,11,.2);border-color:rgba(245,158,11,.4)">📋</div>
-            <div>
-              <h3>全程审计日志</h3>
-              <p class="sub" style="font-size:12px;margin-top:6px">
-                操作日志 90 天留存；支持监管合规导出；
-                异常交易实时告警，支持自动冻结账户保护
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="sec-item">
-            <div class="sec-icon" style="background:rgba(139,92,246,.2);border-color:rgba(139,92,246,.4)">⚡</div>
-            <div>
-              <h3>限流与风控</h3>
-              <p class="sub" style="font-size:12px;margin-top:6px">
-                每个 Agent 独立速率限制；异常消耗模式检测；
-                支持白名单 IP / 黑名单 DID 管理
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="sec-item">
-            <div class="sec-icon" style="background:rgba(239,68,68,.2);border-color:rgba(239,68,68,.4)">🔄</div>
-            <div>
-              <h3>模块化隔离架构</h3>
-              <p class="sub" style="font-size:12px;margin-top:6px">
-                X402 模块与 Token 系统解耦设计，确保未来合并时
-                不影响现有服务；支持灰度升级与零停机部署
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════
-       SLIDE 11 · 系统架构
-  ════════════════════════════════════════════════ -->
+  <!-- 10 · ARCHITECTURE -->
   <div class="slide" id="s-arch">
-    <div style="width:100%;max-width:1080px">
+    <div class="container">
       <div class="slide-title">SYSTEM ARCHITECTURE</div>
-      <h2>技术架构：模块化、可扩展、生态闭环</h2>
+      <h2>分层、解耦、可平滑合并 — 保证短期可演示、长期可产品化</h2>
       <div class="divider"></div>
-      <div style="margin-top:20px;border:1px solid var(--border);border-radius:18px;overflow:hidden">
-        <!-- Layer 1: Client -->
-        <div style="background:rgba(245,158,11,.08);border-bottom:1px solid var(--border);padding:14px 24px">
-          <div style="font-size:11px;letter-spacing:2px;color:var(--gold);margin-bottom:10px">CLIENT LAYER</div>
-          <div style="display:flex;gap:12px">
-            <div class="tag tag-gold">Agent SDK（Python）</div>
-            <div class="tag tag-gold">Agent SDK（Node.js）</div>
+      <div style="margin-top:14px;border:1px solid var(--border);border-radius:14px;overflow:hidden">
+        <div style="background:rgba(245,158,11,.08);border-bottom:1px solid var(--border);padding:12px 22px">
+          <div style="font-size:10px;letter-spacing:2px;color:var(--gold);margin-bottom:8px">CLIENT LAYER · 客户与 Agent 接入</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <div class="tag tag-gold">Agent SDK (Python / Node)</div>
             <div class="tag tag-gold">MCP Interface</div>
             <div class="tag tag-gold">REST API</div>
-            <div class="tag tag-gold">Merchant Dashboard</div>
+            <div class="tag tag-gold">Merchant Console</div>
           </div>
         </div>
-        <!-- Layer 2: Netstars -->
-        <div style="background:rgba(37,99,235,.08);border-bottom:1px solid var(--border);padding:14px 24px">
-          <div style="font-size:11px;letter-spacing:2px;color:var(--accent2);margin-bottom:10px">NETSTARS PLATFORM LAYER</div>
-          <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <div style="background:rgba(37,99,235,.08);border-bottom:1px solid var(--border);padding:12px 22px">
+          <div style="font-size:10px;letter-spacing:2px;color:var(--accent2);margin-bottom:8px">NETSTARS PLATFORM LAYER · 我们的核心可销售资产</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
             <div class="tag tag-blue">X402 Gateway</div>
-            <div class="tag tag-blue">Token System</div>
+            <div class="tag tag-blue">Token System（余额/计费/账本）</div>
             <div class="tag tag-blue">Auth &amp; Rate Limit</div>
-            <div class="tag tag-blue">Billing Engine</div>
-            <div class="tag tag-blue">Audit Logger</div>
-            <div class="tag tag-blue">Invoice Service</div>
+            <div class="tag tag-blue">Billing &amp; Invoice</div>
+            <div class="tag tag-blue">Audit &amp; Risk</div>
           </div>
         </div>
-        <!-- Layer 3: Web3 -->
-        <div style="background:rgba(16,185,129,.08);border-bottom:1px solid var(--border);padding:14px 24px">
-          <div style="font-size:11px;letter-spacing:2px;color:var(--green);margin-bottom:10px">WEB3 SETTLEMENT LAYER — Wea Japan</div>
-          <div style="display:flex;gap:12px">
+        <div style="background:rgba(16,185,129,.08);border-bottom:1px solid var(--border);padding:12px 22px">
+          <div style="font-size:10px;letter-spacing:2px;color:var(--green);margin-bottom:8px">WEB3 SETTLEMENT LAYER · Wea Japan 承接</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
             <div class="tag tag-green">USDC Transfer</div>
             <div class="tag tag-green">Solana RPC</div>
             <div class="tag tag-green">TX Confirmation</div>
             <div class="tag tag-green">Result Callback</div>
           </div>
         </div>
-        <!-- Layer 4: AI -->
-        <div style="background:rgba(139,92,246,.08);padding:14px 24px">
-          <div style="font-size:11px;letter-spacing:2px;color:var(--accent3);margin-bottom:10px">AI SERVICE LAYER</div>
-          <div style="display:flex;gap:12px">
-            <div class="tag tag-purple">Claude API</div>
-            <div class="tag tag-purple">GPT API</div>
-            <div class="tag tag-purple">Grok API</div>
-            <div class="tag tag-purple">Gemini API</div>
+        <div style="background:rgba(139,92,246,.08);padding:12px 22px">
+          <div style="font-size:10px;letter-spacing:2px;color:var(--accent3);margin-bottom:8px">AI SERVICE LAYER · 四大授权模型</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <div class="tag tag-purple">Claude</div>
+            <div class="tag tag-purple">GPT</div>
+            <div class="tag tag-purple">Grok</div>
+            <div class="tag tag-purple">Gemini</div>
           </div>
         </div>
       </div>
-      <div class="card" style="margin-top:16px;background:rgba(37,99,235,.08);border-color:rgba(37,99,235,.25)">
-        <p style="font-size:13px;color:var(--muted);text-align:center">
-          🔮 设计原则：X402 模块与 Token 系统保持清晰边界，未来合并时可平滑迁移，确保零断点扩展
+      <div class="card" style="margin-top:14px;background:rgba(37,99,235,.08);border-color:rgba(37,99,235,.25)">
+        <p class="lead" style="font-size:13px;text-align:center">
+          <strong class="accent">设计原则</strong>：X402 模块与 Token 系统当前保持清晰边界，便于快速 Demo；
+          未来产品化阶段平滑合并为统一商户账本，<strong>零断点、零停机迁移</strong>。
         </p>
       </div>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════
-       SLIDE 12 · 商户价值主张
-  ════════════════════════════════════════════════ -->
-  <div class="slide" id="s-value">
-    <div style="width:100%;max-width:1050px">
-      <div class="slide-title">VALUE PROPOSITION</div>
-      <h2>为什么选择 Netstars？</h2>
+  <!-- 11 · SECURITY & AUDIT -->
+  <div class="slide" id="s-security">
+    <div class="container">
+      <div class="slide-title">SECURITY &amp; AUDIT</div>
+      <h2>四段闭环：从客户端到链上到账本，每一步都留痕</h2>
       <div class="divider"></div>
-      <div class="card-grid cols-3" style="margin-top:24px">
-        <div class="card" style="text-align:center">
-          <div style="font-size:36px;margin-bottom:12px">🚀</div>
-          <h3>最低接入门槛</h3>
-          <p class="sub" style="font-size:13px;margin-top:8px">
-            3 行代码即可集成 SDK；
-            支持 HTTP + MCP 双协议；
-            无需区块链知识
-          </p>
+      <div class="card-grid cols-2" style="margin-top:18px">
+        <div class="card">
+          <h3 class="accent">🔐 客户端</h3>
+          <p class="sub" style="font-size:12.5px">SDK 内做签名与密钥轮换；私钥永不离开客户端；请求 nonce 防重放；Agent 身份通过 API Key + DID 双绑定。</p>
         </div>
-        <div class="card" style="text-align:center">
-          <div style="font-size:36px;margin-bottom:12px">⚡</div>
-          <h3>极致性能</h3>
-          <p class="sub" style="font-size:13px;margin-top:8px">
-            Solana &lt;1 秒确认；
-            支持每秒数千笔 Token 消耗；
-            无感知低延迟
-          </p>
+        <div class="card">
+          <h3 class="accent">🛡️ Netstars Gateway</h3>
+          <p class="sub" style="font-size:12.5px">X402 支付请求校验、订单幂等、Webhook 签名认证、API 限流、异常消耗模式检测。</p>
         </div>
-        <div class="card" style="text-align:center">
-          <div style="font-size:36px;margin-bottom:12px">🔒</div>
-          <h3>合规安全</h3>
-          <p class="sub" style="font-size:13px;margin-top:8px">
-            日本金融监管合规；
-            链上可审计；
-            企业级 SLA 保障
-          </p>
+        <div class="card">
+          <h3 class="green">🔗 Wea / Solana 链上</h3>
+          <p class="sub" style="font-size:12.5px">USDC 转账由 Wea Japan 执行；交易哈希链上可验证；失败/超时自动回滚；防止双花。</p>
         </div>
-        <div class="card" style="text-align:center">
-          <div style="font-size:36px;margin-bottom:12px">🌐</div>
-          <h3>全模型覆盖</h3>
-          <p class="sub" style="font-size:13px;margin-top:8px">
-            一个账户，四大 AI 平台；
-            统一计费，无需多账号管理
-          </p>
+        <div class="card">
+          <h3 class="gold">📋 Token 账本与审计</h3>
+          <p class="sub" style="font-size:12.5px">订单 → 签名 → 链上 TX → 余额变更 → 发票，五个状态全链留痕；操作日志 90 天，合规可导出。</p>
         </div>
-        <div class="card" style="text-align:center">
-          <div style="font-size:36px;margin-bottom:12px">💹</div>
-          <h3>成本透明</h3>
-          <p class="sub" style="font-size:13px;margin-top:8px">
-            USDC 稳定币无汇损；
-            实时账单明细；
-            批量采购折扣
-          </p>
+      </div>
+      <div class="kicker" style="margin-top:14px">
+        <strong>Demo 必须展示一次"非成功路径"</strong>：失败支付的自动回滚、超时订单的对账处理。
+        让客户看到 Netstars 不只是<em>"成功收款"</em>，也能<strong class="accent">管理异常、重试、对账</strong> — 这才是企业级支付服务该有的样子。
+      </div>
+    </div>
+  </div>
+
+  <!-- 12 · REVENUE MODEL ⭐NEW -->
+  <div class="slide" id="s-revenue">
+    <div class="container">
+      <div class="slide-title">REVENUE MODEL · 怎么赚钱</div>
+      <h2>四个收入流，叠加形成稳定现金流</h2>
+      <div class="divider"></div>
+      <div class="rev" style="margin-top:14px">
+        <div class="rev-card">
+          <div class="rh"><div class="rnum">①</div><div class="rt">Token 销售毛利</div></div>
+          <div class="who">来源：商户为 AI 调用付费</div>
+          <div class="what">企业客户用 USDC/日元购买 AI Token，Netstars 从模型供应商批发后转售。</div>
+          <div class="lever">毛利杠杆：批量采购折扣、套餐溢价、多模型组合定价</div>
         </div>
-        <div class="card" style="text-align:center">
-          <div style="font-size:36px;margin-bottom:12px">📈</div>
-          <h3>可伸缩架构</h3>
-          <p class="sub" style="font-size:13px;margin-top:8px">
-            从小型初创到大型企业；
-            子账户多租户支持；
-            按用量弹性计费
-          </p>
+        <div class="rev-card">
+          <div class="rh"><div class="rnum">②</div><div class="rt">支付网关服务费</div></div>
+          <div class="who">来源：每笔 X402 支付按比例或固定费率</div>
+          <div class="what">商户使用 X402 + USDC 支付时，Netstars 收取网关处理费 — 即"链上的 Stripe 费率"。</div>
+          <div class="lever">毛利杠杆：高频小额场景天然放大笔数；MCP 接口让 Agent 自主发现，降低获客成本</div>
+        </div>
+        <div class="rev-card">
+          <div class="rh"><div class="rnum">③</div><div class="rt">商户 SaaS / 运营管理费</div></div>
+          <div class="who">来源：商户购买管理后台 + 多账户 + SLA 套餐</div>
+          <div class="what">Console、子账户管理、自动充值、告警、自定义报表打包为月费/年费订阅。</div>
+          <div class="lever">毛利杠杆：边际成本极低，ARR 复购稳定，便于估值</div>
+        </div>
+        <div class="rev-card">
+          <div class="rh"><div class="rnum">④</div><div class="rt">结算与对账增值服务</div></div>
+          <div class="who">来源：财务/审计部门付费购买</div>
+          <div class="what">链上凭证导出、合规报表、自动对账、跨链多资产汇总 — 大型客户单独付费。</div>
+          <div class="lever">毛利杠杆：仅大客户购买，高客单价；与日本会计软件集成形成网络效应</div>
+        </div>
+      </div>
+      <div class="kicker" style="margin-top:14px">
+        <strong>四流叠加的意义</strong>：①是<strong class="gold">交易型</strong>（随 AI 用量增长）；
+        ②是<strong class="accent">通道型</strong>（随 Agent 普及指数增长）；
+        ③是<strong class="purple">订阅型</strong>（稳定 ARR）；
+        ④是<strong class="green">高客单价型</strong>（拉高平均毛利）。<strong>四个曲线叠加 = 抗周期</strong>。
+      </div>
+    </div>
+  </div>
+
+  <!-- 13 · GO-TO-MARKET ⭐NEW -->
+  <div class="slide" id="s-gtm">
+    <div class="container">
+      <div class="slide-title">GO-TO-MARKET · 怎么开拓</div>
+      <h2>三阶段商务开拓路径 — 每一步都先想清楚"卖给谁、怎么收钱"</h2>
+      <div class="divider"></div>
+      <div class="gtm" style="margin-top:14px">
+        <div class="gtm-phase">
+          <div class="when">Phase 1 · 0–6 个月</div>
+          <h3 class="accent">灯塔商户</h3>
+          <div class="who">打谁：3–5 家旗舰客户<br>（健康食品 / 医药垂直、SaaS、AI 初创）</div>
+          <div class="sell">
+            <strong>卖什么</strong>：免费 PoC + 联合发布 + 案例授权<br>
+            <strong>收什么</strong>：Token 转售毛利（小额）+ 案例 IP
+          </div>
+          <div class="ms"><b>里程碑</b>：完成 3 个对外可宣传案例；积累 10 万笔以上真实支付；Demo 视频与 Console 截图成为标准销售材料</div>
+        </div>
+        <div class="gtm-phase">
+          <div class="when">Phase 2 · 6–18 个月</div>
+          <h3 style="color:var(--accent1)">商户规模化</h3>
+          <div class="who">打谁：日本中型企业 IT 部门<br>（年营收 100 亿日元级，已采用生成式 AI）</div>
+          <div class="sell">
+            <strong>卖什么</strong>：Token 套餐 + Console SaaS + 月度发票<br>
+            <strong>收什么</strong>：Token 毛利 + 网关费 + SaaS 订阅（ARR）
+          </div>
+          <div class="ms"><b>里程碑</b>：100+ 付费商户；ARR 形成可披露的增长曲线；与日本会计软件商建立对账集成</div>
+        </div>
+        <div class="gtm-phase">
+          <div class="when">Phase 3 · 18 个月+</div>
+          <h3 class="purple">生态平台化</h3>
+          <div class="who">打谁：日本大企业 + 海外 Agent 框架商<br>（AP2 / MCP 生态、海外开发者）</div>
+          <div class="sell">
+            <strong>卖什么</strong>：白标网关 + 跨链资产 + 全球结算<br>
+            <strong>收什么</strong>：网关分润 + 结算增值费 + 平台抽佣
+          </div>
+          <div class="ms"><b>里程碑</b>：进入 Anthropic / Google 官方推荐合作伙伴名单；亚太多国节点上线；估值锚定为基础设施级</div>
+        </div>
+      </div>
+      <div class="kicker" style="margin-top:14px;font-size:12.5px">
+        <strong>选择灯塔商户的原则</strong>：①故事性强（媒体愿意写）②金额能起量（不浪费工程资源）③愿意联合发布（案例可复用）。
+        Phase 1 不追求收入，<strong>追求 3 个能说出来的真实案例</strong>，这是 Phase 2/3 撬动规模的杠杆。
+      </div>
+    </div>
+  </div>
+
+  <!-- 13b · TOKEN AI RESALE (M5 新增 · 商户二次转售商业模式) -->
+  <div class="slide" id="s-resale">
+    <div class="container">
+      <div class="slide-title">TOKEN AI RESALE · 商户也能转售</div>
+      <h2>HABA 把 AI 商品顾问按调用量卖给上游 — Token 在链上被消费两次</h2>
+      <div class="divider"></div>
+
+      <!-- chain narrative -->
+      <div class="card" style="background:rgba(15,157,88,.06);border-color:rgba(15,157,88,.25);margin-top:14px">
+        <p class="lead" style="font-size:13.5px">
+          Netstars 卖 Token 给 HABA（x402 + USDC 主线）；HABA 把 Token 组装成「HABA AI Advisor」垂直能力，再按调用量卖给药局 / 医院 / 营养师 / 合作电商。
+          <strong>Token 在这条链上被消费两次</strong> — Netstars 拿到第一次的销售收入，HABA 拿到第二次的转售毛利，<strong class="gold">两层商业模式同时跑在同一条 x402 基础设施上</strong>。
+        </p>
+      </div>
+
+      <!-- chain diagram (Anthropic → Netstars → HABA → 4 partners) -->
+      <div style="margin-top:16px;display:grid;grid-template-columns:1fr;gap:8px;max-width:880px;margin-left:auto;margin-right:auto">
+        <div style="text-align:center;padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:rgba(148,163,184,.08)">
+          <strong style="color:var(--muted)">Anthropic / OpenAI / xAI / Google</strong>
+          <div class="sub" style="font-size:11.5px">AI 模型供给（云授权）</div>
+        </div>
+        <div style="text-align:center;font-size:11px;color:var(--muted)">↓ 云授权</div>
+        <div style="text-align:center;padding:10px 14px;border:1px solid rgba(37,99,235,.4);border-radius:10px;background:rgba(37,99,235,.08)">
+          <strong class="accent">Netstars</strong>
+          <div class="sub" style="font-size:11.5px">Token 销售 + x402 网关（第 1 次 Token 消费）</div>
+        </div>
+        <div style="text-align:center;font-size:11.5px;color:var(--accent2)"><strong>↓ x402 + USDC</strong></div>
+        <div style="text-align:center;padding:10px 14px;border:1px solid rgba(15,157,88,.4);border-radius:10px;background:rgba(15,157,88,.08)">
+          <strong class="green">HABA / ハーバー研究所</strong>
+          <div class="sub" style="font-size:11.5px">Advisor 二次组装 + 转售（第 2 次 Token 消费）</div>
+        </div>
+        <div style="text-align:center;font-size:11px;color:var(--muted)">↓ 按调用量付费给 HABA</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+          <div style="text-align:center;padding:8px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.03)">
+            <div style="font-size:18px">🏪</div><div style="font-size:11.5px;font-weight:600">药局</div>
+            <div class="sub" style="font-size:10.5px">前台咨询调用</div>
+          </div>
+          <div style="text-align:center;padding:8px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.03)">
+            <div style="font-size:18px">🏥</div><div style="font-size:11.5px;font-weight:600">医院</div>
+            <div class="sub" style="font-size:10.5px">营养指导调用</div>
+          </div>
+          <div style="text-align:center;padding:8px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.03)">
+            <div style="font-size:18px">🥗</div><div style="font-size:11.5px;font-weight:600">营养师</div>
+            <div class="sub" style="font-size:10.5px">餐食方案调用</div>
+          </div>
+          <div style="text-align:center;padding:8px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.03)">
+            <div style="font-size:18px">🛒</div><div style="font-size:11.5px;font-weight:600">合作电商</div>
+            <div class="sub" style="font-size:10.5px">首页 widget 嵌入</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 plan tiers -->
+      <div class="card-grid cols-3" style="margin-top:18px">
+        <div class="card">
+          <div class="tag tag-gold" style="margin-bottom:6px">Starter</div>
+          <h3 class="gold">10K Token / 月</h3>
+          <p class="sub" style="font-size:12px"><strong>¥3.0 / Token</strong> · 月基础费 ¥0</p>
+          <p class="sub" style="font-size:11.5px;margin-top:6px">单店药局 / 独立营养师 — 够日均 200 次顾客咨询</p>
+        </div>
+        <div class="card" style="border-color:rgba(15,157,88,.4);background:rgba(15,157,88,.05)">
+          <div class="tag tag-green" style="margin-bottom:6px">Growth · 推荐</div>
+          <h3 class="green">100K Token / 月</h3>
+          <p class="sub" style="font-size:12px"><strong>¥2.4 / Token</strong> · 月基础费 ¥5,000</p>
+          <p class="sub" style="font-size:11.5px;margin-top:6px">中型药局连锁 / 私立医院 — 够 5–10 家门店共用，子账户可拆分</p>
+        </div>
+        <div class="card">
+          <div class="tag tag-purple" style="margin-bottom:6px">Enterprise</div>
+          <h3 class="purple">1M+ Token / 月</h3>
+          <p class="sub" style="font-size:12px"><strong>议价</strong> · API + SLA + 数据回流</p>
+          <p class="sub" style="font-size:11.5px;margin-top:6px">大型药局连锁 / 公立医院 / 合作电商首页嵌入</p>
+        </div>
+      </div>
+
+      <div class="kicker" style="margin-top:14px;font-size:12.5px">
+        <strong>对 Netstars 的意义</strong>：HABA 转售的 Token 量随 B2B 合作方增长被放大 —
+        Netstars 不只是卖 Token 给 HABA 一家，等于<strong>通过 HABA 触达 4 类 B2B 客户群</strong>。
+        与 §14 ECOSYSTEM FLYWHEEL 的"飞轮"逻辑同源：商户做转售生意越大，Netstars 平台规模越大。
+      </div>
+    </div>
+  </div>
+
+  <!-- 14 · ECOSYSTEM FLYWHEEL ⭐NEW -->
+  <div class="slide" id="s-flywheel">
+    <div class="container">
+      <div class="slide-title">ECOSYSTEM FLYWHEEL · 怎么放大</div>
+      <h2>生态扩展飞轮：四个角色互相强化</h2>
+      <div class="divider"></div>
+      <div class="flywheel" style="margin-top:18px">
+        <div class="fw-node">
+          <div class="ic">🏢</div>
+          <h4 class="accent">支付服务商</h4>
+          <p>更多商户接入 = 更多支付笔数 = 更低单笔成本</p>
+        </div>
+        <div class="fw-arr">→</div>
+        <div class="fw-node">
+          <div class="ic">🎟️</div>
+          <h4 class="gold">AI Token 销售商</h4>
+          <p>支付笔数推动 Token 销售 = 更强谈判力 = 更优批发价</p>
+        </div>
+        <div class="fw-arr">→</div>
+        <div class="fw-node">
+          <div class="ic">🤖</div>
+          <h4 class="purple">Agent 市场入口</h4>
+          <p>Token 价格优势吸引 Agent 框架商默认集成 = 网络效应</p>
+        </div>
+        <div class="fw-arr">→</div>
+        <div class="fw-node">
+          <div class="ic">📊</div>
+          <h4 class="green">支付与运营数据</h4>
+          <p>沉淀的调用数据反哺定价、风控、新产品设计</p>
+        </div>
+      </div>
+      <div class="fw-loop">
+        <strong class="accent">↻ 闭环</strong>：数据资产让我们能为大客户做更准的预测式套餐与个性化结算，
+        进而锁定<strong>更多高客单价商户</strong>，再次推动第一个齿轮转得更快。
+        <strong>这个飞轮一旦启动，后入场者难以追赶</strong>。
+      </div>
+      <div class="card-grid cols-3" style="margin-top:14px">
+        <div class="card">
+          <h3 class="accent">短期扩展（1 年内）</h3>
+          <p class="sub" style="font-size:12px">从 USDC 扩展到 USDT、JPYC 等更多稳定币；从 Solana 扩展到 Base 等 L2；让商户的"支付资产选择"更宽。</p>
+        </div>
+        <div class="card">
+          <h3 class="gold">中期扩展（1–2 年）</h3>
+          <p class="sub" style="font-size:12px">把 Token 系统从 AI Token 扩展到 SaaS 订阅、云资源、数据 API — 复用同一套计费/结算/账本。</p>
+        </div>
+        <div class="card">
+          <h3 class="purple">长期扩展（2 年+）</h3>
+          <p class="sub" style="font-size:12px">成为亚太区 Agent 商务的默认结算层；从日本枢纽辐射东南亚；可能 IPO 或战略并入更大金融生态。</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════
-       SLIDE 13 · 实施路线图
-  ════════════════════════════════════════════════ -->
-  <div class="slide" id="s-roadmap">
-    <div style="width:100%;max-width:1080px">
-      <div class="slide-title">IMPLEMENTATION ROADMAP</div>
-      <h2>四阶段落地路线图</h2>
+  <!-- 15 · RISKS -->
+  <div class="slide" id="s-risk">
+    <div class="container">
+      <div class="slide-title">RISKS &amp; MITIGATIONS</div>
+      <h2>三个最可能被质疑的风险 — 我们的应对</h2>
       <div class="divider"></div>
-      <div class="roadmap" style="margin-top:28px">
+      <div class="risk-grid" style="margin-top:14px">
+        <div class="risk-card">
+          <div class="rk-head"><div class="rk-num">01</div><h3>合规与监管</h3></div>
+          <div class="risk"><strong>风险</strong>：日本金融厅对稳定币和加密资产的监管仍在演进，未来可能要求额外牌照或限制。</div>
+          <div class="mit"><b>应对</b>：① 链上执行外包给 Wea Japan，Netstars 自身保持 Web2 PSP 定位；② 法务部前置审阅每个新场景；③ 与金融厅保持沟通通道（已有上市公司背书）。</div>
+        </div>
+        <div class="risk-card">
+          <div class="rk-head"><div class="rk-num">02</div><h3>链上风险与客户损失</h3></div>
+          <div class="risk"><strong>风险</strong>：Solana 网络拥堵、USDC 脱锚、客户私钥丢失等会直接影响商户体验和资金安全。</div>
+          <div class="mit"><b>应对</b>：① 多 RPC 节点冗余 + 自动切换；② 监测稳定币锚定，异常自动暂停；③ 私钥不离开客户端，损失边界限于客户自身；④ 提供保险方案选项。</div>
+        </div>
+        <div class="risk-card">
+          <div class="rk-head"><div class="rk-num">03</div><h3>商户教育成本</h3></div>
+          <div class="risk"><strong>风险</strong>：日本企业对加密支付与 Agent 自主消费仍有顾虑，签约周期可能比预期长。</div>
+          <div class="mit"><b>应对</b>：① 用"日元发票 + 像 Stripe 一样使用"的话术消除区块链感知；② 灯塔商户案例作为信任锚；③ 设置"上限阈值/熔断"功能让财务安心；④ 与会计系统集成降低对接成本。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 16 · ROADMAP -->
+  <div class="slide" id="s-roadmap">
+    <div class="container">
+      <div class="slide-title">IMPLEMENTATION ROADMAP</div>
+      <h2>四阶段交付计划</h2>
+      <div class="divider"></div>
+      <div class="roadmap" style="margin-top:18px">
         <div class="rm-phase">
           <h3 class="accent">Phase 1</h3>
-          <div class="rm-tag">Demo 构建</div>
+          <div class="rm-tag">0–3 个月 · Demo</div>
           <ul>
             <li>X402 网关原型</li>
-            <li>Token 购买流程</li>
-            <li>Agent Demo 场景</li>
-            <li>Solana USDC 集成</li>
-            <li>基础 Dashboard</li>
+            <li>Token 购买/扣减流程</li>
+            <li>HABA AI Advisor 场景（健康食品垂直 demo）</li>
+            <li>Solana 测试网 USDC</li>
+            <li>基础 Console</li>
           </ul>
         </div>
         <div class="rm-phase">
           <h3 style="color:var(--accent1)">Phase 2</h3>
-          <div class="rm-tag">产品化</div>
+          <div class="rm-tag">3–6 个月 · 试点</div>
           <ul>
             <li>SDK 发布（Python / Node）</li>
-            <li>Token 计费引擎</li>
-            <li>多模型接入</li>
-            <li>自动发票系统</li>
-            <li>API 文档 / 开发者门户</li>
+            <li>主网切换 + 灯塔商户接入</li>
+            <li>多模型路由</li>
+            <li>自动发票 + 链上凭证</li>
+            <li>失败/对账流程</li>
           </ul>
         </div>
         <div class="rm-phase">
           <h3 class="purple">Phase 3</h3>
-          <div class="rm-tag">商业化</div>
+          <div class="rm-tag">6–12 个月 · 产品化</div>
           <ul>
-            <li>商户 Beta 测试</li>
-            <li>MCP 接口上线</li>
+            <li>商户 SaaS 套餐上线</li>
+            <li>MCP 接口公开发布</li>
             <li>企业级 SLA</li>
             <li>合规审计报告</li>
-            <li>X402 + Token 合并</li>
+            <li>X402 + Token 系统合并</li>
           </ul>
         </div>
         <div class="rm-phase">
           <h3 class="gold">Phase 4</h3>
-          <div class="rm-tag">生态扩张</div>
+          <div class="rm-tag">12 个月+ · 生态</div>
           <ul>
-            <li>亚太区市场推广</li>
-            <li>更多链上支持</li>
-            <li>Agent 市场接入</li>
-            <li>Web2 支付融合</li>
-            <li>全球化布局</li>
+            <li>跨链 / 多稳定币</li>
+            <li>跨产品复用计费</li>
+            <li>亚太节点扩张</li>
+            <li>Agent 框架默认集成</li>
+            <li>战略合作伙伴</li>
           </ul>
         </div>
       </div>
-      <div class="card-grid cols-3" style="margin-top:20px">
-        <div class="card" style="text-align:center">
-          <div class="stat-num accent">4</div>
-          <div class="stat-lbl">主要参与主体</div>
-        </div>
-        <div class="card" style="text-align:center">
-          <div class="stat-num gold">4</div>
-          <div class="stat-lbl">授权 AI 服务商</div>
-        </div>
-        <div class="card" style="text-align:center">
-          <div class="stat-num" style="color:var(--green)">1st</div>
-          <div class="stat-lbl">亚洲 USDC 支付落地</div>
-        </div>
-      </div>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════
-       SLIDE 14 · DEMO 接入说明
-  ════════════════════════════════════════════════ -->
-  <div class="slide" id="s-demo">
-    <div style="width:100%;max-width:1050px">
-      <div class="slide-title">DEMO INTEGRATION</div>
-      <h2>Demo 接入：3 步完成首次 Token 购买</h2>
-      <div class="divider"></div>
-      <div class="card-grid cols-3" style="margin-top:24px">
-        <div class="card" style="border-color:rgba(37,99,235,.4)">
-          <div style="font-size:28px;font-weight:800;color:var(--accent2);margin-bottom:10px">Step 01</div>
-          <h3>安装 SDK</h3>
-          <div style="margin-top:14px;background:rgba(0,0,0,.3);border-radius:8px;padding:12px;font-family:monospace;font-size:12px;color:var(--accent2)">
-            pip install netstars-sdk
-          </div>
-          <p class="sub" style="font-size:12px;margin-top:10px">支持 Python 3.9+、Node.js 18+</p>
-        </div>
-        <div class="card" style="border-color:rgba(16,185,129,.4)">
-          <div style="font-size:28px;font-weight:800;color:var(--green);margin-bottom:10px">Step 02</div>
-          <h3>初始化 + 充值</h3>
-          <div style="margin-top:14px;background:rgba(0,0,0,.3);border-radius:8px;padding:12px;font-family:monospace;font-size:12px;color:#a7f3d0;line-height:1.8">
-            client = NetstarsClient(<br>
-            &nbsp;&nbsp;api_key="YOUR_KEY"<br>
-            )<br>
-            client.topup(<br>
-            &nbsp;&nbsp;amount_usdc=10.0<br>
-            )
-          </div>
-        </div>
-        <div class="card" style="border-color:rgba(139,92,246,.4)">
-          <div style="font-size:28px;font-weight:800;color:var(--accent3);margin-bottom:10px">Step 03</div>
-          <h3>调用 AI 服务</h3>
-          <div style="margin-top:14px;background:rgba(0,0,0,.3);border-radius:8px;padding:12px;font-family:monospace;font-size:12px;color:#c4b5fd;line-height:1.8">
-            resp = client.claude(<br>
-            &nbsp;&nbsp;model="claude-opus-4-7",<br>
-            &nbsp;&nbsp;prompt="分析竞品..."<br>
-            )<br>
-            # Token 自动扣减
-          </div>
-        </div>
-      </div>
-      <div class="card" style="margin-top:20px">
-        <div style="display:flex;gap:32px;justify-content:center;align-items:center;flex-wrap:wrap">
-          <div style="text-align:center">
-            <div style="font-size:13px;color:var(--muted)">Demo 环境</div>
-            <div style="font-size:14px;font-weight:600;color:var(--accent2);margin-top:4px">Solana Devnet</div>
-          </div>
-          <div style="width:1px;height:40px;background:var(--border)"></div>
-          <div style="text-align:center">
-            <div style="font-size:13px;color:var(--muted)">测试 USDC</div>
-            <div style="font-size:14px;font-weight:600;color:var(--green);margin-top:4px">Faucet 免费获取</div>
-          </div>
-          <div style="width:1px;height:40px;background:var(--border)"></div>
-          <div style="text-align:center">
-            <div style="font-size:13px;color:var(--muted)">文档</div>
-            <div style="font-size:14px;font-weight:600;color:var(--gold);margin-top:4px">developer.netstars.jp</div>
-          </div>
-          <div style="width:1px;height:40px;background:var(--border)"></div>
-          <div style="text-align:center">
-            <div style="font-size:13px;color:var(--muted)">支持</div>
-            <div style="font-size:14px;font-weight:600;color:var(--accent3);margin-top:4px">Slack / 专属 SA</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════
-       SLIDE 15 · CLOSING
-  ════════════════════════════════════════════════ -->
+  <!-- 17 · MANAGEMENT ASK + CLOSING -->
   <div class="slide" id="s-close">
-    <div class="slide-title" style="text-align:center">CONCLUSION</div>
-    <h1 style="text-align:center;max-width:720px">
-      Netstars × Wea Japan<br>
-      <span style="background:linear-gradient(135deg,var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent">
-        重新定义 Agentic 时代的支付基础设施
-      </span>
-    </h1>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;width:100%;max-width:780px;margin-top:32px">
-      <div style="text-align:center;padding:16px;border:1px solid var(--border);border-radius:12px">
-        <div style="font-size:22px;margin-bottom:6px">🏆</div>
-        <div style="font-size:12px;color:var(--muted)">亚洲首家</div>
-        <div style="font-size:13px;font-weight:600;margin-top:2px">USDC 落地支付</div>
+    <div class="container" style="text-align:center">
+      <div class="slide-title" style="text-align:center">MANAGEMENT ASK</div>
+      <h2 style="text-align:center">建议把该项目定位为 <span class="accent">Agent Commerce 支付样板</span>，<br>而非单点技术验证</h2>
+      <div class="divider" style="margin-left:auto;margin-right:auto"></div>
+      <div class="ask-grid" style="margin-top:18px">
+        <div class="ask-card" style="text-align:left">
+          <div class="num">1</div>
+          <h3 class="accent">确认 Demo 口径</h3>
+          <p>以"HABA AI Advisor"为统一故事线，<strong>完整展示支付、Token、调用、转售与账务闭环</strong>（含异常处理）；HABA 是真实客户但 demo 仅用作演示场景，<strong class="gold">对外披露需 HABA × Netstars 双方书面确认</strong>。</p>
+        </div>
+        <div class="ask-card" style="text-align:left">
+          <div class="num">2</div>
+          <h3 class="green">锁定协作边界</h3>
+          <p>Netstars 面向客户统一承接（一份合同、一张发票）；Wea Japan 负责链上执行；Token 系统沉淀账务；<strong>不让客户感受到边界</strong>。</p>
+        </div>
+        <div class="ask-card" style="text-align:left">
+          <div class="num">3</div>
+          <h3 class="gold">启动试点商业包装</h3>
+          <p>形成 SDK + Console + 商户套餐 + 结算说明 + 灯塔商户候选名单，<strong>3–6 个月内拿到首批可对外发布的案例</strong>。</p>
+        </div>
       </div>
-      <div style="text-align:center;padding:16px;border:1px solid var(--border);border-radius:12px">
-        <div style="font-size:22px;margin-bottom:6px">🤝</div>
-        <div style="font-size:12px;color:var(--muted)">四大 AI 公司</div>
-        <div style="font-size:13px;font-weight:600;margin-top:2px">日本独家授权</div>
+      <h1 style="margin-top:34px;font-size:clamp(22px,2.6vw,32px);max-width:880px;margin-left:auto;margin-right:auto">
+        <span style="background:linear-gradient(135deg,var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent">
+          我们拥有：技术 + 牌照 + 合作伙伴 + 市场授权
+        </span><br>
+        <span style="font-size:16px;color:var(--muted);font-weight:400">现在需要经营层批准这三件事，把 12–24 个月窗口期变成长期分发地位</span>
+      </h1>
+      <div style="margin-top:30px;font-size:11px;color:var(--muted)">
+        Netstars Co., Ltd.（日経 5590）&nbsp;|&nbsp; 2026 &nbsp;|&nbsp; CONFIDENTIAL — Executive Briefing
       </div>
-      <div style="text-align:center;padding:16px;border:1px solid var(--border);border-radius:12px">
-        <div style="font-size:22px;margin-bottom:6px">⚡</div>
-        <div style="font-size:12px;color:var(--muted)">X402 + USDC</div>
-        <div style="font-size:13px;font-weight:600;margin-top:2px">毫秒级结算</div>
-      </div>
-    </div>
-    <p class="sub" style="text-align:center;max-width:580px;margin-top:24px">
-      我们拥有技术、牌照、合作伙伴与市场授权——<br>
-      现在只需要您的支持，将这一愿景变为现实
-    </p>
-    <div class="cta-btn">欢迎进一步讨论合作细节</div>
-    <div style="margin-top:24px;font-size:12px;color:var(--muted)">
-      Netstars Co., Ltd.（日経 5590）&nbsp;|&nbsp; 2026 &nbsp;|&nbsp; CONFIDENTIAL
     </div>
   </div>
 
 </div><!-- /#deck -->
 
-<!-- Navigation -->
 <div id="nav">
   <button class="nav-btn" id="btn-prev">← 上一页</button>
-  <span id="page-info">1 / 15</span>
+  <span id="page-info">1 / 18</span>
   <button class="nav-btn" id="btn-next">下一页 →</button>
 </div>
 
@@ -1144,7 +1406,6 @@
     current = Math.max(0, Math.min(n, total - 1));
     const s = slides[current];
     s.classList.add('active');
-    // tiny delay so transition fires
     requestAnimationFrame(() => requestAnimationFrame(() => s.classList.add('visible')));
     document.getElementById('page-info').textContent = `${current + 1} / ${total}`;
     document.getElementById('progress').style.width  = `${((current + 1) / total) * 100}%`;
@@ -1158,7 +1419,6 @@
     if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                      goto(current - 1);
   });
 
-  // init
   goto(0);
 </script>
 </body>

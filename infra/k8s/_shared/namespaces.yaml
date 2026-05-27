@@ -1,0 +1,55 @@
+# =====================================================================
+# Shared · Namespaces
+# Apply first: kubectl apply -f infra/k8s/_shared/namespaces.yaml
+# =====================================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: x402
+  labels:
+    app.kubernetes.io/part-of: x402-token-market
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: token
+  labels:
+    app.kubernetes.io/part-of: x402-token-market
+    pod-security.kubernetes.io/enforce: restricted
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: observability
+  labels:
+    app.kubernetes.io/part-of: x402-token-market
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: external-secrets
+  labels:
+    app.kubernetes.io/part-of: x402-token-market
+---
+# Default deny-all NetworkPolicy: every namespace starts locked down;
+# explicit NetworkPolicies in each module open required paths.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: x402
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: token
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]

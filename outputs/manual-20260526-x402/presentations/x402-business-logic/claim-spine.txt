@@ -1,0 +1,22 @@
+Thesis:
+Netstars can turn x402 from a technical protocol demo into a merchant-facing Agent Commerce payment and AI Token operating service.
+
+Audience:
+Netstars / Wea Japan operating and commercial decision makers.
+
+One-line arc:
+The market is shifting toward agent-initiated micro-transactions; Netstars has an unusual fit because it owns both payment aggregation and AI Token sales; the demo must therefore prove a sellable closed loop, then move through focused GTM and ecosystem expansion.
+
+Slides:
+1. x402 should be positioned as a commercial infrastructure opportunity, not a protocol experiment.
+2. Agent Commerce creates a new payment job: autonomous, small-value, high-frequency, instantly auditable transactions.
+3. Netstars' current assets match the demand pattern better than a pure PSP, wallet, or AI reseller.
+4. The winning product is a four-layer service package that hides chain complexity from merchants.
+5. The demo must prove a revenue chain: USDC payment -> Token credit -> AI usage -> billing and settlement.
+6. Role boundaries make the offer credible: Netstars owns the customer surface, Wea executes chain operations.
+7. Token operations are the commercial center of gravity, because they create recurring usage, billing, and account data.
+8. Trust architecture is a buying criterion, not a back-office topic.
+9. GTM should begin with a narrow wedge where Token consumption and payment pain are already visible.
+10. Ecosystem expansion should connect AI providers, Agent platforms, merchants, and settlement partners around Netstars.
+11. Product roadmap should separate demo proof, pilot hardening, commercialization, and platform scaling.
+12. Management should approve scope, operating model, and pilot packaging.

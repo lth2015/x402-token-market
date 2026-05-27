@@ -1,0 +1,61 @@
+# =====================================================================
+# Token · Ingresses (api + console, both behind same ALB if possible)
+# Hosts:
+#   qa.api.netstars.jp   → token-api
+#   qa.app.netstars.jp   → token-console
+# =====================================================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: token-api
+  namespace: token
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443},{"HTTP":80}]'
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS13-1-2-2021-06
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-northeast-1:REPLACE_ACCOUNT_ID:certificate/REPLACE_CERT_ID
+    alb.ingress.kubernetes.io/wafv2-acl-arn: arn:aws:wafv2:ap-northeast-1:REPLACE_ACCOUNT_ID:regional/webacl/netstars-qa-waf/REPLACE_ID
+    alb.ingress.kubernetes.io/healthcheck-path: /readyz
+    alb.ingress.kubernetes.io/group.name: netstars-qa             # share ALB across token-api & token-console
+    alb.ingress.kubernetes.io/group.order: '10'
+    external-dns.alpha.kubernetes.io/hostname: qa.api.netstars.jp
+spec:
+  ingressClassName: alb
+  rules:
+    - host: qa.api.netstars.jp
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend: { service: { name: token-api, port: { number: 80 } } }
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: token-console
+  namespace: token
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443},{"HTTP":80}]'
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS13-1-2-2021-06
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-northeast-1:REPLACE_ACCOUNT_ID:certificate/REPLACE_CERT_ID
+    alb.ingress.kubernetes.io/wafv2-acl-arn: arn:aws:wafv2:ap-northeast-1:REPLACE_ACCOUNT_ID:regional/webacl/netstars-qa-waf/REPLACE_ID
+    alb.ingress.kubernetes.io/healthcheck-path: /api/health
+    alb.ingress.kubernetes.io/group.name: netstars-qa
+    alb.ingress.kubernetes.io/group.order: '20'
+    external-dns.alpha.kubernetes.io/hostname: qa.app.netstars.jp
+spec:
+  ingressClassName: alb
+  rules:
+    - host: qa.app.netstars.jp
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend: { service: { name: token-console, port: { number: 80 } } }

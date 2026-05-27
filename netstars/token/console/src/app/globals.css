@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Design tokens (UX-SPEC §2.1) ─────────────────────────────── */
+:root {
+  --bg-page:             #F8FAFC;
+  --bg-surface:          #FFFFFF;
+  --bg-surface-elevated: #FFFFFF;
+  --bg-muted:            #F1F5F9;
+  --border-subtle:       #E2E8F0;
+  --border-default:      #CBD5E1;
+  --text-primary:        #0F172A;
+  --text-secondary:      #475569;
+  --text-tertiary:       #94A3B8;
+}
+
+.dark {
+  --bg-page:             #0B1220;
+  --bg-surface:          #0F172A;
+  --bg-surface-elevated: #1E293B;
+  --bg-muted:            #1E293B;
+  --border-subtle:       #1E293B;
+  --border-default:      #334155;
+  --text-primary:        #F1F5F9;
+  --text-secondary:      #94A3B8;
+  --text-tertiary:       #64748B;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    font-feature-settings: "cv11", "ss03";
+    font-variant-numeric: tabular-nums;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  *:focus-visible {
+    outline: 2px solid theme(colors.brand.primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0ms !important;
+    transition-duration: 0ms !important;
+  }
+}

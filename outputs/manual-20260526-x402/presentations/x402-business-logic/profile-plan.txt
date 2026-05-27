@@ -1,0 +1,18 @@
+Task mode: reference-beating
+Primary deck-profile: product-platform
+Secondary gates: gtm-growth, strategy narrative
+
+Required proof objects:
+- market-demand progression from human checkout to agent-initiated micro-payments
+- Netstars advantage-to-demand fit matrix
+- commercial service stack and monetization bridge
+- demo proof chain from payment to token ledger to AI usage to billing
+- GTM wedge and ecosystem expansion path
+
+Source / asset requirements:
+- Primary source is proposal.md and the two generated references in codex/ and claude/
+- Use no unverified company logos or pseudo-brand marks
+- External trend references are qualitative only; no fabricated market sizing
+
+Known missing inputs:
+- exact commercial pricing, gross margin, expected merchant pipeline, regulatory/contract details

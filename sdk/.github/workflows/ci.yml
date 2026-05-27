@@ -1,0 +1,89 @@
+# =====================================================================
+# SDK · Continuous Integration
+# Stages: lint → typecheck → unit → integration (mock backend) → build wheel
+# Reference design: ../../../netstars/token/.github/workflows/README.md
+# =====================================================================
+name: SDK CI
+
+on:
+  push:
+    branches: [main]
+    paths: ['sdk/**', '.github/workflows/sdk-ci.yml']
+  pull_request:
+    paths: ['sdk/**']
+
+concurrency:
+  group: ci-sdk-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: sdk
+
+jobs:
+  test:
+    name: Test (Py${{ matrix.python }} / ${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.9', '3.10', '3.11', '3.12']
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - run: pipx install poetry==1.8.3
+      - run: poetry install --no-root --with dev
+      - name: Ruff
+        run: poetry run ruff check . && poetry run ruff format --check .
+      - name: Mypy
+        run: poetry run mypy src/
+      - name: Unit
+        run: poetry run pytest tests/unit --cov=src --cov-report=xml
+      - name: Integration (mock backend)
+        run: poetry run pytest tests/integration
+      - uses: codecov/codecov-action@v4
+        if: matrix.python == '3.12' && matrix.os == 'ubuntu-latest'
+        with:
+          files: ./sdk/coverage.xml
+          flags: sdk
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  security:
+    name: Security checks
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: returntocorp/semgrep-action@v1
+        with:
+          config: 'p/python p/security-audit p/owasp-top-ten'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pip-audit
+      - run: pip-audit -r <(poetry export -f requirements.txt)
+
+  build:
+    name: Build wheel
+    runs-on: ubuntu-latest
+    needs: [test, security]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pipx install poetry==1.8.3
+      - run: poetry build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdk-wheel-${{ github.sha }}
+          path: sdk/dist/
+          retention-days: 7

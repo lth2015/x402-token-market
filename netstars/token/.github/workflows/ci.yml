@@ -1,0 +1,237 @@
+# =====================================================================
+# Token System · Continuous Integration
+# Triggers on PR + main branch push
+# Stages: lint → typecheck → test → SAST → dependency audit → build → image scan
+# =====================================================================
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'netstars/token/**'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    paths:
+      - 'netstars/token/**'
+
+concurrency:
+  group: ci-token-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: '3.12'
+  NODE_VERSION: '20'
+  POETRY_VERSION: '1.8.3'
+
+permissions:
+  contents: read
+  pull-requests: write
+  security-events: write
+
+defaults:
+  run:
+    working-directory: netstars/token
+
+jobs:
+  # ──────────────────────────────────────────────────────────────────
+  # Static checks (api + console parallel)
+  # ──────────────────────────────────────────────────────────────────
+  lint-api:
+    name: Lint & Typecheck (API)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - name: Install Poetry
+        run: pipx install poetry==${{ env.POETRY_VERSION }}
+      - name: Install deps
+        run: poetry install --no-root --with dev
+      - name: Ruff (lint + format check)
+        run: poetry run ruff check . && poetry run ruff format --check .
+      - name: Mypy (typecheck)
+        run: poetry run mypy src/
+
+  lint-console:
+    name: Lint & Typecheck (Console)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: netstars/token/console
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: netstars/token/console/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+
+  # ──────────────────────────────────────────────────────────────────
+  # Unit + integration tests (with Postgres + Redis services)
+  # ──────────────────────────────────────────────────────────────────
+  test-api:
+    name: Test (API)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: token_app
+          POSTGRES_PASSWORD: token_app_test
+          POSTGRES_DB: token_test
+        options: >-
+          --health-cmd "pg_isready -U token_app"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+        ports: [5432:5432]
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+        ports: [6379:6379]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - run: pipx install poetry==${{ env.POETRY_VERSION }}
+      - run: poetry install --no-root --with dev
+      - name: Apply DB schema
+        env:
+          PGPASSWORD: token_app_test
+        run: |
+          psql -h localhost -U token_app -d token_test -f db/SCHEMA.sql
+      - name: Pytest
+        env:
+          DATABASE_URL: postgresql://token_app:token_app_test@localhost:5432/token_test
+          REDIS_URL: redis://localhost:6379/0
+          ENV: test
+        run: poetry run pytest --cov=src --cov-report=xml --cov-fail-under=80
+      - uses: codecov/codecov-action@v4
+        with:
+          files: ./netstars/token/coverage.xml
+          flags: token-api
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  test-console:
+    name: Test (Console)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: netstars/token/console
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: netstars/token/console/package-lock.json
+      - run: npm ci
+      - run: npm run test -- --coverage
+      - name: Lighthouse CI (perf baseline)
+        run: npm run lhci || echo "Lighthouse warning only — does not fail CI"
+
+  # ──────────────────────────────────────────────────────────────────
+  # Security: SAST + dependency audit
+  # ──────────────────────────────────────────────────────────────────
+  sast:
+    name: SAST (Semgrep)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/owasp-top-ten
+            p/python
+            p/javascript
+            p/typescript
+
+  deps-audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [api, console]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit (Python)
+        if: matrix.target == 'api'
+        run: |
+          pip install pip-audit
+          cd netstars/token && pip-audit -r <(poetry export -f requirements.txt) || true
+      - name: Audit (npm)
+        if: matrix.target == 'console'
+        working-directory: netstars/token/console
+        run: npm audit --audit-level=high
+
+  # ──────────────────────────────────────────────────────────────────
+  # Build container images (no push on PR; push on main)
+  # ──────────────────────────────────────────────────────────────────
+  build-images:
+    name: Build images
+    runs-on: ubuntu-latest
+    needs: [lint-api, lint-console, test-api, test-console, sast, deps-audit]
+    strategy:
+      matrix:
+        service: [api, console, worker]
+    permissions:
+      id-token: write   # for AWS OIDC
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Configure AWS (OIDC, no long-lived keys)
+        if: github.event_name == 'push'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID_TOOLING }}:role/gh-actions-token-ci
+          aws-region: ap-northeast-1
+      - name: Login to ECR
+        if: github.event_name == 'push'
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Compute image tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "tag=main-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          else
+            echo "tag=pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          fi
+      - name: Build & (conditionally) push
+        uses: docker/build-push-action@v5
+        with:
+          context: netstars/token
+          file: netstars/token/${{ matrix.service }}/Dockerfile
+          push: ${{ github.event_name == 'push' }}
+          tags: |
+            ${{ secrets.ECR_REGISTRY }}/x402-token-market/token/${{ matrix.service }}:${{ steps.tag.outputs.tag }}
+          cache-from: type=gha,scope=token-${{ matrix.service }}
+          cache-to: type=gha,scope=token-${{ matrix.service }},mode=max
+          provenance: true
+          sbom: true
+
+      # Vulnerability scan (Trivy); high/critical breaks the build
+      - name: Trivy scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ secrets.ECR_REGISTRY }}/x402-token-market/token/${{ matrix.service }}:${{ steps.tag.outputs.tag }}
+          format: 'sarif'
+          output: 'trivy-${{ matrix.service }}.sarif'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+          ignore-unfixed: true
+      - name: Upload Trivy SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-${{ matrix.service }}.sarif'
+          category: trivy-${{ matrix.service }}

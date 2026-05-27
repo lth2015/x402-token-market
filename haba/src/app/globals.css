@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── HABA design tokens — warm/natural; independent from Netstars Console ── */
+:root {
+  --bg-page:             #FAFAF7;  /* warm off-white, cream */
+  --bg-surface:          #FFFFFF;
+  --bg-surface-elevated: #FFFFFF;
+  --bg-muted:            #F1F5F0;  /* very soft green tint */
+  --border-subtle:       #E5E7DF;
+  --border-default:      #CBD2C7;
+  --text-primary:        #0B3D2E;  /* dark forest */
+  --text-secondary:      #4B5D54;
+  --text-tertiary:       #8A9890;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    font-feature-settings: "cv11", "ss03";
+    font-variant-numeric: tabular-nums;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  *:focus-visible {
+    outline: 2px solid theme(colors.brand.primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0ms !important;
+    transition-duration: 0ms !important;
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "dashboard": {
+    "title": "ダッシュボード",
+    "kpi": {
+      "balance": "Token 残高",
+      "spent_30d": "今月消費",
+      "requests_30d": "30日間リクエスト",
+      "active_keys": "有効なAPI Key"
+    },
+    "live_activity": {
+      "title": "ライブアクティビティ",
+      "subtitle": "API 経由のリアルタイム消費 / 入金",
+      "empty": "まだイベントがありません。SDK 経由でリクエストを送信すると、ここに表示されます。",
+      "see_audit": "監査ログを見る →"
+    },
+    "footer": {
+      "powered_by": "Netstars Token System"
+    }
+  },
+  "nav": {
+    "dashboard": "ダッシュボード",
+    "usage": "消費分析",
+    "tokens": "Token",
+    "api_keys": "API Key",
+    "models": "モデル",
+    "invoices": "請求書",
+    "protocol": "プロトコル",
+    "settings": "設定",
+    "audit": "監査ログ"
+  }
+}

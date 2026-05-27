@@ -1,0 +1,158 @@
+# =====================================================================
+# Token System · Deployments (api + worker + console)
+# =====================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: token-api
+  namespace: token
+  labels: { app: token-api, app.kubernetes.io/component: api }
+spec:
+  replicas: 5
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxSurge: 25%, maxUnavailable: 0 }
+  selector: { matchLabels: { app: token-api } }
+  template:
+    metadata:
+      labels: { app: token-api, app.kubernetes.io/component: api }
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port:   "8080"
+        prometheus.io/path:   "/metrics"
+    spec:
+      serviceAccountName: token-api
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile: { type: RuntimeDefault }
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector: { matchLabels: { app: token-api } }
+      containers:
+        - name: api
+          image: REPLACE_ECR/x402-token-market/token/api:REPLACE_TAG
+          ports: [ { name: http, containerPort: 8080 } ]
+          envFrom:
+            - configMapRef: { name: token-config }
+            - secretRef:    { name: token-db-creds }
+            - secretRef:    { name: token-redis-url }
+            - secretRef:    { name: token-provider-keys }
+            - secretRef:    { name: token-pii-key }
+          env:
+            - { name: POD_NAME, valueFrom: { fieldRef: { fieldPath: metadata.name } } }
+            - { name: OTEL_SERVICE_NAME, value: "token-api" }
+          resources:
+            requests: { cpu: 1000m, memory: 1Gi }
+            limits:   { cpu: 2000m, memory: 2Gi }
+          readinessProbe:
+            httpGet: { path: /readyz, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          startupProbe:
+            httpGet: { path: /healthz, port: http }
+            failureThreshold: 24
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ALL] }
+          volumeMounts: [ { name: tmp, mountPath: /tmp } ]
+      volumes: [ { name: tmp, emptyDir: {} } ]
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: token-worker
+  namespace: token
+  labels: { app: token-worker, app.kubernetes.io/component: worker }
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  strategy: { type: Recreate }
+  selector: { matchLabels: { app: token-worker } }
+  template:
+    metadata:
+      labels: { app: token-worker, app.kubernetes.io/component: worker }
+    spec:
+      serviceAccountName: token-worker
+      securityContext: { runAsNonRoot: true, runAsUser: 10001, seccompProfile: { type: RuntimeDefault } }
+      containers:
+        - name: worker
+          image: REPLACE_ECR/x402-token-market/token/worker:REPLACE_TAG
+          envFrom:
+            - configMapRef: { name: token-config }
+            - secretRef:    { name: token-db-creds }
+            - secretRef:    { name: token-redis-url }
+            - secretRef:    { name: token-provider-keys }
+            - secretRef:    { name: token-pii-key }
+          env:
+            - { name: WORKER_MODE, value: "all" }   # invoice + reconcile + usage_agg + anomaly + balance_alert
+            - { name: OTEL_SERVICE_NAME, value: "token-worker" }
+          resources:
+            requests: { cpu: 1000m, memory: 1Gi }
+            limits:   { cpu: 2000m, memory: 2Gi }
+          livenessProbe:
+            exec: { command: ["/app/healthcheck"] }
+            periodSeconds: 30
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ALL] }
+          volumeMounts: [ { name: tmp, mountPath: /tmp } ]
+      volumes: [ { name: tmp, emptyDir: {} } ]
+      terminationGracePeriodSeconds: 60
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: token-console
+  namespace: token
+  labels: { app: token-console, app.kubernetes.io/component: console }
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxSurge: 25%, maxUnavailable: 0 }
+  selector: { matchLabels: { app: token-console } }
+  template:
+    metadata:
+      labels: { app: token-console, app.kubernetes.io/component: console }
+    spec:
+      serviceAccountName: token-console
+      securityContext: { runAsNonRoot: true, runAsUser: 10001, seccompProfile: { type: RuntimeDefault } }
+      containers:
+        - name: console
+          image: REPLACE_ECR/x402-token-market/token/console:REPLACE_TAG
+          ports: [ { name: http, containerPort: 3000 } ]
+          envFrom:
+            - configMapRef: { name: token-config }
+            - secretRef:    { name: token-sso }
+          env:
+            - { name: NEXT_PUBLIC_API_BASE, value: "https://qa.api.netstars.jp" }
+            - { name: OTEL_SERVICE_NAME, value: "token-console" }
+          resources:
+            requests: { cpu: 500m, memory: 512Mi }
+            limits:   { cpu: 1000m, memory: 1Gi }
+          readinessProbe: { httpGet: { path: /api/health, port: http } }
+          livenessProbe:  { httpGet: { path: /api/health, port: http }, periodSeconds: 30 }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ALL] }
+          volumeMounts:
+            - { name: tmp, mountPath: /tmp }
+            - { name: next-cache, mountPath: /app/.next/cache }
+      volumes:
+        - { name: tmp, emptyDir: {} }
+        - { name: next-cache, emptyDir: {} }
+      terminationGracePeriodSeconds: 30

@@ -1,0 +1,267 @@
+# =====================================================================
+# X402 Token Market · Local development stack
+# Brings up: MySQL 8.0 + Redis 7 + Solana devnet validator
+#            + x402-api + token-api + token-worker + token-console + wea-api
+#
+# Usage:
+#   cp .env.example .env  # then edit if needed
+#   make up               # or: docker compose up -d
+#   make logs             # tail all services
+#   make migrate          # run DB migrations
+#   make down             # stop + remove
+#
+# Notes:
+# - The 3 Aurora MySQL clusters in QA become 3 logical databases here.
+# - All services use the same MySQL/Redis instance for local dev (different DBs).
+# - Solana service uses solana-test-validator (single node, no real money).
+# =====================================================================
+# Project name comes from the directory by default ("x402-token-market").
+# Override with: COMPOSE_PROJECT_NAME=foo docker compose up
+
+x-app-defaults: &app-defaults
+  restart: unless-stopped
+  networks: [internal]
+  environment:
+    ENV: local
+    LOG_LEVEL: DEBUG
+    LOG_FORMAT: json
+    OTEL_EXPORTER_OTLP_ENDPOINT: ""        # disabled locally
+    SOLANA_NETWORK: devnet
+    SOLANA_RPC_URL: http://solana:8899
+    USDC_MINT: 4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU
+
+services:
+  # ── Infrastructure ───────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: x402m_mysql
+    restart: unless-stopped
+    networks: [internal]
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_0900_ai_ci
+      --default-time-zone=+00:00
+      --transaction-isolation=READ-COMMITTED
+      --innodb-lock-wait-timeout=30
+      --log-bin-trust-function-creators=1
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootdev}
+      MYSQL_DATABASE: x402_qa
+    ports: ["3306:3306"]
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./scripts/mysql-init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-rootdev}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    container_name: x402m_redis
+    restart: unless-stopped
+    networks: [internal]
+    ports: ["6379:6379"]
+    volumes: [redis-data:/data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  solana:
+    image: solanalabs/solana:v1.18.22
+    container_name: x402m_solana
+    restart: unless-stopped
+    networks: [internal]
+    command: >
+      solana-test-validator
+        --rpc-bind-address 0.0.0.0
+        --rpc-port 8899
+        --reset
+        --quiet
+    ports: ["8899:8899", "8900:8900"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf -X POST -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"getHealth\"}' http://127.0.0.1:8899 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  # ── Backend services ──────────────────────────────────────────────
+  x402-api:
+    <<: *app-defaults
+    container_name: x402m_x402_api
+    build:
+      context: ./netstars/x402
+      dockerfile: Dockerfile
+    ports: ["8081:8080"]
+    environment:
+      ENV: local
+      DATABASE_URL: mysql+aiomysql://x402_app:x402_app_dev@mysql:3306/x402_qa
+      REDIS_URL: redis://redis:6379/0
+      WEA_API_BASE_URL: http://wea-api:8080
+      TOKEN_API_BASE_URL: http://token-api:8080
+      INTERNAL_AUTH_SECRET: ${INTERNAL_AUTH_SECRET:-internal_localdev_token}
+      SOLANA_RPC_URL: http://solana:8899
+      USDC_MINT: ${USDC_MINT:-4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU}
+      DEPOSIT_RECIPIENT_ADDRESS: ${DEPOSIT_RECIPIENT_ADDRESS:-5dHJpDeM4kvNSnSqkA2D9wmJZ5fHZ3iH3a6CkZxJ2hYz}
+      # Webhook delivery. Default URL loops back to this service's /dev/webhook-sink
+      # so a single-compose demo can show the full delivery round-trip in logs.
+      WEBHOOK_DEFAULT_URL:    ${WEBHOOK_DEFAULT_URL:-http://x402-api:8080/dev/webhook-sink}
+      WEBHOOK_SIGNING_SECRET: ${WEBHOOK_SIGNING_SECRET:-whsec_localdev_change_me}
+      WEBHOOK_MAX_ATTEMPTS:   ${WEBHOOK_MAX_ATTEMPTS:-6}
+    depends_on:
+      mysql:    { condition: service_healthy }
+      redis:    { condition: service_healthy }
+      # Solana is intentionally a soft dep: on Apple Silicon the validator
+      # image is amd64-only and crashes under QEMU (no AVX). x402-api will
+      # boot fine and only contact Solana when REAL CHAIN mode is enabled
+      # (see LOCAL-DEV.md). To run real chain on M-series Macs, install
+      # solana-cli on the host and run `solana-test-validator` outside docker.
+      solana:   { condition: service_started }
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/healthz || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  token-api:
+    <<: *app-defaults
+    container_name: x402m_token_api
+    build:
+      context: ./netstars/token/api
+      dockerfile: Dockerfile
+    ports: ["8080:8080"]
+    environment:
+      ENV: local
+      DATABASE_URL: mysql+aiomysql://token_app:token_app_dev@mysql:3306/token_qa
+      REDIS_URL: redis://redis:6379/1
+      X402_API_BASE_URL: http://x402-api:8080
+      INTERNAL_AUTH_SECRET: ${INTERNAL_AUTH_SECRET:-internal_localdev_token}
+      # KMS_MODE=dev treats key_secret_enc bytes as plaintext (local-only).
+      # In QA/prod set KMS_MODE=aws + AWS_REGION + AWS_KMS_KEY_ALIAS and grant
+      # the pod's IRSA role kms:Decrypt on that key.
+      KMS_MODE:           ${KMS_MODE:-dev}
+      AWS_REGION:         ${AWS_REGION:-ap-northeast-1}
+      AWS_KMS_KEY_ALIAS:  ${AWS_KMS_KEY_ALIAS:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-sk-ant-DUMMY}
+      OPENAI_API_KEY:    ${OPENAI_API_KEY:-sk-DUMMY}
+      XAI_API_KEY:       ${XAI_API_KEY:-DUMMY}
+      GOOGLE_API_KEY:    ${GOOGLE_API_KEY:-DUMMY}
+    depends_on:
+      mysql: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/healthz || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  token-worker:
+    <<: *app-defaults
+    container_name: x402m_token_worker
+    build:
+      context: ./netstars/token/worker
+      dockerfile: Dockerfile
+    environment:
+      ENV: local
+      DATABASE_URL: mysql+aiomysql://token_app:token_app_dev@mysql:3306/token_qa
+      REDIS_URL: redis://redis:6379/1
+      WORKER_MODE: all
+    depends_on:
+      mysql:     { condition: service_healthy }
+      redis:     { condition: service_healthy }
+      token-api: { condition: service_healthy }
+
+  token-console:
+    <<: *app-defaults
+    container_name: x402m_token_console
+    build:
+      context: ./netstars/token/console
+      dockerfile: Dockerfile
+    ports: ["3000:3000"]
+    environment:
+      # Browser-visible URL (used if a future client component fetches direct).
+      NEXT_PUBLIC_API_BASE: http://localhost:8080
+      # Server-side URL — Console's lib/api.ts uses this for SSR fetches.
+      # Without it, the dashboard's `api.balance()` call resolves localhost
+      # inside the container and 401s. See netstars/token/console/src/lib/api.ts.
+      NETSTARS_API_BASE_INTERNAL: http://token-api:8080
+      # HMAC creds for /v1/balance, /v1/recent-activity. Same demo creds as
+      # sdk/quickstart.py — rotate before any non-demo use.
+      NETSTARS_API_KEY:        ${NETSTARS_API_KEY:-ak_localdev_test}
+      NETSTARS_API_KEY_SECRET: ${NETSTARS_API_KEY_SECRET:-secret_localdev_test}
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-localdevsecret_change_in_real_env_min_32_chars}
+    depends_on:
+      token-api: { condition: service_healthy }
+
+  wea-api:
+    <<: *app-defaults
+    container_name: x402m_wea_api
+    build:
+      context: ./wea
+      dockerfile: Dockerfile
+    ports: ["8082:8080"]
+    environment:
+      ENV: local
+      DATABASE_URL: mysql://wea_app:wea_app_dev@mysql:3306/wea_qa
+      SOLANA_RPC_URL: http://solana:8899
+      X402_CALLBACK_BASE_URL: http://x402-api:8080
+    depends_on:
+      mysql:  { condition: service_healthy }
+      # See x402-api note: Solana is a soft dep so the stack can boot on arm64.
+      solana: { condition: service_started }
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/healthz || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # ── HABA AI Commerce demo site (independent merchant; see docs/haba-*.md) ──
+  haba-site:
+    container_name: x402m_haba_site
+    restart: unless-stopped
+    networks: [internal]
+    build:
+      context: ./haba
+      dockerfile: Dockerfile
+    ports: ["3001:3001"]
+    environment:
+      NODE_ENV: production
+      # Browser-visible URLs (used by client components if they ever go
+      # direct; today they don't — see lib/netstars/client.ts).
+      NEXT_PUBLIC_NETSTARS_TOKEN_API: http://localhost:8080
+      NEXT_PUBLIC_NETSTARS_X402_API:  http://localhost:8081
+      # Server-side URLs (used by Next.js API routes under api/netstars/*).
+      # Inside docker, HABA hits Netstars via service DNS; on the host
+      # `make haba-dev` flow these are absent and the client falls back
+      # to NEXT_PUBLIC_* which points to localhost.
+      NETSTARS_TOKEN_API_INTERNAL: http://token-api:8080
+      NETSTARS_X402_API_INTERNAL:  http://x402-api:8080
+      # HMAC credentials for /v1/balance, /v1/token-purchase, etc.
+      # Demo creds; same as sdk/quickstart.py's defaults. Rotate before any
+      # non-demo deployment.
+      NETSTARS_API_KEY:        ${NETSTARS_API_KEY:-ak_localdev_test}
+      NETSTARS_API_KEY_SECRET: ${NETSTARS_API_KEY_SECRET:-secret_localdev_test}
+    # HABA site is intentionally NOT in token-api's depends_on chain — it's a
+    # separate merchant deployment, comes up on its own. token-api healthiness
+    # only matters when we actually wire SDK calls (Milestone 3+).
+    healthcheck:
+      # `force-dynamic` page does full SSR on first hit (next-intl loads
+      # messages, etc.), so cold renders can break 3s. 10s + 30s start_period
+      # gives Next.js room to warm up without flapping unhealthy on boot.
+      test: ["CMD-SHELL", "wget -qO- --tries=1 --timeout=8 http://localhost:3001/ > /dev/null || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 6
+      start_period: 30s
+
+volumes:
+  mysql-data:
+  redis-data:
+
+networks:
+  internal:
+    driver: bridge

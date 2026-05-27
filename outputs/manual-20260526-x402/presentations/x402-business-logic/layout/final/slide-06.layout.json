@@ -1,0 +1,1069 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/0m23uh",
+    "id": "0m23uh",
+    "slide": 6,
+    "layoutId": "24f31b55-bb51-4e6a-8795-b940d8db7383",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "cc253390-b288-46ff-b017-fbd8a87f18c4",
+    "masterLayoutName": "Master",
+    "backgroundColor": "#F7F3EA",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "typefaces": [
+      "Hiragino Sans"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "24f31b55-bb51-4e6a-8795-b940d8db7383",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "cc253390-b288-46ff-b017-fbd8a87f18c4",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "cc253390-b288-46ff-b017-fbd8a87f18c4",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/donyd0z6",
+      "id": "1",
+      "bbox": [
+        54,
+        34,
+        260,
+        28
+      ],
+      "geometry": "rect",
+      "text": "OPERATING MODEL",
+      "textPreview": "OPERATING MODEL",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "fontSize": 12,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "OPERATING MODEL"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "OPERATING MODEL",
+          "runs": [
+            {
+              "index": 1,
+              "text": "OPERATING MODEL",
+              "fontSize": 12,
+              "typeface": "Hiragino Sans",
+              "color": "#0891B2",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#F7F3EA",
+      "lineColor": "#F7F3EA",
+      "lineWidth": 0
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/2x4nap4r",
+      "id": "2",
+      "bbox": [
+        54,
+        70,
+        900,
+        92
+      ],
+      "geometry": "rect",
+      "text": "客户只面对 Netstars；链上执行和 AI Token 供给在后台协作完成。",
+      "textPreview": "客户只面对 Netstars；链上执行和 AI Token 供给在后台协作完成。",
+      "resolvedFontSize": 32,
+      "resolvedTextStyle": {
+        "fontSize": 32,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "客户只面对 Netstars；链上执行和 AI Token"
+          },
+          {
+            "index": 2,
+            "text": "供给在后台协作完成。"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "客户只面对 Netstars；链上执行和 AI Token 供给在后台协作完成。",
+          "runs": [
+            {
+              "index": 1,
+              "text": "客户只面对 Netstars；链上执行和 AI Token 供给在后台协作完成。",
+              "fontSize": 32,
+              "typeface": "Hiragino Sans",
+              "color": "#111827",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#F7F3EA",
+      "lineColor": "#F7F3EA",
+      "lineWidth": 0
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/vixczed8",
+      "id": "3",
+      "bbox": [
+        54,
+        166,
+        1172,
+        1
+      ],
+      "geometry": "rect",
+      "fillColor": "#D8D2C4",
+      "lineColor": "#D8D2C4",
+      "lineWidth": 0
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/kre1w7mp",
+      "id": "4",
+      "bbox": [
+        1180,
+        38,
+        46,
+        22
+      ],
+      "geometry": "rect",
+      "text": "06",
+      "textPreview": "06",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "fontSize": 12,
+        "typeface": "Hiragino Sans",
+        "alignment": "right"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "06"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "06",
+          "runs": [
+            {
+              "index": 1,
+              "text": "06",
+              "fontSize": 12,
+              "typeface": "Hiragino Sans",
+              "color": "#5B6472"
+            }
+          ]
+        }
+      ],
+      "fillColor": "#F7F3EA",
+      "lineColor": "#F7F3EA",
+      "lineWidth": 0
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/dcbulwva",
+      "id": "5",
+      "bbox": [
+        80,
+        236,
+        236,
+        188
+      ],
+      "geometry": "rect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#D97706",
+      "lineWidth": 2
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/6psfil0r",
+      "id": "6",
+      "bbox": [
+        80,
+        236,
+        236,
+        12
+      ],
+      "geometry": "rect",
+      "fillColor": "#D97706",
+      "lineColor": "#D97706",
+      "lineWidth": 0
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/val87ed8",
+      "id": "7",
+      "bbox": [
+        98,
+        272,
+        194,
+        30
+      ],
+      "geometry": "rect",
+      "text": "商户 / Agent",
+      "textPreview": "商户 / Agent",
+      "resolvedFontSize": 20,
+      "resolvedTextStyle": {
+        "fontSize": 20,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "商户 / Agent"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "商户 / Agent",
+          "runs": [
+            {
+              "index": 1,
+              "text": "商户 / Agent",
+              "fontSize": 20,
+              "typeface": "Hiragino Sans",
+              "color": "#111827",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#FFFFFF",
+      "lineColor": "#FFFFFF",
+      "lineWidth": 0
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/knih4byh",
+      "id": "8",
+      "bbox": [
+        102,
+        326,
+        190,
+        58
+      ],
+      "geometry": "rect",
+      "text": "发起购买、调用模型、查询余额",
+      "textPreview": "发起购买、调用模型、查询余额",
+      "resolvedFontSize": 15,
+      "resolvedTextStyle": {
+        "fontSize": 15,
+        "typeface": "Hiragino Sans",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "发起购买、调用模型、查"
+          },
+          {
+            "index": 2,
+            "text": "询余额"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "发起购买、调用模型、查询余额",
+          "runs": [
+            {
+              "index": 1,
+              "text": "发起购买、调用模型、查询余额",
+              "fontSize": 15,
+              "typeface": "Hiragino Sans",
+              "color": "#5B6472"
+            }
+          ]
+        }
+      ],
+      "fillColor": "#FFFFFF",
+      "lineColor": "#FFFFFF",
+      "lineWidth": 0
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/d8bat47y",
+      "id": "9",
+      "bbox": [
+        326,
+        326,
+        28,
+        2
+      ],
+      "geometry": "rect",
+      "fillColor": "#D97706",
+      "lineColor": "#D97706",
+      "lineWidth": 0
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/pkzupwb2",
+      "id": "10",
+      "bbox": [
+        350,
+        320,
+        14,
+        14
+      ],
+      "geometry": "triangle",
+      "fillColor": "#D97706",
+      "lineColor": "#D97706",
+      "lineWidth": 0
+    },
+    {
+      "order": 11,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/0z61032l",
+      "id": "11",
+      "bbox": [
+        372,
+        236,
+        236,
+        188
+      ],
+      "geometry": "rect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#1D4ED8",
+      "lineWidth": 2
+    },
+    {
+      "order": 12,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/7ed8bat4",
+      "id": "12",
+      "bbox": [
+        372,
+        236,
+        236,
+        12
+      ],
+      "geometry": "rect",
+      "fillColor": "#1D4ED8",
+      "lineColor": "#1D4ED8",
+      "lineWidth": 0
+    },
+    {
+      "order": 13,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/itgfmlkj",
+      "id": "13",
+      "bbox": [
+        390,
+        272,
+        194,
+        30
+      ],
+      "geometry": "rect",
+      "text": "Netstars",
+      "textPreview": "Netstars",
+      "resolvedFontSize": 20,
+      "resolvedTextStyle": {
+        "fontSize": 20,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Netstars"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Netstars",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Netstars",
+              "fontSize": 20,
+              "typeface": "Hiragino Sans",
+              "color": "#111827",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#FFFFFF",
+      "lineColor": "#FFFFFF",
+      "lineWidth": 0
+    },
+    {
+      "order": 14,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/p8nqxs72",
+      "id": "14",
+      "bbox": [
+        394,
+        326,
+        190,
+        58
+      ],
+      "geometry": "rect",
+      "text": "统一签约、SDK/API/MCP、x402 网关、Token 账本、账务后台",
+      "textPreview": "统一签约、SDK/API/MCP、x402 网关、Token 账本、账务后台",
+      "resolvedFontSize": 15,
+      "resolvedTextStyle": {
+        "fontSize": 15,
+        "typeface": "Hiragino Sans",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 3,
+        "lines": [
+          {
+            "index": 1,
+            "text": "统一签约、SDK/API/MC"
+          },
+          {
+            "index": 2,
+            "text": "P、x402 网关、Token"
+          },
+          {
+            "index": 3,
+            "text": "账本、账务后台"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "统一签约、SDK/API/MCP、x402 网关、Token 账本、账务后台",
+          "runs": [
+            {
+              "index": 1,
+              "text": "统一签约、SDK/API/MCP、x402 网关、Token 账本、账务后台",
+              "fontSize": 15,
+              "typeface": "Hiragino Sans",
+              "color": "#5B6472"
+            }
+          ]
+        }
+      ],
+      "fillColor": "#FFFFFF",
+      "lineColor": "#FFFFFF",
+      "lineWidth": 0
+    },
+    {
+      "order": 15,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/0nuxc3yl",
+      "id": "15",
+      "bbox": [
+        618,
+        326,
+        28,
+        2
+      ],
+      "geometry": "rect",
+      "fillColor": "#1D4ED8",
+      "lineColor": "#1D4ED8",
+      "lineWidth": 0
+    },
+    {
+      "order": 16,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/72x4nap4",
+      "id": "16",
+      "bbox": [
+        642,
+        320,
+        14,
+        14
+      ],
+      "geometry": "triangle",
+      "fillColor": "#1D4ED8",
+      "lineColor": "#1D4ED8",
+      "lineWidth": 0
+    },
+    {
+      "order": 17,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ih4byhgn",
+      "id": "17",
+      "bbox": [
+        664,
+        236,
+        236,
+        188
+      ],
+      "geometry": "rect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#059669",
+      "lineWidth": 2
+    },
+    {
+      "order": 18,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/p4r65wju",
+      "id": "18",
+      "bbox": [
+        664,
+        236,
+        236,
+        12
+      ],
+      "geometry": "rect",
+      "fillColor": "#059669",
+      "lineColor": "#059669",
+      "lineWidth": 0
+    },
+    {
+      "order": 19,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/wjudg7ad",
+      "id": "19",
+      "bbox": [
+        682,
+        272,
+        194,
+        30
+      ],
+      "geometry": "rect",
+      "text": "Wea Japan",
+      "textPreview": "Wea Japan",
+      "resolvedFontSize": 20,
+      "resolvedTextStyle": {
+        "fontSize": 20,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Wea Japan"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Wea Japan",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Wea Japan",
+              "fontSize": 20,
+              "typeface": "Hiragino Sans",
+              "color": "#111827",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#FFFFFF",
+      "lineColor": "#FFFFFF",
+      "lineWidth": 0
+    },
+    {
+      "order": 20,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/szqtcj6t",
+      "id": "20",
+      "bbox": [
+        686,
+        326,
+        190,
+        58
+      ],
+      "geometry": "rect",
+      "text": "Solana / USDC 执行、交易确认、链上凭证",
+      "textPreview": "Solana / USDC 执行、交易确认、链上凭证",
+      "resolvedFontSize": 15,
+      "resolvedTextStyle": {
+        "fontSize": 15,
+        "typeface": "Hiragino Sans",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 3,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Solana / USDC"
+          },
+          {
+            "index": 2,
+            "text": "执行、交易确认、链上凭"
+          },
+          {
+            "index": 3,
+            "text": "证"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Solana / USDC 执行、交易确认、链上凭证",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Solana / USDC 执行、交易确认、链上凭证",
+              "fontSize": 15,
+              "typeface": "Hiragino Sans",
+              "color": "#5B6472"
+            }
+          ]
+        }
+      ],
+      "fillColor": "#FFFFFF",
+      "lineColor": "#FFFFFF",
+      "lineWidth": 0
+    },
+    {
+      "order": 21,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/lkjm1cfa",
+      "id": "21",
+      "bbox": [
+        910,
+        326,
+        28,
+        2
+      ],
+      "geometry": "rect",
+      "fillColor": "#059669",
+      "lineColor": "#059669",
+      "lineWidth": 0
+    },
+    {
+      "order": 22,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/at47y1kr",
+      "id": "22",
+      "bbox": [
+        934,
+        320,
+        14,
+        14
+      ],
+      "geometry": "triangle",
+      "fillColor": "#059669",
+      "lineColor": "#059669",
+      "lineWidth": 0
+    },
+    {
+      "order": 23,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/3ex0nuxc",
+      "id": "23",
+      "bbox": [
+        956,
+        236,
+        236,
+        188
+      ],
+      "geometry": "rect",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#0891B2",
+      "lineWidth": 2
+    },
+    {
+      "order": 24,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/sneloj2t",
+      "id": "24",
+      "bbox": [
+        956,
+        236,
+        236,
+        12
+      ],
+      "geometry": "rect",
+      "fillColor": "#0891B2",
+      "lineColor": "#0891B2",
+      "lineWidth": 0
+    },
+    {
+      "order": 25,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/l87ed8ba",
+      "id": "25",
+      "bbox": [
+        974,
+        272,
+        194,
+        30
+      ],
+      "geometry": "rect",
+      "text": "AI Providers",
+      "textPreview": "AI Providers",
+      "resolvedFontSize": 20,
+      "resolvedTextStyle": {
+        "fontSize": 20,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "AI Providers"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "AI Providers",
+          "runs": [
+            {
+              "index": 1,
+              "text": "AI Providers",
+              "fontSize": 20,
+              "typeface": "Hiragino Sans",
+              "color": "#111827",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#FFFFFF",
+      "lineColor": "#FFFFFF",
+      "lineWidth": 0
+    },
+    {
+      "order": 26,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ahoza1gv",
+      "id": "26",
+      "bbox": [
+        978,
+        326,
+        190,
+        58
+      ],
+      "geometry": "rect",
+      "text": "授权模型 Token 供给与调用服务",
+      "textPreview": "授权模型 Token 供给与调用服务",
+      "resolvedFontSize": 15,
+      "resolvedTextStyle": {
+        "fontSize": 15,
+        "typeface": "Hiragino Sans",
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "授权模型 Token"
+          },
+          {
+            "index": 2,
+            "text": "供给与调用服务"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "授权模型 Token 供给与调用服务",
+          "runs": [
+            {
+              "index": 1,
+              "text": "授权模型 Token 供给与调用服务",
+              "fontSize": 15,
+              "typeface": "Hiragino Sans",
+              "color": "#5B6472"
+            }
+          ]
+        }
+      ],
+      "fillColor": "#FFFFFF",
+      "lineColor": "#FFFFFF",
+      "lineWidth": 0
+    },
+    {
+      "order": 27,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/32lszqtc",
+      "id": "27",
+      "bbox": [
+        122,
+        502,
+        1036,
+        58
+      ],
+      "geometry": "rect",
+      "text": "经营原则：客户侧不学习链、不处理私钥、不拼接多个后台；Netstars 负责把复杂协作包装成可购买的产品体验。",
+      "textPreview": "经营原则：客户侧不学习链、不处理私钥、不拼接多个后台；Netstars 负责把复杂协作包装成可购买的产品体验。",
+      "resolvedFontSize": 21,
+      "resolvedTextStyle": {
+        "fontSize": 21,
+        "typeface": "Hiragino Sans",
+        "bold": true,
+        "alignment": "center"
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "经营原则：客户侧不学习链、不处理私钥、不拼接多个后台；Netstars"
+          },
+          {
+            "index": 2,
+            "text": "负责把复杂协作包装成可购买的产品体验。"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "经营原则：客户侧不学习链、不处理私钥、不拼接多个后台；Netstars 负责把复杂协作包装成可购买的产品体验。",
+          "runs": [
+            {
+              "index": 1,
+              "text": "经营原则：客户侧不学习链、不处理私钥、不拼接多个后台；Netstars 负责把复杂协作包装成可购买的产品体验。",
+              "fontSize": 21,
+              "typeface": "Hiragino Sans",
+              "color": "#1D4ED8",
+              "bold": true
+            }
+          ]
+        }
+      ],
+      "fillColor": "#F7F3EA",
+      "lineColor": "#F7F3EA",
+      "lineWidth": 0
+    },
+    {
+      "order": 28,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/wb2hwfyx",
+      "id": "28",
+      "bbox": [
+        54,
+        666,
+        1172,
+        1
+      ],
+      "geometry": "rect",
+      "fillColor": "#D8D2C4",
+      "lineColor": "#D8D2C4",
+      "lineWidth": 0
+    },
+    {
+      "order": 29,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/lwval87e",
+      "id": "29",
+      "bbox": [
+        54,
+        674,
+        760,
+        22
+      ],
+      "geometry": "rect",
+      "text": "Source: proposal.md, codex reference deck, claude reference deck | Internal discussion draft",
+      "textPreview": "Source: proposal.md, codex reference deck, claude reference deck | Internal discussion draft",
+      "resolvedFontSize": 10,
+      "resolvedTextStyle": {
+        "fontSize": 10,
+        "typeface": "Hiragino Sans",
+        "alignment": "left"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Source: proposal.md, codex reference deck, claude reference deck | Internal discussion draft"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Source: proposal.md, codex reference deck, claude reference deck | Internal discussion draft",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Source: proposal.md, codex reference deck, claude reference deck | Internal discussion draft",
+              "fontSize": 10,
+              "typeface": "Hiragino Sans",
+              "color": "#5B6472"
+            }
+          ]
+        }
+      ],
+      "fillColor": "#F7F3EA",
+      "lineColor": "#F7F3EA",
+      "lineWidth": 0
+    },
+    {
+      "order": 30,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/bq1oryts",
+      "id": "30",
+      "bbox": [
+        990,
+        674,
+        236,
+        22
+      ],
+      "geometry": "rect",
+      "text": "X402 Token Market  |  06",
+      "textPreview": "X402 Token Market  |  06",
+      "resolvedFontSize": 10,
+      "resolvedTextStyle": {
+        "fontSize": 10,
+        "typeface": "Hiragino Sans",
+        "alignment": "right"
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "X402 Token Market  |  06"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "X402 Token Market  |  06",
+          "runs": [
+            {
+              "index": 1,
+              "text": "X402 Token Market  |  06",
+              "fontSize": 10,
+              "typeface": "Hiragino Sans",
+              "color": "#5B6472"
+            }
+          ]
+        }
+      ],
+      "fillColor": "#F7F3EA",
+      "lineColor": "#F7F3EA",
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

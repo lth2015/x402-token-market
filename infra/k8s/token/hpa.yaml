@@ -1,0 +1,29 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata: { name: token-api, namespace: token }
+spec:
+  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: token-api }
+  minReplicas: 5
+  maxReplicas: 30
+  metrics:
+    - { type: Resource, resource: { name: cpu,    target: { type: Utilization, averageUtilization: 60 } } }
+    - { type: Resource, resource: { name: memory, target: { type: Utilization, averageUtilization: 75 } } }
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - { type: Percent, value: 100, periodSeconds: 30 }
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - { type: Percent, value: 25, periodSeconds: 60 }
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata: { name: token-console, namespace: token }
+spec:
+  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: token-console }
+  minReplicas: 2
+  maxReplicas: 8
+  metrics:
+    - { type: Resource, resource: { name: cpu, target: { type: Utilization, averageUtilization: 70 } } }

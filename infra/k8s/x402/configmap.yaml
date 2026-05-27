@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: x402-config
+  namespace: x402
+data:
+  ENV: "qa"
+  LOG_LEVEL: "INFO"
+  LOG_FORMAT: "json"
+  HTTP_PORT: "8080"
+
+  # X402 protocol settings
+  PAYMENT_ORDER_EXPIRY_SECONDS: "1800"            # 30 min
+  WEBHOOK_RETRY_INTERVALS: "300,900,3600,21600,86400"   # 5m / 15m / 1h / 6h / 24h
+  WEBHOOK_MAX_ATTEMPTS: "5"
+
+  # Wea integration
+  WEA_API_BASE_URL: "https://wea-api.wea-qa.internal"
+  WEA_TIMEOUT_SECONDS: "30"
+
+  # Token system integration
+  TOKEN_API_BASE_URL: "http://token-api.token.svc.cluster.local"
+  TOKEN_API_TIMEOUT_SECONDS: "5"
+
+  # Solana
+  SOLANA_NETWORK: "devnet"
+  USDC_MINT: "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"   # Devnet USDC
+
+  # Idempotency
+  IDEMPOTENCY_TTL_SECONDS: "86400"
+
+  # Observability
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector.observability.svc.cluster.local:4317"
+  OTEL_SERVICE_NAME: "x402-api"

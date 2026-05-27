@@ -1,0 +1,40 @@
+# secrets
+.env
+
+# generated bootstrap artifacts (Solana keypairs, mint, env)
+.local/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# node
+node_modules/
+.next/
+out/
+.npm/
+.eslintcache
+tsconfig.tsbuildinfo
+next-env.d.ts
+
+# rust
+target/
+
+# editor / OS
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# logs / scratch
+*.log
+.playwright-mcp/
+*.png
+!claude/**/*.png

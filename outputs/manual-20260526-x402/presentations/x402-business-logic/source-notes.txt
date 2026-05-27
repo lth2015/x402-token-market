@@ -1,0 +1,14 @@
+Primary source:
+- proposal.md: project background, goals, operating roles, implementation boundaries, security emphasis, demo objective.
+
+Reference deck notes:
+- codex/x402-ai-token-agent-commerce-briefing.pptx: useful operational detail, demo story, payment/token/security flows.
+- claude/presentation.html: useful macro structure and executive framing, but some claims require stronger business linkage.
+
+Qualitative external context considered:
+- x402 / HTTP 402 framing: payment can be embedded into a resource-access flow.
+- Agentic commerce trend: major payment and platform companies are exploring AI-agent payment authorization and merchant-side controls.
+- Stablecoin payment relevance: USDC on fast chains can support low-friction settlement and machine-triggered transactions.
+
+Identity asset policy:
+- No official logos embedded. Brand cues are expressed through text, color, and business-role labels only.

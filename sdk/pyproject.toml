@@ -1,0 +1,41 @@
+[tool.poetry]
+name = "netstars-sdk"
+version = "0.1.0"
+description = "Netstars SDK — X402-based payment & AI Token client for Agentic Commerce"
+authors = ["Netstars <dev@netstars.jp>"]
+license = "Apache-2.0"
+readme = "README.md"
+homepage = "https://developer.netstars.jp"
+repository = "https://github.com/netstars/x402-token-market"
+keywords = ["x402", "usdc", "solana", "ai", "agent", "anthropic", "openai"]
+packages = [{ include = "netstars", from = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+httpx = ">=0.27,<1.0"
+pydantic = ">=2.0,<3.0"
+pynacl = ">=1.5,<2.0"          # Ed25519 signing
+base58 = ">=2.1,<3.0"
+solders = ">=0.21,<1.0"        # Solana primitives (Pubkey, Message, ATA derivation)
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3"
+pytest-asyncio = "^0.24"
+respx = "^0.21"
+ruff = "^0.7"
+mypy = "^1.13"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "ASYNC"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

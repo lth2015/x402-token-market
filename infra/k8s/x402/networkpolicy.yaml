@@ -1,0 +1,65 @@
+# =====================================================================
+# X402 · NetworkPolicies
+# (Default deny-all is in _shared/namespaces.yaml; these open required paths)
+# =====================================================================
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: x402-api-allow
+  namespace: x402
+spec:
+  podSelector: { matchLabels: { app: x402-api } }
+  policyTypes: [Ingress, Egress]
+  ingress:
+    # From AWS ALB target group (any source — ALB does the security; alt: limit to VPC CIDR)
+    - {}
+    # Intra-namespace (worker → api, etc.)
+    - from:
+        - podSelector: {}
+  egress:
+    # DNS
+    - to:
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: kube-system } }
+      ports: [ { protocol: UDP, port: 53 }, { protocol: TCP, port: 53 } ]
+    # Aurora MySQL (DB subnet CIDR)
+    - to: [ { ipBlock: { cidr: 10.0.48.0/20 } } ]
+      ports: [ { protocol: TCP, port: 3306 } ]
+    # Redis (DB subnet)
+    - to: [ { ipBlock: { cidr: 10.0.48.0/20 } } ]
+      ports: [ { protocol: TCP, port: 6379 } ]
+    # token-api in cluster
+    - to:
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: token } }
+          podSelector: { matchLabels: { app: token-api } }
+      ports: [ { protocol: TCP, port: 80 } ]
+    # OTel collector (observability ns)
+    - to:
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: observability } }
+      ports: [ { protocol: TCP, port: 4317 } ]
+    # Wea API (cross-account via VPC Peering)
+    - to: [ { ipBlock: { cidr: 10.1.0.0/16 } } ]
+      ports: [ { protocol: TCP, port: 443 } ]
+    # AWS APIs (VPC Endpoints) — coarse: any 443
+    - to: [ { ipBlock: { cidr: 0.0.0.0/0, except: [ 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 ] } } ]
+      ports: [ { protocol: TCP, port: 443 } ]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: x402-worker-allow
+  namespace: x402
+spec:
+  podSelector: { matchLabels: { app: x402-worker } }
+  policyTypes: [Ingress, Egress]
+  ingress: []
+  egress:
+    - to:
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: kube-system } }
+      ports: [ { protocol: UDP, port: 53 } ]
+    - to: [ { ipBlock: { cidr: 10.0.48.0/20 } } ]
+      ports: [ { protocol: TCP, port: 3306 }, { protocol: TCP, port: 6379 } ]
+    - to:
+        - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: token } }
+      ports: [ { protocol: TCP, port: 80 } ]
+    - to: [ { ipBlock: { cidr: 0.0.0.0/0, except: [ 10.0.0.0/8 ] } } ]   # webhook out
+      ports: [ { protocol: TCP, port: 443 } ]

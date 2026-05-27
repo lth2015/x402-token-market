@@ -1,0 +1,8 @@
+node_modules
+.next
+.next/standalone
+.next/static
+out
+tsconfig.tsbuildinfo
+next-env.d.ts
+.env*.local

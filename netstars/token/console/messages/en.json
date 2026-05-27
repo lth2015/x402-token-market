@@ -1,0 +1,31 @@
+{
+  "dashboard": {
+    "title": "Dashboard",
+    "kpi": {
+      "balance": "Token balance",
+      "spent_30d": "Spent (30d)",
+      "requests_30d": "Requests (30d)",
+      "active_keys": "Active API keys"
+    },
+    "live_activity": {
+      "title": "Live activity",
+      "subtitle": "Real-time API consumption + top-ups",
+      "empty": "No events yet. Make a request via the SDK and it will appear here.",
+      "see_audit": "See Audit Log →"
+    },
+    "footer": {
+      "powered_by": "Netstars Token System"
+    }
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "usage": "Usage",
+    "tokens": "Tokens",
+    "api_keys": "API Keys",
+    "models": "Models",
+    "invoices": "Invoices",
+    "protocol": "Protocol",
+    "settings": "Settings",
+    "audit": "Audit Log"
+  }
+}

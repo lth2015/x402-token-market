@@ -1,0 +1,54 @@
+[package]
+name = "wea"
+version = "0.1.0"
+edition = "2021"
+authors = ["Wea Japan <dev@weajapan.example>"]
+description = "Wea Settlement Connector — MVP (loop-closing settlements + mock RPC)"
+
+[dependencies]
+# HTTP server
+axum            = "0.7"
+tokio           = { version = "1.40", features = ["full"] }
+tower-http      = { version = "0.6", features = ["trace"] }
+
+# Logging
+tracing            = "0.1"
+tracing-subscriber = { version = "0.3", features = ["json", "env-filter"] }
+
+# Serde
+serde      = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# DB — sqlx mysql, runtime-tokio, chrono/json type support
+sqlx       = { version = "0.7", default-features = false, features = [
+    "runtime-tokio-rustls",
+    "mysql",
+    "chrono",
+    "macros",
+    "json",
+] }
+
+# Outbound HTTP (callbacks)
+reqwest    = { version = "0.12", default-features = false, features = [
+    "json", "rustls-tls",
+] }
+
+# HMAC signing
+hmac   = "0.12"
+sha2   = "0.10"
+hex    = "0.4"
+
+# Misc
+anyhow  = "1.0"
+chrono  = { version = "0.4", default-features = false, features = ["clock", "serde"] }
+ulid    = { version = "1.1", features = ["serde"] }
+base64  = "0.22"
+
+[[bin]]
+name = "wea-api"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+strip = true

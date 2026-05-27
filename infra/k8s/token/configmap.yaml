@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: token-config
+  namespace: token
+data:
+  ENV: "qa"
+  LOG_LEVEL: "INFO"
+  LOG_FORMAT: "json"
+  HTTP_PORT: "8080"
+  CONSOLE_PORT: "3000"
+
+  # X402 integration
+  X402_API_BASE_URL: "http://x402-api.x402.svc.cluster.local"
+
+  # AI Providers
+  ANTHROPIC_BASE_URL: "https://api.anthropic.com"
+  OPENAI_BASE_URL:    "https://api.openai.com"
+  XAI_BASE_URL:       "https://api.x.ai"
+  GOOGLE_BASE_URL:    "https://generativelanguage.googleapis.com"
+  PROVIDER_TIMEOUT_SECONDS: "60"
+
+  # Pricing
+  FX_USDC_TO_JPY: "150.0"          # cached; refreshed by worker
+  TOKEN_PER_USDC: "1000000"
+
+  # Rate limit defaults
+  DEFAULT_RPM: "600"
+  DEFAULT_TPM: "100000000"
+
+  # Console
+  CONSOLE_BASE_URL: "https://qa.app.netstars.jp"
+  NEXTAUTH_URL: "https://qa.app.netstars.jp"
+
+  # SSO (既有)
+  OIDC_ISSUER_URL: "https://sso.netstars.jp/realms/internal"
+
+  # Legacy integrations
+  LEGACY_INVOICE_API: "https://invoice.internal.netstars.jp/v1"
+  LEGACY_CRM_API:     "https://crm.internal.netstars.jp/v1"
+
+  # Worker schedules
+  INVOICE_CRON: "0 0 1 * *"        # 每月 1 日 00:00
+  RECONCILE_CRON: "0 * * * *"      # 每小时
+  USAGE_AGG_INTERVAL_SECONDS: "300"  # 5min
+
+  # Observability
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector.observability.svc.cluster.local:4317"

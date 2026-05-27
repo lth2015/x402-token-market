@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X402 Token Market — Demo Control Panel</title>
+<style>
+  :root {
+    --bg:        #0a0f1e;
+    --panel:     #111d42;
+    --panel-2:   #0d1b3e;
+    --line:      rgba(255,255,255,0.08);
+    --text:      #e2e8f0;
+    --muted:     #94a3b8;
+    --accent:    #2563eb;
+    --cyan:      #06b6d4;
+    --violet:    #8b5cf6;
+    --green:     #10b981;
+    --amber:     #f59e0b;
+    --red:       #ef4444;
+    --haba:      #0F9D58;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    background:
+      radial-gradient(circle at 20% 0%, rgba(37,99,235,0.18), transparent 60%),
+      radial-gradient(circle at 80% 100%, rgba(15,157,88,0.12), transparent 55%),
+      var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 32px 24px 56px;
+  }
+  main { max-width: 1180px; margin: 0 auto; }
+  header { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 28px; }
+  h1 { font-size: 22px; font-weight: 700; letter-spacing: 0.02em; }
+  h1 span.dim { color: var(--muted); font-weight: 400; margin-left: 8px; font-size: 14px; }
+  .tag { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); }
+  .tag .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--muted); margin: 28px 0 12px; font-weight: 600; }
+  h2:first-child { margin-top: 0; }
+  .grid { display: grid; gap: 14px; }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 880px) { .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+  /* surface launchers */
+  .surface {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--text);
+    transition: transform .2s, border-color .2s, background .2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .surface:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.18); }
+  .surface .badge {
+    align-self: flex-start;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em;
+    padding: 3px 10px; border-radius: 4px; font-weight: 600;
+  }
+  .surface .badge.haba    { background: rgba(15,157,88,0.18);  color: var(--haba); }
+  .surface .badge.console { background: rgba(37,99,235,0.18);  color: #93c5fd; }
+  .surface .badge.deck    { background: rgba(139,92,246,0.18); color: #c4b5fd; }
+  .surface .title { font-size: 18px; font-weight: 600; }
+  .surface .desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .surface .url { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+  .surface .arrow { position: absolute; right: 18px; top: 18px; opacity: .35; }
+
+  /* health checks */
+  .health-card {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px;
+  }
+  .health-card .name { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .health-card .name code { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+  .health-card .light {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #475569;
+    box-shadow: 0 0 0 3px rgba(71,85,105,0.18);
+    transition: background .2s, box-shadow .2s;
+  }
+  .health-card.ok    .light { background: var(--green); box-shadow: 0 0 0 3px rgba(16,185,129,0.18); }
+  .health-card.warn  .light { background: var(--amber); box-shadow: 0 0 0 3px rgba(245,158,11,0.18); }
+  .health-card.down  .light { background: var(--red);   box-shadow: 0 0 0 3px rgba(239,68,68,0.18); }
+  .health-card .pill {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 2px 8px; border-radius: 999px;
+    border: 1px solid var(--line); color: var(--muted);
+  }
+  .health-card.ok   .pill { color: var(--green); border-color: rgba(16,185,129,0.3); }
+  .health-card.warn .pill { color: var(--amber); border-color: rgba(245,158,11,0.3); }
+  .health-card.down .pill { color: var(--red);   border-color: rgba(239,68,68,0.3); }
+
+  /* topology */
+  .topology {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px 22px;
+  }
+  .topo-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    align-items: center;
+    text-align: center;
+    margin-top: 10px;
+  }
+  @media (max-width: 880px) { .topo-row { grid-template-columns: 1fr; } }
+  .actor {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 12px;
+  }
+  .actor .who { font-size: 14px; font-weight: 600; }
+  .actor .what { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .actor.haba    { border-color: rgba(15,157,88,0.35); }
+  .actor.haba    .who { color: var(--haba); }
+  .actor.netstars { border-color: rgba(37,99,235,0.4); }
+  .actor.netstars .who { color: #93c5fd; }
+  .actor.wea     { border-color: rgba(139,92,246,0.4); }
+  .actor.wea     .who { color: #c4b5fd; }
+  .actor.solana  { border-color: rgba(16,185,129,0.4); }
+  .actor.solana  .who { color: #6ee7b7; }
+
+  /* demo script */
+  ol.script {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 16px 14px 20px;
+    list-style: none;
+    counter-reset: step;
+  }
+  ol.script li {
+    counter-increment: step;
+    padding: 14px 4px;
+    border-bottom: 1px dashed var(--line);
+    display: grid;
+    grid-template-columns: 28px 1fr auto;
+    gap: 12px;
+    align-items: baseline;
+  }
+  ol.script li:last-child { border-bottom: none; }
+  ol.script li::before {
+    content: counter(step);
+    width: 22px; height: 22px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+  }
+  ol.script li .body { color: var(--text); font-size: 14px; line-height: 1.55; }
+  ol.script li .body code { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--cyan); background: rgba(6,182,212,0.08); padding: 1px 6px; border-radius: 4px; }
+  ol.script li a.go {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--cyan); text-decoration: none;
+    padding: 4px 10px; border: 1px solid rgba(6,182,212,0.3); border-radius: 4px;
+    transition: background .2s;
+  }
+  ol.script li a.go:hover { background: rgba(6,182,212,0.12); }
+
+  /* CLI snippets */
+  pre.snippet {
+    background: #06091a;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #cbd5e1;
+    overflow-x: auto;
+    line-height: 1.7;
+  }
+  pre.snippet .c { color: var(--muted); }
+  pre.snippet .k { color: var(--amber); }
+
+  footer { margin-top: 36px; font-size: 11px; color: var(--muted); text-align: center; }
+  footer a { color: var(--cyan); text-decoration: none; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>X402 Token Market <span class="dim">· Demo Control Panel</span></h1>
+      <p style="color: var(--muted); font-size: 13px; margin-top: 6px;">
+        给演示者用的驾驶舱：4 个相关方、3 个表面、1 套真实闭环。
+      </p>
+    </div>
+    <span class="tag"><span class="dot"></span><span>仅在 demo 演示者本地打开</span></span>
+  </header>
+
+  <h2>4-Actor 拓扑</h2>
+  <div class="topology">
+    <p style="font-size: 12px; color: var(--muted); line-height: 1.5;">
+      Demo 中四个独立主体，独立部署、通过 API / 协议互通。HABA 消费端不暴露上游 vendor 身份(只有这个驾驶舱面板会点名)。
+    </p>
+    <div class="topo-row">
+      <div class="actor haba"><div class="who">HABA</div><div class="what">商户 · 实业 / 买 Token / 卖商品</div></div>
+      <div class="actor netstars"><div class="who">Netstars</div><div class="what">x402 + Token 网关</div></div>
+      <div class="actor wea"><div class="who">WEA Japan</div><div class="what">x402 链上执行</div></div>
+      <div class="actor solana"><div class="who">Solana</div><div class="what">USDC SPL 公链</div></div>
+    </div>
+  </div>
+
+  <h2>表面 (按演示顺序)</h2>
+  <div class="grid grid-3">
+    <a class="surface" href="http://localhost:3001/" target="_blank" rel="noreferrer">
+      <span class="badge haba">HABA</span>
+      <div class="title">HABA AI Commerce</div>
+      <div class="desc">主线场地 — Hero / Agent / 商品 / 充值 / 购物车 / B2B / 终端 Agent 模拟器</div>
+      <div class="url">http://localhost:3001/</div>
+      <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg>
+    </a>
+    <a class="surface" href="http://localhost:3000/" target="_blank" rel="noreferrer">
+      <span class="badge console">Netstars Console</span>
+      <div class="title">Token Console</div>
+      <div class="desc">商户后台 — Live Activity Ticker 同步看到 HABA 那侧每一笔事件(credit / debit / x402)</div>
+      <div class="url">http://localhost:3000/dashboard</div>
+      <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg>
+    </a>
+    <a class="surface" href="./presentation.html" target="_blank" rel="noreferrer">
+      <span class="badge deck">Slides</span>
+      <div class="title">经营层简报</div>
+      <div class="desc">商业逻辑 / 市场匹配 / GTM / 生态飞轮 · 全屏 deck，键盘 ← → 翻页</div>
+      <div class="url">claude/presentation.html</div>
+      <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M9 7h8v8"/></svg>
+    </a>
+  </div>
+
+  <h2>服务自检 (打开各端点验证)</h2>
+  <p style="font-size: 12px; color: var(--muted); margin-bottom: 12px;">
+    本面板是 <code style="font-family: monospace; color: var(--cyan);">file://</code> 打开的，浏览器不允许直接 fetch 跨 origin 端点。下面卡片点开会在新标签直接访问该 URL，看到返回(或 401 / cors 错误)就说明服务在跑。
+  </p>
+  <div class="grid grid-4">
+    <a class="health-card" href="http://localhost:3001/api/payment/balance" target="_blank" rel="noreferrer">
+      <div class="name"><span class="light"></span><span>HABA Site<br><code>:3001/api/payment/balance</code></span></div>
+      <span class="pill">probe</span>
+    </a>
+    <a class="health-card" href="http://localhost:3000/" target="_blank" rel="noreferrer">
+      <div class="name"><span class="light"></span><span>Console<br><code>:3000/</code></span></div>
+      <span class="pill">probe</span>
+    </a>
+    <a class="health-card" href="http://localhost:8080/healthz" target="_blank" rel="noreferrer">
+      <div class="name"><span class="light"></span><span>token-api<br><code>:8080/healthz</code></span></div>
+      <span class="pill">probe</span>
+    </a>
+    <a class="health-card" href="http://localhost:8081/healthz" target="_blank" rel="noreferrer">
+      <div class="name"><span class="light"></span><span>x402-api<br><code>:8081/healthz</code></span></div>
+      <span class="pill">probe</span>
+    </a>
+    <a class="health-card" href="http://localhost:8082/healthz" target="_blank" rel="noreferrer">
+      <div class="name"><span class="light"></span><span>wea-api<br><code>:8082/healthz</code></span></div>
+      <span class="pill">probe</span>
+    </a>
+  </div>
+
+  <h2>5 分钟演示剧本</h2>
+  <ol class="script">
+    <li>
+      <span></span>
+      <span class="body">
+        打开 <code>HABA</code> 首页 → Hero / MARVIE 商品库 / 5 场景 AI Advisor 一眼到位
+      </span>
+      <a class="go" href="http://localhost:3001/" target="_blank">Go</a>
+    </li>
+    <li>
+      <span></span>
+      <span class="body">
+        点任一场景的 <code>真打一次</code> → 真 LLM 调用 / Token 扣减 / TopBar 余额掉
+      </span>
+      <a class="go" href="http://localhost:3001/" target="_blank">Go</a>
+    </li>
+    <li>
+      <span></span>
+      <span class="body">
+        去 <code>/topup</code> 点 <code>真打一笔</code> → 看 8 步动画 + 真 tx hash 入账
+      </span>
+      <a class="go" href="http://localhost:3001/topup" target="_blank">Go</a>
+    </li>
+    <li>
+      <span></span>
+      <span class="body">
+        加几件商品到购物车，去 <code>/cart</code> 走 USDC 钱包结账 → 订单号 + 链上 tx
+      </span>
+      <a class="go" href="http://localhost:3001/cart" target="_blank">Go</a>
+    </li>
+    <li>
+      <span></span>
+      <span class="body">
+        切到 <code>Netstars Console</code> → Live Activity Ticker 上看到刚才所有事件
+      </span>
+      <a class="go" href="http://localhost:3000/dashboard" target="_blank">Go</a>
+    </li>
+    <li>
+      <span></span>
+      <span class="body">
+        加分项：<code>/agent</code> 跑 "自动 topup" 剧本 → 机器人 12 次连续调用 + 自动补 Token
+      </span>
+      <a class="go" href="http://localhost:3001/agent" target="_blank">Go</a>
+    </li>
+  </ol>
+
+  <h2>排查 CLI (复制粘贴)</h2>
+  <pre class="snippet"><span class="c"># 1. 看全栈状态</span>
+<span class="k">docker compose ps</span>
+
+<span class="c"># 2. 重启 HABA 站</span>
+<span class="k">docker compose up -d --no-deps haba-site</span>
+
+<span class="c"># 3. 看 token-api 最近 5 笔事件 (需 HMAC，用 python 脚本)</span>
+<span class="k">python3 scripts/wea_smoke.py recent</span>
+
+<span class="c"># 4. 重置 token-api ledger (危险，会清空所有余额)</span>
+<span class="c"># 暂未实现 — 如需重置请重建 mysql 容器</span></pre>
+
+  <footer>
+    <p>本驾驶舱面板是 demo 演示者工具，不对外暴露。HABA 消费端 (:3001) 始终保持 vendor-neutral。</p>
+    <p style="margin-top: 6px;">© Netstars 2026 · X402 Token Market · 本面板请仅在演示者本地打开</p>
+  </footer>
+</main>
+</body>
+</html>

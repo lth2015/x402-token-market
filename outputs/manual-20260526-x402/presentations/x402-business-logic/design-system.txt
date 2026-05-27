@@ -1,0 +1,20 @@
+Slide size: 1280x720.
+Background: warm off-white canvas with deep ink text; one deep-ink cover and closing slide for contrast.
+Typography: Hiragino Sans / Arial fallback; large claim titles, compact evidence labels.
+Palette:
+- Deep ink #111827 for primary text and dark sections.
+- Off-white #F7F3EA for canvas.
+- Blue #1D4ED8 for payment and Netstars-facing control.
+- Cyan #0891B2 for x402 / protocol.
+- Green #059669 for settlement and trust.
+- Amber #D97706 for commercial value.
+- Red #DC2626 only for risk or control.
+Diagram grammar:
+- Horizontal flows show sequence.
+- Vertical stacks show service layers.
+- Matrices show fit and priority.
+- Thin rules separate evidence; avoid decorative card grids.
+Footer grammar:
+- Left: source note; right: page number.
+Brand policy:
+- No invented logos or unofficial marks.

@@ -1,0 +1,105 @@
+# =====================================================================
+# Wea Settlement Connector · CI (Rust)
+# Reference design: ../../netstars/token/.github/workflows/README.md
+# Note: Wea is operated by Wea Japan in their own GitHub repo + AWS account;
+# this file lives in the shared monorepo as the agreed CI standard.
+# =====================================================================
+name: Wea CI
+
+on:
+  push:
+    branches: [main]
+    paths: ['wea/**']
+  pull_request:
+    paths: ['wea/**']
+
+concurrency:
+  group: ci-wea-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write
+  id-token: write
+
+defaults:
+  run:
+    working-directory: wea
+
+env:
+  RUST_VERSION: '1.79'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env: {POSTGRES_USER: wea_app, POSTGRES_PASSWORD: wea_app_test, POSTGRES_DB: wea_test}
+        options: >-
+          --health-cmd "pg_isready" --health-interval 10s --health-timeout 5s --health-retries 5
+        ports: [5432:5432]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: wea
+      - name: Format check
+        run: cargo fmt -- --check
+      - name: Clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+      - name: Apply schema
+        env: {PGPASSWORD: wea_app_test}
+        run: psql -h localhost -U wea_app -d wea_test -f db/SCHEMA.sql
+      - name: Test
+        env:
+          DATABASE_URL: postgresql://wea_app:wea_app_test@localhost:5432/wea_test
+        run: cargo test --all-features
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with: {workspaces: wea}
+      - name: cargo audit
+        run: |
+          cargo install cargo-audit --locked
+          cargo audit
+      - uses: returntocorp/semgrep-action@v1
+        with: {config: 'p/rust p/security-audit'}
+
+  build:
+    needs: [test, security]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [api, worker, callback]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.WEA_AWS_ACCOUNT_ID_TOOLING }}:role/gh-actions-wea-ci
+          aws-region: ap-northeast-1
+      - uses: aws-actions/amazon-ecr-login@v2
+      - uses: docker/build-push-action@v5
+        with:
+          context: wea
+          file: wea/${{ matrix.service }}/Dockerfile
+          push: true
+          tags: ${{ secrets.WEA_ECR_REGISTRY }}/x402-token-market/wea/${{ matrix.service }}:main-${{ github.sha }}
+          provenance: true
+          sbom: true
+      - uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ secrets.WEA_ECR_REGISTRY }}/x402-token-market/wea/${{ matrix.service }}:main-${{ github.sha }}
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+          ignore-unfixed: true
