@@ -28,6 +28,12 @@ const SCENARIOS = [
     description:
       "重复调用直到 Token 余额跌破阈值，触发 /v1/token-purchase 自动补足，然后继续跑剩余调用 — 没有人工干预。",
   },
+  {
+    id: "b2b-multi-channel",
+    title: "B2B 多渠道 · 4 频道轮流调用",
+    description:
+      "模拟药局、医院营养科、独立营养师、合作电商 4 个 B2B 渠道各发起 3 轮调用（共 12 次）。展示多租户高频场景下 Token 消耗模式，触发一次自动充值。",
+  },
 ] as const;
 
 type ScenarioId = (typeof SCENARIOS)[number]["id"];
@@ -38,6 +44,38 @@ const FIVE_PROMPTS = [
   "早餐想吃低卡果酱涂吐司，希望不是粘稠的甜得发腻。",
   "减脂期间想吃零食，又不想全是蛋白棒，给我几个低卡糖果方案。",
   "我外公 72 岁，眼神不好。给他控糖的产品要简单好认。",
+];
+
+/** B2B 多渠道剧本 — 4 个 partner 频道的典型调用提示词 */
+const B2B_CHANNEL_PROMPTS: Array<{ channel: string; label: string; prompt: string }> = [
+  {
+    channel: "pharmacy",
+    label: "药局前台",
+    prompt:
+      "[context] store=ABC 药局梅田店, customer_age=60+\n" +
+      "顾客：医生让少糖，老婆让来买代糖，家里要泡咖啡也要煮甜煮物。",
+  },
+  {
+    channel: "hospital",
+    label: "医院营养科",
+    prompt:
+      "[context] dept=营养指导科, client_profile={age:62, dx:糖尿病前期, goal:出院后控糖}\n" +
+      "营养师：给患者出一周早餐与零食建议，避免砂糖、要可执行。",
+  },
+  {
+    channel: "dietitian",
+    label: "独立营养师",
+    prompt:
+      "[context] client_profile={age:45, goal:减脂5kg, restrictions:[乳糖不耐]}\n" +
+      "营养师：给这位客户出一周早餐 + 下午茶建议，控糖、避乳制品。",
+  },
+  {
+    channel: "ec_partner",
+    label: "合作电商",
+    prompt:
+      "[context] surface=ecommerce_home, widget=health_advisor\n" +
+      "访客：最近在减肥，但是早上还是想吃面包配果酱怎么办？",
+  },
 ];
 
 // In stub mode the per-call debit is ~150 Token, which against a 100M+
@@ -146,7 +184,63 @@ export function AgentRunner() {
         return;
       }
 
-      // advise-until-empty
+      // ── b2b-multi-channel ──────────────────────────────────────────
+      if (id === "b2b-multi-channel") {
+        const ROUNDS = 3;
+        const total = ROUNDS * B2B_CHANNEL_PROMPTS.length; // 12
+        let callNum = 0;
+        let topupFired = false;
+        for (let round = 0; round < ROUNDS; round++) {
+          if (stopRef.current) break;
+          appendLog("info", `── Round ${round + 1}/${ROUNDS} ──`);
+          for (const ch of B2B_CHANNEL_PROMPTS) {
+            if (stopRef.current) break;
+            callNum += 1;
+            await sleep(320);
+            appendLog("step", `→ [${ch.label}] call ${callNum}/${total}`);
+            appendLog(
+              "http",
+              `POST /v1/messages   system=b2b_${ch.channel}  "${ch.prompt.slice(0, 36)}…"`,
+            );
+            try {
+              const r = await fireAdvise(ch.prompt);
+              setCurrentBalance(r.balanceAfter);
+              appendLog(
+                "ok",
+                `−${r.tokensConsumed} Token · balance = ${formatTokenCount(r.balanceAfter)}`,
+              );
+              window.dispatchEvent(new CustomEvent("haba:balance-refresh"));
+
+              const cumulativeBurn = start - r.balanceAfter;
+              if (!topupFired && cumulativeBurn >= DEMO_AUTOPILOT_BURN_TRIGGER_TOKEN) {
+                topupFired = true;
+                appendLog(
+                  "warn",
+                  `⚠ 累计消耗 ${cumulativeBurn} Token ≥ 阈值 (${DEMO_AUTOPILOT_BURN_TRIGGER_TOKEN}) — 触发自动充值`,
+                );
+                await sleep(420);
+                appendLog("http", "POST /v1/token-purchase  amount=10 USDC  [autopilot]");
+                appendLog("http", "POST /v1/admin/payments/.../confirm  (DEV)");
+                const t = await fireTopup(10);
+                setCurrentBalance(t.balanceAfter);
+                appendLog(
+                  "ok",
+                  `+10,000,000 Token · tx=${t.txHash ?? "?"} · balance = ${formatTokenCount(t.balanceAfter)}`,
+                );
+                window.dispatchEvent(new CustomEvent("haba:balance-refresh"));
+              }
+            } catch (e) {
+              appendLog("error", `call failed: ${e instanceof Error ? e.message : String(e)}`);
+              break;
+            }
+          }
+        }
+        appendLog("info", `✓ B2B 多渠道场景完成  total=${callNum} 次调用`);
+        setPhase("done");
+        return;
+      }
+
+      // ── advise-until-empty ─────────────────────────────────────────
       const MAX_CALLS = 12;
       let topupFired = false;
       for (let i = 0; i < MAX_CALLS; i++) {

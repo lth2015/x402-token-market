@@ -6,6 +6,7 @@ import type { AgentCta, HabaAgentScenario, MarvieProduct } from "@/lib/haba";
 import { cn } from "@/lib/utils";
 import { RecommendationCard } from "./RecommendationCard";
 import { RealAdvisorPanel } from "./RealAdvisorPanel";
+import { B2BCallNotice } from "./B2BCallNotice";
 import { AddAllToCartButton } from "@/components/cart/AddToCartButton";
 
 /**
@@ -67,12 +68,8 @@ export function AgentChatDemo({ scenario }: { scenario: HabaAgentScenario }) {
             ))}
           </ul>
 
-          {/* B2B billing notice */}
-          {scenario.billsAsB2bCall && (
-            <p className="mt-4 rounded-lg bg-surface-muted px-3 py-2 text-caption text-ink-tertiary">
-              {t("b2bCallNotice")}
-            </p>
-          )}
+          {/* B2B billing notice — live monthly call counter */}
+          {scenario.billsAsB2bCall && <B2BCallNotice />}
 
           {/* fallback / warning */}
           {scenario.warning && (

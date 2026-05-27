@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   CheckCircle,
+  Clock,
   Loader2,
   Minus,
   Plus,
@@ -16,23 +17,58 @@ import { formatJpy } from "@/lib/utils";
 import { X402TopupSteps } from "@/components/payment/X402TopupSteps";
 import { x402CheckoutSteps } from "@/lib/haba";
 
+/** Persisted across page refreshes in localStorage */
+const STORAGE_KEY = "haba_last_order";
+const ORDER_TTL_MS = 24 * 60 * 60 * 1000; // 24 h
+
+type SuccessPayload = {
+  orderId: string;
+  paymentOrderId: string;
+  txHash: string | null;
+  amountUsdc: number;
+  totalJpy: number;
+  placedAt: string;
+};
+
 type Phase =
   | { kind: "cart" }
   | { kind: "processing" }
-  | {
-      kind: "success";
-      orderId: string;
-      paymentOrderId: string;
-      txHash: string | null;
-      amountUsdc: number;
-      totalJpy: number;
-      placedAt: string;
-    }
+  | ({ kind: "success" } & SuccessPayload)
   | { kind: "error"; message: string };
+
+function saveOrder(payload: SuccessPayload) {
+  try {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ ...payload, savedAt: new Date().toISOString() }),
+    );
+  } catch { /* storage full or SSR — ignore */ }
+}
+
+function loadSavedOrder(): SuccessPayload | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as SuccessPayload & { savedAt: string };
+    // Expire after 24 h
+    if (Date.now() - new Date(parsed.savedAt).getTime() > ORDER_TTL_MS) {
+      localStorage.removeItem(STORAGE_KEY);
+      return null;
+    }
+    return parsed;
+  } catch { return null; }
+}
 
 export function CheckoutFlow() {
   const cart = useCart();
   const [phase, setPhase] = useState<Phase>({ kind: "cart" });
+  const [savedOrder, setSavedOrder] = useState<SuccessPayload | null>(null);
+
+  // Restore last order from localStorage on mount (24-h TTL)
+  useEffect(() => {
+    const order = loadSavedOrder();
+    if (order) setSavedOrder(order);
+  }, []);
 
   async function placeOrder() {
     setPhase({ kind: "processing" });
@@ -54,15 +90,18 @@ export function CheckoutFlow() {
         });
         return;
       }
-      setPhase({
-        kind: "success",
+      const successPayload: SuccessPayload = {
         orderId: j.order_id,
         paymentOrderId: j.payment_order_id,
         txHash: j.tx_hash,
         amountUsdc: j.amount_usdc,
         totalJpy: j.total_jpy,
         placedAt: j.placed_at,
-      });
+      };
+      setPhase({ kind: "success", ...successPayload });
+      // Persist for 24 h so the user can return to the page after a refresh
+      saveOrder(successPayload);
+      setSavedOrder(successPayload);
       // Empty the cart on confirmation; refresh the TopBar Token pill so
       // anyone watching it sees the credit land.
       cart.clear();
@@ -75,65 +114,121 @@ export function CheckoutFlow() {
     }
   }
 
-  if (phase.kind === "cart") return <CartView onCheckout={placeOrder} />;
+  if (phase.kind === "cart") return (
+    <CartView
+      onCheckout={placeOrder}
+      savedOrder={savedOrder}
+      onViewSaved={() => savedOrder && setPhase({ kind: "success", ...savedOrder })}
+      onDismissSaved={() => {
+        localStorage.removeItem(STORAGE_KEY);
+        setSavedOrder(null);
+      }}
+    />
+  );
   if (phase.kind === "processing") return <ProcessingView />;
-  if (phase.kind === "success") return <SuccessView phase={phase} />;
+  if (phase.kind === "success") return (
+    <SuccessView
+      phase={phase}
+      onNewOrder={() => setPhase({ kind: "cart" })}
+    />
+  );
   return <ErrorView message={phase.message} retry={() => setPhase({ kind: "cart" })} />;
 }
 
 // ────────────────────────────────────────────────────────────────────
 // cart state
 // ────────────────────────────────────────────────────────────────────
-function CartView({ onCheckout }: { onCheckout: () => void }) {
+function CartView({
+  onCheckout,
+  savedOrder,
+  onViewSaved,
+  onDismissSaved,
+}: {
+  onCheckout: () => void;
+  savedOrder: SuccessPayload | null;
+  onViewSaved: () => void;
+  onDismissSaved: () => void;
+}) {
   const cart = useCart();
-  if (cart.items.length === 0) {
-    return (
-      <div className="mt-10 rounded-2xl border border-dashed border-border-default bg-surface-base p-12 text-center">
-        <ShoppingBag className="mx-auto h-10 w-10 text-ink-tertiary" aria-hidden />
-        <h3 className="mt-4 text-body font-semibold text-brand-ink">购物车空空</h3>
-        <p className="mt-2 text-small text-ink-secondary">
-          打开首页，让 HABA AI Advisor 帮你挑几款 MARVIE 商品。
-        </p>
-        <Link
-          href="/"
-          className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-brand-primary px-3 py-2 text-small font-semibold text-white hover:bg-brand-primary-hover"
-        >
-          去逛 MARVIE 全系列
-        </Link>
-      </div>
-    );
-  }
 
   return (
-    <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
-      <ul className="space-y-3 lg:col-span-2">
-        {cart.items.map((item) => (
-          <CartLine key={item.productId} item={item} />
-        ))}
-      </ul>
-      <aside className="rounded-2xl border border-border-subtle bg-surface-base p-6 shadow-e1 lg:sticky lg:top-24 lg:h-fit">
-        <h3 className="text-body font-semibold text-brand-ink">订单摘要</h3>
-        <dl className="mt-4 space-y-2 text-small">
-          <Row label="件数" value={`${cart.totalItems} 件`} />
-          <Row label="合计 (JPY)" value={formatJpy(cart.totalJpy)} />
-          <Row
-            label="折合 USDC"
-            value={`${cart.totalUsdc.toFixed(4)} USDC`}
-            sub="1 USDC ≈ 150 JPY (demo)"
-          />
-        </dl>
-        <button
-          type="button"
-          onClick={onCheckout}
-          className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-primary px-4 py-3 text-body font-semibold text-white hover:bg-brand-primary-hover"
-        >
-          <Wallet className="h-4 w-4" aria-hidden /> USDC 钱包结账
-        </button>
-        <p className="mt-3 text-caption text-ink-tertiary">
-          DEV 演示模式：会真发起链上结算请求，几秒内返回 tx hash。
-        </p>
-      </aside>
-    </div>
+    <>
+      {/* Saved order banner — shown when a recent order exists and cart is open */}
+      {savedOrder && (
+        <div className="mt-8 flex items-center justify-between gap-3 rounded-2xl border border-semantic-success/40 bg-semantic-success/5 px-5 py-3 text-small">
+          <div className="flex items-center gap-2 text-semantic-success">
+            <Clock className="h-4 w-4 shrink-0" aria-hidden />
+            <span>
+              <span className="font-semibold">上次订单</span>
+              <span className="ml-1 font-mono text-caption text-ink-secondary">{savedOrder.orderId}</span>
+              <span className="ml-1 text-ink-tertiary">· {new Date(savedOrder.placedAt).toLocaleString("zh-CN")}</span>
+            </span>
+          </div>
+          <div className="flex shrink-0 gap-2">
+            <button
+              type="button"
+              onClick={onViewSaved}
+              className="rounded-lg border border-semantic-success/50 bg-semantic-success/10 px-3 py-1 text-caption font-semibold text-semantic-success hover:bg-semantic-success/20"
+            >
+              查看
+            </button>
+            <button
+              type="button"
+              onClick={onDismissSaved}
+              className="rounded-lg border border-border-default px-3 py-1 text-caption text-ink-tertiary hover:text-ink-secondary"
+            >
+              忽略
+            </button>
+          </div>
+        </div>
+      )}
+
+      {cart.items.length === 0 ? (
+        <div className="mt-10 rounded-2xl border border-dashed border-border-default bg-surface-base p-12 text-center">
+          <ShoppingBag className="mx-auto h-10 w-10 text-ink-tertiary" aria-hidden />
+          <h3 className="mt-4 text-body font-semibold text-brand-ink">购物车空空</h3>
+          <p className="mt-2 text-small text-ink-secondary">
+            打开首页，让 HABA AI Advisor 帮你挑几款 MARVIE 商品。
+          </p>
+          <Link
+            href="/"
+            className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-brand-primary px-3 py-2 text-small font-semibold text-white hover:bg-brand-primary-hover"
+          >
+            去逛 MARVIE 全系列
+          </Link>
+        </div>
+      ) : (
+        <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <ul className="space-y-3 lg:col-span-2">
+            {cart.items.map((item) => (
+              <CartLine key={item.productId} item={item} />
+            ))}
+          </ul>
+          <aside className="rounded-2xl border border-border-subtle bg-surface-base p-6 shadow-e1 lg:sticky lg:top-24 lg:h-fit">
+            <h3 className="text-body font-semibold text-brand-ink">订单摘要</h3>
+            <dl className="mt-4 space-y-2 text-small">
+              <Row label="件数" value={`${cart.totalItems} 件`} />
+              <Row label="合计 (JPY)" value={formatJpy(cart.totalJpy)} />
+              <Row
+                label="折合 USDC"
+                value={`${cart.totalUsdc.toFixed(4)} USDC`}
+                sub="1 USDC ≈ 150 JPY (demo)"
+              />
+            </dl>
+            <button
+              type="button"
+              onClick={onCheckout}
+              className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-primary px-4 py-3 text-body font-semibold text-white hover:bg-brand-primary-hover"
+            >
+              <Wallet className="h-4 w-4" aria-hidden /> USDC 钱包结账
+            </button>
+            <p className="mt-3 text-caption text-ink-tertiary">
+              DEV 演示模式：会真发起链上结算请求，几秒内返回 tx hash。
+            </p>
+          </aside>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -212,7 +307,13 @@ function ProcessingView() {
 // ────────────────────────────────────────────────────────────────────
 // success state — show real order ids + tx hash
 // ────────────────────────────────────────────────────────────────────
-function SuccessView({ phase }: { phase: Extract<Phase, { kind: "success" }> }) {
+function SuccessView({
+  phase,
+  onNewOrder,
+}: {
+  phase: Extract<Phase, { kind: "success" }>;
+  onNewOrder: () => void;
+}) {
   return (
     <div className="mt-10 space-y-6">
       <div className="rounded-2xl border border-semantic-success/40 bg-semantic-success/5 p-6">
@@ -241,6 +342,13 @@ function SuccessView({ phase }: { phase: Extract<Phase, { kind: "success" }> }) 
         >
           继续购物
         </Link>
+        <button
+          type="button"
+          onClick={onNewOrder}
+          className="rounded-lg border border-border-default bg-surface-base px-4 py-2 text-small font-medium text-ink-secondary hover:border-brand-primary/40 hover:text-brand-primary"
+        >
+          新建订单
+        </button>
         <Link
           href="/topup"
           className="rounded-lg border border-border-default bg-surface-base px-4 py-2 text-small font-medium text-ink-secondary hover:border-brand-primary/40 hover:text-brand-primary"

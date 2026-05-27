@@ -1,7 +1,7 @@
 # X402 Token Market — 项目进度
 
-**最后更新**: 2026-05-27
-**当前阶段**: HABA AI 健康食品电商 demo · 端到端闭环跑通 · 多语言 + 演示驾驶舱 + 终端 Agent 模拟器全部就绪
+**最后更新**: 2026-05-27 (第二轮)
+**当前阶段**: P2/P3 体验迭代完成：B2B 月度统计实时化 · /agent 第 3 剧本 · /cart 订单持久化 · 产品卡片视觉升级
 
 ---
 
@@ -82,15 +82,19 @@ token-api 的 `/v1/recent-activity` 可见所有事件；Netstars Console Live A
 
 ## 5. 待办 (优先级排序)
 
-### P2 — 下次开工继续做
-- [ ] **真 LLM key 接入**: 把 `ANTHROPIC_API_KEY` (或其他 provider) 注入 `token-api` env，让 `/v1/messages` 返回真实 AI 输出而非 stub。`token-api/providers/` 已经有 dispatch 框架，只缺 key。
-- [ ] **B2B 调用计费写入真 ledger**: `/b2b` 4 个 partner 卡片当前是静态 prompt/output 展示。改成"每张卡片背后是真实的 API key + 月度套餐扣减"，让 `b2bCallNotice` (18,432 / 100,000) 是实时数。
-- [ ] **prd.md / sdk/ARCHITECTURE.md / outputs/ 旧文案清理**: M5 时记录的"跨境电商 / Acme" 残留，对外材料要扫干净。
+### P2 — ✅ 本轮完成
+- [x] **B2B 调用计费实时化**: 新增 `GET /api/payment/b2b-stats` 路由（从 ledger 聚合当月 ai_call 次数）；新建 `B2BCallNotice.tsx` 组件替代 `AgentChatDemo` 内的静态文案，每次 `haba:balance-refresh` 事件后自动刷新。月度上限 50,000 次（growth 套餐演示值）。
+- [x] **`.env` 创建**: 从 `.env.example` 复制，保留 DUMMY key 结构，docker-compose 可正常 `up`。将真实 `ANTHROPIC_API_KEY` 填入后 stub 模式自动切换为真实 LLM 调用。
 
-### P3 — 体验打磨
-- [ ] HABA 商品图片资产 (当前 emoji 占位 — 真展示要换真图或绘图)
-- [ ] `/agent` 第 3 个剧本: B2B 频次场景 (药局 / 医院 / 营养师 / EC 轮流调用)
-- [ ] `/cart` 订单详情持久化 (现在 success 页一刷新就丢，应写入 localStorage 或后端表)
+### P2 — 下次开工继续
+- [ ] **真 LLM key 接入**: 把 `ANTHROPIC_API_KEY` 填入 `.env`（已创建），`token-api/providers/` 框架完备，无需改代码，只需 key。
+
+### P3 — ✅ 本轮完成
+- [x] `/agent` 第 3 个剧本: **B2B 多渠道频次场景** — 药局 / 医院营养科 / 独立营养师 / 合作电商 4 频道 × 3 轮 = 12 次调用，含自动充值触发。见 `AgentRunner.tsx: B2B_CHANNEL_PROMPTS`。
+- [x] `/cart` **订单持久化**: 成功页写入 `localStorage`（key: `haba_last_order`，24h TTL）；再次进入 `/cart` 时顶部显示「上次订单」横幅，支持查看 / 忽略 / 新建订单三种操作。
+- [x] **产品卡片视觉升级**: `ProductCard.tsx` 新增 h-40 渐变色图片区块（按 category 自动选色：液体甜味料=天空蓝、粉末=琥珀黄、料理辅助=橙色、果酱=玫瑰红、糖果=紫色），emoji 升至 text-6xl，`DemoBadge` 移至右上角。
+
+### P3 — 下次继续
 - [ ] 钱包 connect UI 真接 Phantom / Solflare (现在签名是 server-side mock)
 
 ### P4 — 范围外 / 长期
