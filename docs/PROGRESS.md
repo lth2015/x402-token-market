@@ -1,13 +1,41 @@
 # X402 Token Market — 项目进度
 
-**最后更新**: 2026-05-27 (第四轮)
-**当前阶段**: Demo 视觉精品化：Hero 双栏生态图 · 动态指标栏 · 链上结算戏剧化成功页 · 全站 hover/入场动画 · 明天办公室配置 TODO
+**最后更新**: 2026-05-28 (第五轮 · 办公室激活)
+**当前阶段**: **真链 + 真 LLM 双双上线**。Devnet 钱包配齐、Anthropic key 接入、全表面 smoke test 全过。Demo 可直接对内演示。
+
+---
+
+## 0. 第五轮变更（2026-05-28 办公室激活）
+
+按 `docs/TOMORROW_SETUP.md` 7 步全部完成，demo 从"stub + DEV bypass"升级为"真 LLM + 真 Devnet 链上结算"：
+
+- ✅ **Devnet 钱包激活**：`scripts/setup-devnet-wallet.py` 生成 merchant + payer 对，写入 `.env`
+  - Merchant（收款）：`61e1MSTEN5dTjNGNQcwUivRVubYz6ebYfmz9qvYtkeNr`
+  - Payer（付款，已充值）：`5gYYVxNa4EfeYafSoM9c2e4YSFuRh1aRaw9G1zzMwYMS` — SOL 5.0 / USDC 起始 20.0
+  - `x402-api` rebuild → `demo_payer_configured: true`
+- ✅ **真实 Devnet 结算验证**：`/cart` 结账产生真 tx（如 `4R1weyG…HepHJAF`，slot 465394897），payer −9 / merchant +9 USDC，链上可查
+- ✅ **Anthropic key 接入**：`.env` 填真 key → `token-api` rebuild → AI Advisor 返回 `provider: anthropic` / `claude-haiku-4-5` 真实回复（不再 stub）
+- ✅ **全表面 smoke test 通过**（见下表）
+
+| 表面 | 验证 | 结果 |
+|---|---|---|
+| 首页 | Hero 双栏 / EcosystemFlow / LiveMetricsBar | ✅ |
+| AI Advisor | 真 Anthropic 调用 + Token 扣减 | ✅ `−1,652` token/次 |
+| /topup | +10M Token | ✅ |
+| /cart | 真 Devnet USDC tx + Explorer 按钮 | ✅ 链上确认 |
+| /agent | 5 连击 + B2B 多渠道（真 LLM） | ✅ |
+| /b2b | B2BCallNotice 实时计数 | ✅ `41 → 42` |
+| Console | Live Ticker 跨表面同步 | ✅ 6+ 笔 anthropic 调用可见 |
+| 多语言 | zh-CN ⇄ ja ⇄ en | ✅ |
+| demo-runner | 驾驶舱 3 表面 + 6 步剧本 | ✅ |
+
+- ✅ **演示叙事**：`story.md`（项目根）— 串场故事「一勺甜，背后一条链」+ 演示对照表 + 海报生成 prompt
 
 ---
 
 ## 1. 一句话状态
 
-> HABA AI 健康食品电商 demo 已端到端跑通：4 个相关方独立部署，3 个表面共享一份 ledger，所有"真打一次"按钮都触发真实后端调用并在 token-api / Console / HABA pill 三处同步可见。
+> HABA AI 健康食品电商 demo 端到端真实运转：4 个相关方独立部署，3 个表面共享一份 ledger，AI Advisor 调真 Claude，`/cart` 结算落真 Solana Devnet 链，所有动作在 token-api / Console / HABA pill 三处同步可见。
 
 ---
 
@@ -115,13 +143,22 @@ token-api 的 `/v1/recent-activity` 可见所有事件；Netstars Console Live A
   - 全站 hover/入场动画：产品卡 `-translate-y-0.5 hover:shadow-e3`；Teaser 格同步；TopBar Logo 渐变升级
   - Footer 新增技术栈行：HABA · x402 Protocol · Solana USDC chip
 
-### P3 — 下次继续
+### P2/P3 — 下次开工继续（第五轮 smoke test 新发现）
+- [ ] **AI Advisor system prompt 注入真实 MARVIE 目录**：现在真 LLM 会"编"出 catalog 里没有的 SKU 名（如「罗汉果糖浆」）。需把 `marvieProducts` 的 SKU + 卖点拼进 `haba/src/app/api/payment/advise/route.ts` 的 `HABA_SYSTEM_PROMPT`，约束它只推真实 7 款。**演示前最好补**——否则推荐与下方商品卡对不上。
+- [ ] **`/cart` 订单摘要 USDC 显示与实扣不一致**：摘要按原始换算显示（如 `10.5333 USDC`），但后端 clamp 到 `MAX_USDC=$9`，成功页才显示 $9。应在购物车摘要也显示 clamp 后金额，避免观众疑惑。
+- [ ] **`/agent` B2B 多渠道剧本超时**：12 次调用 × 真 LLM（每次 2–3s）≈ 30s+，前端无硬超时但单页等待偏久。可缩短为 2 轮（8 次）或并发，或加进度提示。
+- [ ] **ledger 重置工具**：topup / checkout 都会 credit HABA Token，多轮演示后余额数字越滚越大。需要一个 `make reset-ledger` 或脚本（重建 mysql / 清表），让演示从干净状态开始。
 - [ ] 钱包 connect UI 真接 Phantom / Solflare (现在签名是 server-side mock)
 
 ### P4 — 范围外 / 长期
 - [ ] Solana validator on Apple Silicon (需要 host-side solana-cli + Devnet RPC 转发)
 - [ ] 真实 HABA 商品履约 (订单下完不发货，纯演示)
 - [ ] HABA 自有用户体系 (现在没登录)
+
+### 演示当天运维备忘
+- payer 钱包 USDC 用一笔少 $9，余额低于 $9 时去 https://faucet.circle.com 补；SOL 手续费极省（每笔 0.000005），5 SOL 够上千次。
+- 每次 `/cart` 真结算等 10–30s（真等 Solana 确认）——正常，是真实性的证据。
+- 改 `.env` 后对应服务要 rebuild：LLM key → `token-api`；钱包/RPC → `x402-api`。
 
 ---
 
