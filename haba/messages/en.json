@@ -5,9 +5,22 @@
     "productLine": "MARVIE Medical Foods",
     "tagline": "AI advisor for smarter family food choices"
   },
+  "hero": {
+    "eyebrow": "HABA Laboratories · TSE Prime listed",
+    "headline": "Love sweet, watch sugar?",
+    "headlineAccent": "Let the AI advisor pick for you",
+    "sub": "Tell the HABA AI Advisor your health needs and get the right low-cal, no-added-sugar MARVIE products in seconds — for you and your family.",
+    "ctaPrimary": "Ask the AI advisor",
+    "ctaSecondary": "Browse all products",
+    "value1": "From 0 kcal",
+    "value2": "No added sugar",
+    "previewLabel": "AI Advisor · live recommendation",
+    "previewQuestion": "Low-cal sweetener for my diabetic parent — for coffee and cooking.",
+    "previewBadge": "AI pick",
+    "previewReason": "0 kcal · ~200x sweeter than sugar, a few drops is enough"
+  },
   "nav": {
     "home": "Home",
-    "topup": "AI Token top-up",
     "resale": "AI Advisor partner plans",
     "b2b": "B2B partners"
   },
@@ -27,16 +40,9 @@
   },
   "home": {
     "teaser": {
-      "eyebrow": "The full HABA AI commerce loop",
-      "title": "3 storylines from HABA AI commerce",
-      "description": "Each card opens its own page: an 8-step AI Token auto top-up animation, HABA reselling AI capacity by call volume to partners, and 4 B2B embedding modes.",
-      "topup": {
-        "eyebrow": "AI Token auto top-up",
-        "title": "Low balance? The SDK refills it",
-        "desc": "When HABA AI Advisor's Token balance dips below threshold, the SDK auto-pays a USDC micro-payment to refill — credited in seconds. Wallet signs client-side; HABA's server never holds the key.",
-        "cta": "See the 8 steps",
-        "metricCaption": "< 1s end-to-end · client-side signed"
-      },
+      "eyebrow": "HABA AI commerce",
+      "title": "How HABA builds AI into its business",
+      "description": "HABA packages the AI Advisor by call volume for partners — pharmacy / hospital / dietitian / EC, four B2B embedding modes. Each card below opens its own page.",
       "resale": {
         "eyebrow": "AI capacity partnership",
         "title": "HABA AI Advisor resale",
@@ -52,20 +58,6 @@
         "metricCaption": "Click to switch"
       }
     }
-  },
-  "topup": {
-    "backHome": "Back to home",
-    "eyebrow": "AI Token auto top-up",
-    "sectionTitle": "How a USDC micro-payment flows into a Token credit",
-    "sectionDescription": "When HABA AI Advisor's Token balance dips below threshold, the SDK fires a 10,000-Token purchase. The 8 steps below auto-advance; click a row to pause and inspect.",
-    "flowTitle": "8 steps · from order to Token credit",
-    "flowSubtitle": "Advances every 1.6s; click a row to pause / pick",
-    "noteAutopilotTitle": "Autopilot",
-    "noteAutopilotBody": "The SDK kicks off when balance drops below threshold. Zero human intervention from HABA ops.",
-    "noteNoKeyTitle": "Client-side signed · HABA never holds the private key",
-    "noteNoKeyBody": "Wallet signing happens entirely in the browser; HABA's server only sees an already-signed USDC tx.",
-    "noteWebhookTitle": "Webhook credit",
-    "noteWebhookBody": "When Token lands, HABA AI Advisor resumes B2B / C-end calls immediately — invisible to end users."
   },
   "resale": {
     "backHome": "Back to home",

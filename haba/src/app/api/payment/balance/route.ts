@@ -2,7 +2,7 @@
  * GET /api/payment/balance — server-side proxy that fetches HABA's
  * current Token balance from the upstream payment provider.
  *
- * HMAC secret never reaches the browser. Used by <TokenBalancePill />.
+ * HMAC secret never reaches the browser. Server-side balance capability.
  */
 import { NextResponse } from "next/server";
 import { fetchBalance, NetstarsError } from "@/lib/netstars/client";

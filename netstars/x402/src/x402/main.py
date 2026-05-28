@@ -6,18 +6,18 @@ Endpoints:
     GET  /v1/payments/{id}                     query order
     POST /v1/payments/{id}/proof               verify signed USDC tx + broadcast to Solana RPC
     POST /v1/payments/{id}/dev-checkout        DEV: server-side sign + broadcast real devnet USDC tx
-    POST /v1/admin/payments/{id}/confirm       DEV: skip chain entirely, mark confirmed + credit token
+    POST /v1/admin/payments/{id}/confirm       DEV: skip chain, then settle by order metadata
 
 Background:
     Confirmer task — polls broadcasting orders, transitions to confirmed
-    when on-chain status is 'confirmed'/'finalized', then calls
-    token-api /internal/credit and finalizes to token_credited.
+    when on-chain status is 'confirmed'/'finalized'. Token top-up orders call
+    token-api /internal/credit; merchant checkout orders stop at confirmed.
 
 Real chain path (v0.3.0):
     - dev-checkout builds + signs a real SPL TransferChecked + Memo tx
       using DEMO_PAYER_PRIVATE_KEY_B64 (a pre-funded devnet wallet)
     - Broadcasts to Solana Devnet (SOLANA_RPC_URL=https://api.devnet.solana.com)
-    - Polls on-chain status and completes the full token-credit cycle
+    - Polls on-chain status and completes token credit only for Token top-ups
     - Returns real tx_hash + Solana Explorer URL
 
 Setup: run scripts/setup-devnet-wallet.py once to generate keypairs +
@@ -230,6 +230,18 @@ class AdminConfirmIn(BaseModel):
     tx_hash: str = "DEV_FAKE_TX_HASH"
 
 
+def _settlement_kind(order: dict) -> str:
+    metadata = order.get("metadata") or {}
+    if not isinstance(metadata, dict):
+        return "token_topup"
+    kind = metadata.get("settlement_kind")
+    return kind if isinstance(kind, str) and kind else "token_topup"
+
+
+def _should_credit_token(order: dict) -> bool:
+    return _settlement_kind(order) == "token_topup"
+
+
 # ── Routes ─────────────────────────────────────────────────────────
 @app.post("/v1/payments", response_model=PaymentOut)
 async def create_payment(body: CreatePaymentIn, _: None = Depends(require_internal)):
@@ -241,6 +253,7 @@ async def create_payment(body: CreatePaymentIn, _: None = Depends(require_intern
             amount_usdc_micro=body.amount_usdc_micro,
             idempotency_key=body.idempotency_key,
             recipient_address=DEPOSIT_RECIPIENT,
+            metadata=body.metadata or {},
             webhook_url=DEFAULT_TARGET_URL or None,
         )
     log.info("payment.created", order_id=order["id"],
@@ -348,7 +361,7 @@ async def submit_proof(order_id: str, body: SubmitProofIn):
         "ok": True,
         "order": order,
         "tx_hash": rpc_sig,
-        "note": "tx broadcast; confirmer will credit tokens once on-chain status reaches 'confirmed'",
+        "note": "tx broadcast; confirmer will settle according to order metadata",
     }
 
 
@@ -356,7 +369,7 @@ async def submit_proof(order_id: str, body: SubmitProofIn):
 async def admin_confirm(order_id: str, body: AdminConfirmIn):
     """
     Dev shortcut: bypass real Solana entirely. Transitions through pending →
-    broadcasting → confirmed → token_credited and calls token-api /internal/credit.
+    broadcasting → confirmed, then credits Token only for Token top-up orders.
     Useful when running the quickstart without funding a real USDC ATA.
     """
     if ENV not in ("local", "qa"):
@@ -382,6 +395,12 @@ async def admin_confirm(order_id: str, body: AdminConfirmIn):
                 updates={"tx_hash": body.tx_hash, "confirmed_at": now},
             )
 
+    if not _should_credit_token(order):
+        await _enqueue_event(order, "payment.confirmed")
+        log.info("payment.admin_confirmed", order_id=order_id, tx_hash=body.tx_hash,
+                 settlement_kind=_settlement_kind(order))
+        return {"ok": True, "order": order, "credit": None}
+
     credit = await _credit_via_token_api(order, body.tx_hash)
 
     async with app.state.db.begin() as conn:
@@ -394,7 +413,8 @@ async def admin_confirm(order_id: str, body: AdminConfirmIn):
             order = await OrderService.fetch(conn, order_id)
 
     await _enqueue_event(order, "payment.token_credited")
-    log.info("payment.admin_confirmed", order_id=order_id, tx_hash=body.tx_hash)
+    log.info("payment.admin_confirmed", order_id=order_id, tx_hash=body.tx_hash,
+             settlement_kind=_settlement_kind(order))
     return {"ok": True, "order": order, "credit": credit}
 
 
@@ -603,7 +623,12 @@ async def dev_checkout(order_id: str) -> dict:
                         attempt=attempt, order_id=order_id, err=str(poll_err))
         async with app.state.db.connect() as conn:
             order = await OrderService.fetch(conn, order_id) or order
-        if order["status"] in ("token_credited", "failed"):
+        terminal_statuses = (
+            ("token_credited", "failed")
+            if _should_credit_token(order)
+            else ("confirmed", "failed")
+        )
+        if order["status"] in terminal_statuses:
             break
         log.debug("dev_checkout.awaiting_confirmation",
                   attempt=attempt + 1, status=order["status"])
@@ -661,7 +686,8 @@ async def _enqueue_event(order: dict, event_type: str) -> None:
 async def _confirmer_loop(app: FastAPI) -> None:
     """
     Background task: every poll-interval seconds, advance broadcasting orders
-    to confirmed/failed based on Solana RPC status, then credit tokens.
+    to confirmed/failed based on Solana RPC status, then credit Token only
+    for Token top-up orders.
     """
     await asyncio.sleep(2.0)  # give the rest of startup a moment
     while True:
@@ -731,6 +757,12 @@ async def _confirmer_advance_one(app: FastAPI, order_id: str, tx_hash: str) -> N
             )
         except OrderStateConflictError:
             return  # race with another worker
+
+    if not _should_credit_token(order):
+        await _enqueue_event(order, "payment.confirmed")
+        log.info("confirmer.confirmed", order_id=order_id, tx_hash=tx_hash,
+                 settlement_kind=_settlement_kind(order))
+        return
 
     credit = await _credit_via_token_api(order, tx_hash)
 

@@ -54,6 +54,7 @@ class OrderService:
         amount_usdc_micro: int,
         idempotency_key: str,
         recipient_address: str,
+        metadata: Optional[dict] = None,
         expiry_seconds: int = 1800,
         trace_id: Optional[str] = None,
         webhook_url: Optional[str] = None,
@@ -91,7 +92,7 @@ class OrderService:
                 nonce=nonce,
                 status="created",
                 expires_at=expires_at.replace(tzinfo=None),  # MySQL DATETIME has no tz
-                metadata={},
+                metadata=metadata or {},
                 created_trace_id=trace_id,
                 webhook_url=webhook_url,
             ))
@@ -180,5 +181,6 @@ def _row_to_dict(row) -> dict:
         "tx_hash": row.tx_hash,
         "confirmed_at": row.confirmed_at.replace(tzinfo=timezone.utc).isoformat() if row.confirmed_at else None,
         "created_at": row.created_at.replace(tzinfo=timezone.utc).isoformat() if row.created_at else None,
+        "metadata": row.metadata or {},
         "webhook_url": getattr(row, "webhook_url", None),
     }

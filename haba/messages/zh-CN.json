@@ -5,9 +5,22 @@
     "productLine": "MARVIE Medical Foods",
     "tagline": "AI 智能顾问 · 帮你为家人挑更聪明的饮食"
   },
+  "hero": {
+    "eyebrow": "ハーバー研究所 · 東証プライム上場",
+    "headline": "想吃甜，又要控糖？",
+    "headlineAccent": "让 AI 顾问帮你选对",
+    "sub": "把你的健康需求告诉 HABA AI 顾问，几秒钟挑出适合的低卡・无添加蔗糖食品——为自己，也为家人。",
+    "ctaPrimary": "问问 AI 顾问",
+    "ctaSecondary": "看全部商品",
+    "value1": "0 kcal 起",
+    "value2": "无添加蔗糖",
+    "previewLabel": "AI 顾问 · 实时推荐",
+    "previewQuestion": "想给糖尿病的家人买低卡甜味料，咖啡和料理都能用。",
+    "previewBadge": "AI 推荐",
+    "previewReason": "0 kcal · 甜度约砂糖 200 倍，一两滴就够"
+  },
   "nav": {
     "home": "首页",
-    "topup": "AI Token 充值",
     "resale": "AI Advisor 合作计划",
     "b2b": "B2B 合作方"
   },
@@ -27,16 +40,9 @@
   },
   "home": {
     "teaser": {
-      "eyebrow": "看 HABA AI 商务的完整闭环",
-      "title": "3 条故事线 · 看 HABA 怎么把 AI 装进生意",
-      "description": "下面三块各自是一个完整页面：AI Token 自动充值的 8 步动画、HABA 把 AI 能力按调用量打包给合作方的商业模式、4 种 B2B 接入形态。",
-      "topup": {
-        "eyebrow": "AI Token 自动充值",
-        "title": "余额低？SDK 自动补",
-        "desc": "HABA AI Advisor 调用余额低于阈值 → SDK 自动用 USDC 钱包微支付补足 Token → 几秒内到账。全程客户端签名，HABA 服务器不持有用户钱包私钥。",
-        "cta": "看 8 步动画",
-        "metricCaption": "全程 < 1s · 客户端签名"
-      },
+      "eyebrow": "HABA AI 商务",
+      "title": "看 HABA 怎么把 AI 装进生意",
+      "description": "HABA 把 AI Advisor 按调用量打包卖给合作方，覆盖药局 / 医院 / 营养师 / 电商 4 种 B2B 接入形态——下面两块各自展开成完整页面。",
       "resale": {
         "eyebrow": "AI 能力合作计划",
         "title": "HABA AI Advisor 转售",
@@ -52,20 +58,6 @@
         "metricCaption": "点击切换"
       }
     }
-  },
-  "topup": {
-    "backHome": "返回首页",
-    "eyebrow": "AI Token 自动充值",
-    "sectionTitle": "一笔 USDC 微支付怎么走完整个充值流程",
-    "sectionDescription": "HABA AI Advisor 调用余额低于阈值 → SDK 自动发起 10,000 Token 充值。下面 8 步实时高亮，鼠标点击任意步骤暂停查看细节。",
-    "flowTitle": "8 步 · 从下单到 Token 入账",
-    "flowSubtitle": "每 1.6 秒推进一步；点击行可暂停 / 切换查看",
-    "noteAutopilotTitle": "全自动",
-    "noteAutopilotBody": "Token 余额低于阈值时 SDK 自启动；HABA 运维零干预。",
-    "noteNoKeyTitle": "客户端签名 · HABA 不存私钥",
-    "noteNoKeyBody": "钱包签名只发生在浏览器端，HABA 服务器只看到已签名的 USDC 转账，不接触任何私钥。",
-    "noteWebhookTitle": "Webhook 入账",
-    "noteWebhookBody": "Token 入账后 HABA AI Advisor 即刻继续接收 B2B / C 端调用，无需用户感知。"
   },
   "resale": {
     "backHome": "返回首页",

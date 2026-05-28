@@ -8,6 +8,7 @@ Endpoints in this version:
     GET  /v1/balance              real balance from ledger cache
     GET  /v1/recent-activity      reads last N ledger entries (real, not mock)
     POST /v1/token-purchase       proxies to X402 to create payment intent
+    POST /v1/merchant-checkout    product-order settlement; does not top up Token
     POST /internal/credit         X402 calls this after payment confirms
     GET  /                        service info + TODO list
 
@@ -137,6 +138,13 @@ class TokenPurchaseIn(BaseModel):
     idempotency_key: Optional[str] = None
 
 
+class MerchantCheckoutIn(BaseModel):
+    amount_usdc: float = Field(..., gt=0, le=10000)
+    idempotency_key: Optional[str] = None
+    order_reference: str = Field(..., min_length=1, max_length=80)
+    metadata: dict = Field(default_factory=dict)
+
+
 class TokenPurchaseOut(BaseModel):
     payment_order_id: str
     amount_usdc_micro: int
@@ -227,27 +235,26 @@ async def recent_activity(limit: int = 20, auth: AuthContext = Depends(verify_re
     return {"items": items, "is_mock": False}
 
 
-# ── Token purchase (creates a payment order via X402) ──────────────
-@app.post("/v1/token-purchase", response_model=TokenPurchaseOut)
-async def token_purchase(
-    body: TokenPurchaseIn,
-    request: Request,
-    auth: AuthContext = Depends(verify_request),
-):
-    amount_usdc_micro = int(round(body.amount_usdc * 1_000_000))
-    idempotency_key = body.idempotency_key or request.headers.get("Idempotency-Key")
-    if not idempotency_key:
-        raise HTTPException(400, "Idempotency-Key header or body field required")
+async def _create_x402_payment(
+    *,
+    amount_usdc: float,
+    idempotency_key: str,
+    auth: AuthContext,
+    metadata: dict,
+) -> dict:
+    """Delegate a signed merchant request to x402 with explicit settlement metadata."""
+    amount_usdc_micro = int(round(amount_usdc * 1_000_000))
 
-    # Delegate to X402 with internal-service shared-secret auth
+    # Delegate to X402 with internal-service shared-secret auth.
     from .auth import INTERNAL_AUTH_SECRET
     payload = {
         "merchant_id": auth.merchant_id,
         "api_key_id": auth.agent_key_id,
         "amount_usdc_micro": amount_usdc_micro,
         "idempotency_key": idempotency_key,
+        "metadata": metadata,
     }
-    log.info("token_purchase.delegate", **payload)
+    log.info("x402_payment.delegate", **payload)
     try:
         resp = await app.state.http.post(
             f"{X402_API_BASE_URL}/v1/payments",
@@ -273,6 +280,56 @@ async def token_purchase(
         "expires_at":        j["expires_at"],
         "status":            j["status"],
     }
+
+
+# ── Token purchase (creates a Token top-up payment order via X402) ──
+@app.post("/v1/token-purchase", response_model=TokenPurchaseOut)
+async def token_purchase(
+    body: TokenPurchaseIn,
+    request: Request,
+    auth: AuthContext = Depends(verify_request),
+):
+    idempotency_key = body.idempotency_key or request.headers.get("Idempotency-Key")
+    if not idempotency_key:
+        raise HTTPException(400, "Idempotency-Key header or body field required")
+
+    return await _create_x402_payment(
+        amount_usdc=body.amount_usdc,
+        idempotency_key=idempotency_key,
+        auth=auth,
+        metadata={
+            "settlement_kind": "token_topup",
+            "source": "token-api.token_purchase",
+        },
+    )
+
+
+# ── Merchant checkout (product settlement, not Token top-up) ───────
+@app.post("/v1/merchant-checkout", response_model=TokenPurchaseOut)
+async def merchant_checkout(
+    body: MerchantCheckoutIn,
+    request: Request,
+    auth: AuthContext = Depends(verify_request),
+):
+    """
+    Create a product-order payment intent over the same x402 rail without
+    crediting the merchant's Token balance after confirmation.
+    """
+    idempotency_key = body.idempotency_key or request.headers.get("Idempotency-Key")
+    if not idempotency_key:
+        raise HTTPException(400, "Idempotency-Key header or body field required")
+
+    return await _create_x402_payment(
+        amount_usdc=body.amount_usdc,
+        idempotency_key=idempotency_key,
+        auth=auth,
+        metadata={
+            **body.metadata,
+            "settlement_kind": "merchant_checkout",
+            "source": "token-api.merchant_checkout",
+            "order_reference": body.order_reference,
+        },
+    )
 
 
 # ── Credit endpoint (called by X402 after on-chain confirmation) ───
@@ -568,6 +625,7 @@ async def root():
             "GET  /v1/balance",
             "GET  /v1/recent-activity",
             "POST /v1/token-purchase  (delegates to x402)",
+            "POST /v1/merchant-checkout (product settlement, no Token credit)",
             "POST /internal/credit    (called by x402)",
             "POST /v1/messages        (stub AI call → debit)",
         ],

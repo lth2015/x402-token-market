@@ -5,9 +5,22 @@
     "productLine": "MARVIE Medical Foods",
     "tagline": "AI アドバイザーで、ご家族にもっとスマートな食を"
   },
+  "hero": {
+    "eyebrow": "ハーバー研究所 · 東証プライム上場",
+    "headline": "甘いものを、がまんしない。",
+    "headlineAccent": "AI アドバイザーが選びます",
+    "sub": "あなたの健康ニーズを HABA AI アドバイザーへ。数秒で低カロリー・砂糖無添加の MARVIE 商品をご提案——ご自身にも、ご家族にも。",
+    "ctaPrimary": "AI に相談する",
+    "ctaSecondary": "商品をすべて見る",
+    "value1": "0 kcal から",
+    "value2": "砂糖無添加",
+    "previewLabel": "AI アドバイザー · リアルタイム提案",
+    "previewQuestion": "糖尿病の家族に、コーヒーにも料理にも使える低カロリー甘味料がほしい。",
+    "previewBadge": "AI おすすめ",
+    "previewReason": "0 kcal・甘さは砂糖の約 200 倍、数滴で十分"
+  },
   "nav": {
     "home": "ホーム",
-    "topup": "AI Token チャージ",
     "resale": "AI Advisor 提携プラン",
     "b2b": "B2B パートナー"
   },
@@ -27,16 +40,9 @@
   },
   "home": {
     "teaser": {
-      "eyebrow": "HABA AI コマースの完全ループ",
-      "title": "3 つのストーリー · HABA が AI をビジネスに組み込む",
-      "description": "下記の 3 枚はそれぞれ独立ページ:AI Token 自動チャージの 8 ステップ、HABA が AI を呼び出し量で提携先に再販するビジネス、4 つのパートナー組み込み例。",
-      "topup": {
-        "eyebrow": "AI Token 自動チャージ",
-        "title": "残高低下を SDK が自動補充",
-        "desc": "HABA AI Advisor の Token 残高が閾値を割ると、SDK が USDC マイクロペイメントで自動補充 → 数秒で入金。署名はブラウザ側のみ、HABA サーバは秘密鍵を保持しない。",
-        "cta": "8 ステップを見る",
-        "metricCaption": "全工程 < 1s · クライアント署名"
-      },
+      "eyebrow": "HABA AI コマース",
+      "title": "HABA が AI をビジネスに組み込む",
+      "description": "HABA は AI Advisor を呼び出し量でパッケージ化し提携先へ販売。薬局 / 病院 / 栄養士 / EC の 4 つの B2B 組み込み形態——下記 2 枚がそれぞれ独立ページに展開。",
       "resale": {
         "eyebrow": "AI 能力提携",
         "title": "HABA AI Advisor 再販",
@@ -52,20 +58,6 @@
         "metricCaption": "クリックで切替"
       }
     }
-  },
-  "topup": {
-    "backHome": "ホームへ戻る",
-    "eyebrow": "AI Token 自動チャージ",
-    "sectionTitle": "USDC マイクロペイメントが Token 入金まで流れる仕組み",
-    "sectionDescription": "HABA AI Advisor の残高が閾値を割ると、SDK が自動で 10,000 Token チャージを起動。下記の 8 ステップがリアルタイムにハイライト、行クリックで一時停止可能。",
-    "flowTitle": "8 ステップ · 発注から Token 入金まで",
-    "flowSubtitle": "1.6 秒ごとに進行;行をクリックで停止 / 切替",
-    "noteAutopilotTitle": "フルオート",
-    "noteAutopilotBody": "残高が閾値を割ると SDK が自動起動。HABA 運用人の手介入は不要。",
-    "noteNoKeyTitle": "クライアント署名 · HABA は秘密鍵を保持しない",
-    "noteNoKeyBody": "ウォレット署名はブラウザ側のみで発生し、HABA サーバには署名済の USDC tx しか届かない。",
-    "noteWebhookTitle": "Webhook で入金通知",
-    "noteWebhookBody": "Token 入金後、HABA AI Advisor は即座に B2B / C 向け呼び出しを再開、ユーザは意識しない。"
   },
   "resale": {
     "backHome": "ホームへ戻る",

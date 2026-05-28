@@ -46,20 +46,20 @@ export function ProductCard({ product, className }: { product: MarvieProduct; cl
   return (
     <article
       className={cn(
-        "group flex flex-col overflow-hidden rounded-2xl border border-border-subtle bg-surface-base shadow-e1",
-        "transition-all duration-200 hover:-translate-y-0.5 hover:shadow-e3 hover:border-brand-primary/20",
+        "group flex flex-col overflow-hidden rounded-[24px] border border-border-subtle bg-surface-base shadow-e1",
+        "transition-all duration-200 hover:-translate-y-1 hover:shadow-e3 hover:border-brand-primary/25",
         className,
       )}
     >
       {/* ── Image tile — gradient + large emoji ───────────────── */}
       <div
         className={cn(
-          "relative flex h-40 items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-[1.02]",
+          "relative flex h-48 items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-[1.02]",
           style.bg,
           style.ring,
         )}
       >
-        <span className="text-6xl leading-none drop-shadow-sm transition-transform duration-300 group-hover:scale-110" aria-hidden>
+        <span className="text-7xl leading-none drop-shadow-sm transition-transform duration-300 group-hover:scale-110" aria-hidden>
           {product.imageEmoji}
         </span>
         <div className="absolute right-3 top-3">
@@ -68,13 +68,13 @@ export function ProductCard({ product, className }: { product: MarvieProduct; cl
       </div>
 
       {/* ── Card body ──────────────────────────────────────────── */}
-      <div className="flex flex-1 flex-col p-5">
-        <h3 className="text-body font-semibold text-brand-ink">{product.shortName}</h3>
-        <p className="mt-0.5 text-caption text-ink-tertiary">{product.sku}</p>
-        <p className="mt-2 text-small text-ink-secondary">{product.shortPitch}</p>
+      <div className="flex flex-1 flex-col p-6">
+        <h3 className="text-[18px] font-bold leading-6 text-brand-ink">{product.shortName}</h3>
+        <p className="mt-1 text-small text-ink-tertiary">{product.sku}</p>
+        <p className="mt-3 text-[14px] leading-6 text-ink-secondary">{product.shortPitch}</p>
 
         {/* Nutrition stats */}
-        <dl className="mt-4 grid grid-cols-2 gap-2 text-caption">
+        <dl className="mt-5 grid grid-cols-2 gap-2.5 text-caption">
           <Datum
             label="卡路里"
             value={`${product.caloriesPerServing.value} ${product.caloriesPerServing.unit}`}
@@ -90,11 +90,11 @@ export function ProductCard({ product, className }: { product: MarvieProduct; cl
         </dl>
 
         {/* Tags */}
-        <div className="mt-3 flex flex-wrap gap-1">
+        <div className="mt-4 flex flex-wrap gap-1.5">
           {product.tags.slice(0, 4).map((t) => (
             <span
               key={t}
-              className="rounded bg-surface-muted px-1.5 py-0.5 text-[10px] text-ink-tertiary"
+              className="rounded-md bg-surface-muted px-2 py-1 text-[11px] text-ink-tertiary"
             >
               {t}
             </span>
@@ -104,11 +104,11 @@ export function ProductCard({ product, className }: { product: MarvieProduct; cl
         {/* Price + CTA — pushed to bottom */}
         <div className="mt-auto pt-4">
           <div className="flex items-baseline justify-between border-t border-border-subtle pt-4">
-            <span className="text-lg font-semibold text-brand-ink">{formatJpy(product.priceJpy)}</span>
-            <span className="text-caption text-ink-tertiary">含税 · 演示价</span>
+            <span className="text-2xl font-bold text-brand-ink">{formatJpy(product.priceJpy)}</span>
+            <span className="text-small text-ink-tertiary">含税 · 演示价</span>
           </div>
-          <div className="mt-3 flex justify-end">
-            <AddToCartButton productId={product.id} />
+          <div className="mt-4 flex justify-end">
+            <AddToCartButton productId={product.id} size="md" />
           </div>
         </div>
       </div>
@@ -118,10 +118,10 @@ export function ProductCard({ product, className }: { product: MarvieProduct; cl
 
 function Datum({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="rounded-lg bg-surface-muted/60 px-2.5 py-2">
-      <dt className="text-[10px] uppercase tracking-wider text-ink-tertiary">{label}</dt>
-      <dd className="mt-0.5 text-small font-medium text-brand-ink">{value}</dd>
-      {sub && <dd className="text-[10px] text-ink-tertiary">{sub}</dd>}
+    <div className="rounded-xl bg-surface-muted/60 px-3 py-2.5">
+      <dt className="text-[11px] uppercase tracking-wider text-ink-tertiary">{label}</dt>
+      <dd className="mt-1 text-body font-semibold text-brand-ink">{value}</dd>
+      {sub && <dd className="text-[11px] leading-4 text-ink-tertiary">{sub}</dd>}
     </div>
   );
 }

@@ -1,75 +1,70 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Bot, User } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Bot, User } from "lucide-react";
 import type { AgentCta, HabaAgentScenario, MarvieProduct } from "@/lib/haba";
 import { cn } from "@/lib/utils";
 import { RecommendationCard } from "./RecommendationCard";
-import { RealAdvisorPanel } from "./RealAdvisorPanel";
-import { B2BCallNotice } from "./B2BCallNotice";
+import { AdvisorFollowupChat } from "./AdvisorFollowupChat";
 import { AddAllToCartButton } from "@/components/cart/AddToCartButton";
 
 /**
  * Renders one scenario as an Agent chat thread.
- *   user prompt → agent opening → real-AI panel → curated recommendations → CTAs
+ *   user prompt → agent opening → recommendations → CTAs
  *
  * Client component so it can swap scenarios on click without a server
- * round-trip. The `<RealAdvisorPanel />` fires a live LLM call against
- * the upstream Token API on demand so every scenario can show real
- * Token-burn behaviour without losing the curated SKU recommendations.
+ * round-trip.
  */
-export function AgentChatDemo({ scenario }: { scenario: HabaAgentScenario }) {
+export function AgentChatDemo({
+  scenario,
+  onAskMore,
+}: {
+  scenario: HabaAgentScenario;
+  onAskMore?: () => void;
+}) {
   const t = useTranslations("agent");
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border-subtle bg-surface-base shadow-e2">
+    <div className="overflow-hidden rounded-[24px] border border-border-subtle bg-surface-base shadow-e3">
       {/* user bubble */}
-      <div className="flex gap-3 border-b border-border-subtle bg-surface-muted px-6 py-5">
+      <div className="flex gap-4 border-b border-border-subtle bg-surface-muted px-7 py-6">
         <span
           aria-hidden
-          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-base text-ink-tertiary"
+          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-base text-ink-tertiary"
         >
-          <User className="h-4 w-4" />
+          <User className="h-5 w-5" />
         </span>
         <div className="flex-1">
-          <p className="text-caption font-medium text-ink-tertiary">{t("userLabel")}</p>
-          <p className="mt-1 whitespace-pre-wrap text-body text-brand-ink">{scenario.userPrompt}</p>
+          <p className="text-small font-semibold text-ink-tertiary">{t("userLabel")}</p>
+          <p className="mt-1.5 whitespace-pre-wrap text-[15px] leading-7 text-brand-ink">{scenario.userPrompt}</p>
         </div>
       </div>
 
       {/* agent reply */}
-      <div className="flex gap-3 px-6 py-6">
+      <div className="flex gap-4 px-7 py-7">
         <span
           aria-hidden
-          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-primary text-white"
+          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-primary text-white"
         >
-          <Bot className="h-4 w-4" />
+          <Bot className="h-5 w-5" />
         </span>
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <p className="text-caption font-medium text-brand-primary">{t("agentLabel")}</p>
-            <span className="rounded-full bg-surface-muted px-2 py-0.5 text-[10px] uppercase tracking-wider text-ink-tertiary">
+            <p className="text-small font-semibold text-brand-primary">{t("agentLabel")}</p>
+            <span className="rounded-full bg-surface-muted px-2.5 py-1 text-[11px] uppercase tracking-wider text-ink-tertiary">
               {scenario.persona.replace(/^c_/, "").replace(/^b2b_/, "B2B · ").replace(/_/g, " ")}
             </span>
           </div>
-          <p className="mt-2 text-body text-ink-primary">{scenario.agentOpening}</p>
+          <p className="mt-3 text-[15px] leading-7 text-ink-primary">{scenario.agentOpening}</p>
 
-          {/* Live LLM call — proves Token actually moves on click. */}
-          <RealAdvisorPanel
-            scenarioId={scenario.id}
-            userPrompt={scenario.userPrompt}
-            systemHint={`Persona: ${scenario.persona}.${scenario.billsAsB2bCall ? " (B2B-billed call)" : ""}`}
-          />
-
-          {/* recommendations */}
-          <ul className="mt-5 space-y-3">
+          {/* recommendations — horizontal scroll keeps the page height fixed
+              no matter how many products the advisor returns */}
+          <ul className="mt-5 flex snap-x gap-3 overflow-x-auto pb-2 [scrollbar-width:thin]">
             {scenario.recommendations.map((r) => (
               <RecommendationCard key={r.productId} recommendation={r} />
             ))}
           </ul>
-
-          {/* B2B billing notice — live monthly call counter */}
-          {scenario.billsAsB2bCall && <B2BCallNotice />}
 
           {/* fallback / warning */}
           {scenario.warning && (
@@ -79,15 +74,27 @@ export function AgentChatDemo({ scenario }: { scenario: HabaAgentScenario }) {
           )}
 
           {/* CTAs */}
-          <div className="mt-5 flex flex-wrap gap-2">
+          <div className="mt-6 flex flex-wrap gap-2.5">
             {scenario.closingCtas.map((cta) => (
               <CtaButton
                 key={cta.label}
                 cta={cta}
                 productIds={scenario.recommendations.map((r) => r.productId)}
+                onAskMore={onAskMore}
               />
             ))}
+            {scenario.persona === "c_concierge" && (
+              <Link
+                href="#products"
+                className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-xl border border-border-default bg-surface-base px-5 py-3 text-body font-semibold text-ink-secondary transition-colors hover:border-brand-primary/40 hover:text-brand-primary"
+              >
+                查看全部商品
+                <ArrowRight className="h-4 w-4" aria-hidden />
+              </Link>
+            )}
           </div>
+
+          {scenario.persona === "c_concierge" && <AdvisorFollowupChat scenario={scenario} />}
         </div>
       </div>
     </div>
@@ -97,14 +104,31 @@ export function AgentChatDemo({ scenario }: { scenario: HabaAgentScenario }) {
 function CtaButton({
   cta,
   productIds,
+  onAskMore,
 }: {
   cta: AgentCta;
   productIds: MarvieProduct["id"][];
+  onAskMore?: () => void;
 }) {
   // "Add to cart" CTAs (C-end + pharmacy "推荐给顾客") wire to the real
   // cart store. Other CTAs (print / copy / embed) remain demo-only no-ops.
   if (cta.kind === "add_to_cart" || cta.kind === "recommend_to_client") {
     return <AddAllToCartButton productIds={productIds} label={cta.label} />;
+  }
+  if (cta.kind === "ask_more") {
+    return (
+      <button
+        type="button"
+        onClick={onAskMore}
+        className={cn(
+          "inline-flex items-center gap-1.5 whitespace-nowrap rounded-xl border px-5 py-3 text-body font-semibold transition-colors",
+          "border-border-default bg-surface-base text-ink-secondary hover:border-brand-primary/40 hover:text-brand-primary",
+        )}
+      >
+        {cta.label}
+        <ArrowRight className="h-4 w-4" aria-hidden />
+      </button>
+    );
   }
   return (
     <button
@@ -116,7 +140,7 @@ function CtaButton({
         }
       }}
       className={cn(
-        "rounded-lg border px-3 py-2 text-small font-medium transition-colors",
+        "whitespace-nowrap rounded-xl border px-5 py-3 text-body font-semibold transition-colors",
         "border-border-default bg-surface-base text-ink-secondary hover:border-brand-primary/40 hover:text-brand-primary",
       )}
     >

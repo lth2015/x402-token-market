@@ -5,7 +5,6 @@ import {
   habaB2BPartners,
   resaleChainNarrative,
   tokenResalePlans,
-  x402TopupSteps,
 } from "@/lib/haba";
 import { cn, formatTokenCount } from "@/lib/utils";
 import { SectionTitle } from "@/components/shared/SectionTitle";
@@ -21,17 +20,7 @@ export async function SubpageTeaserGrid() {
   return (
     <section className="mx-auto max-w-6xl px-6 py-16 lg:px-12 lg:py-20">
       <SectionTitle eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <Teaser
-          href="/topup"
-          tone="primary"
-          eyebrow={t("topup.eyebrow")}
-          title={t("topup.title")}
-          desc={t("topup.desc")}
-          cta={t("topup.cta")}
-          metric={`${x402TopupSteps.length} 步`}
-          metricCaption={t("topup.metricCaption")}
-        />
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Teaser
           href="/resale"
           tone="accent"

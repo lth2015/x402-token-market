@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { resaleChainNarrative, tokenResalePlans } from "@/lib/haba";
 import { SectionTitle } from "@/components/shared/SectionTitle";
 import { DemoBadge } from "@/components/shared/DemoBadge";
+import { EnterpriseAcceptancePanel } from "@/components/shared/EnterpriseAcceptancePanel";
 import { formatJpy, formatTokenCount } from "@/lib/utils";
 import { ResaleChainDiagram } from "./ResaleChainDiagram";
 import { TokenResalePlanCard } from "./TokenResalePlanCard";
@@ -21,6 +22,34 @@ export async function TokenResaleSection() {
         eyebrow={t("eyebrow")}
         title={resaleChainNarrative.headline}
         description={t("description")}
+      />
+
+      <EnterpriseAcceptancePanel
+        className="mb-8"
+        title="从 demo 到试点合同的验收线"
+        description="这页把 HABA 的 AI 能力转售拆成可签约的商业模块：定价、计量、审计、风控和链上凭证各自独立，可逐项进入试点验收。"
+        items={[
+          {
+            kind: "commercial",
+            title: "收入流清楚",
+            body: "Token 配额、月基础费、超额单价与 Enterprise 议价分开，避免把技术 PoC 误解成单次项目收入。",
+          },
+          {
+            kind: "audit",
+            title: "对账证据闭环",
+            body: "Token 消耗、USDC 支付、订单号、trace 与发票口径对齐，支持月度报表和抽样核验。",
+          },
+          {
+            kind: "control",
+            title: "企业级治理",
+            body: "子账户、API key、调用限额、停用与异常消耗冻结，是大客户上线前的必备控制面。",
+          },
+          {
+            kind: "boundary",
+            title: "生态叙事稳健",
+            body: "HABA 卖 Advisor 能力，Netstars 提供支付与 Token 运营，Solana 只作为可验证结算层出现。",
+          },
+        ]}
       />
 
       {/* Narrative + chain */}

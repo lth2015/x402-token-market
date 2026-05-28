@@ -37,4 +37,6 @@ target/
 *.log
 .playwright-mcp/
 *.png
+*.jpeg
+*.jpg
 !claude/**/*.png

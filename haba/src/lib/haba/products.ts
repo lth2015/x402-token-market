@@ -46,7 +46,7 @@ export const marvieProducts: readonly MarvieProduct[] = [
     caloriesPerServing: { value: 1.5, unit: "kcal", servingLabel: "1g" },
     sweetnessRatioToSugar: 3,
     ingredients: ["赤藓糖醇", "甜菊糖苷"],
-    imageEmoji: "🥄",
+    imageEmoji: "🧂",
     shortPitch: "1:1 替砂糖 · 烘焙 180℃ 不焦化",
     longDescription:
       "颗粒大小与砂糖一致，**直接 1:1 替换原食谱不用换勺子**。烘焙至 180℃ 不焦化，社内 50 人盲测后味评分 8.4/10。",

@@ -6,7 +6,7 @@
  *   1. HabaHero                  — brand block + consumer segments
  *   2. ConsumerScenarioSection   — 5 C-end Agent flows
  *   3. ProductGrid               — 7 MARVIE SKUs
- *   4. SubpageTeaserGrid         — 3 cards → /topup, /resale, /b2b
+ *   4. SubpageTeaserGrid         — business cards → /resale, /b2b
  */
 import { HabaHero } from "@/components/hero/HabaHero";
 import { ConsumerScenarioSection } from "@/components/agent/ConsumerScenarioSection";

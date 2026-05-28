@@ -21,17 +21,27 @@ export function ConsumerScenarioSection() {
   const scenarios = useMemo(() => getConsumerScenarios(), []);
   const [selectedId, setSelectedId] = useState(scenarios[0]?.id ?? "");
   const selected = scenarios.find((s) => s.id === selectedId) ?? scenarios[0];
+  const selectedIndex = Math.max(0, scenarios.findIndex((s) => s.id === selected?.id));
+
+  function showNextScenario() {
+    if (scenarios.length <= 1) return;
+    const next = scenarios[(selectedIndex + 1) % scenarios.length];
+    setSelectedId(next!.id);
+    window.requestAnimationFrame(() => {
+      document.getElementById("advisor")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-16 lg:px-12 lg:py-20">
+    <section id="advisor" className="mx-auto max-w-6xl px-6 py-16 lg:px-12 lg:py-20 scroll-mt-20">
       <SectionTitle
         eyebrow={t("eyebrow")}
         title={t("sectionTitle")}
         description={t("sectionDescription")}
       />
 
-      <div className="grid gap-8 lg:grid-cols-12">
-        <div className="space-y-2 lg:col-span-5">
+      <div className="grid gap-9 lg:grid-cols-12">
+        <div className="space-y-3 lg:col-span-5">
           {scenarios.map((s) => (
             <ScenarioPickerCard
               key={s.id}
@@ -42,7 +52,9 @@ export function ConsumerScenarioSection() {
           ))}
         </div>
 
-        <div className="lg:col-span-7">{selected && <AgentChatDemo scenario={selected} />}</div>
+        <div className="lg:col-span-7">
+          {selected && <AgentChatDemo scenario={selected} onAskMore={showNextScenario} />}
+        </div>
       </div>
     </section>
   );

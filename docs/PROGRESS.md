@@ -1,7 +1,39 @@
 # X402 Token Market — 项目进度
 
-**最后更新**: 2026-05-28 (第五轮 · 办公室激活)
-**当前阶段**: **真链 + 真 LLM 双双上线**。Devnet 钱包配齐、Anthropic key 接入、全表面 smoke test 全过。Demo 可直接对内演示。
+**最后更新**: 2026-05-28 (第七轮 · 商业验收硬化)
+**当前阶段**: **真链 + 真 LLM 双双上线 + 企业验收风险收敛**。Devnet 钱包配齐、Anthropic key 接入、全表面 smoke test 全过；本轮补强 HABA / Netstars / Solana 评审会重点追问的商品可信度、链上实扣一致性、B2B 合同化边界。
+
+---
+
+## 0b. 第七轮变更（2026-05-28 UI/UX 商业观感修正）
+
+针对最新产品走查反馈，补强前台商业质感与购买动线：
+
+- ✅ **视觉层级放大**：Hero、导航、SectionTitle、场景卡、推荐卡、商品卡整体增大字号、图标、卡片尺度和按钮尺寸；消费端从“小 demo 组件感”向更正式的商业产品观感靠拢。
+- ✅ **加入购物车后可直接购买**：单品和批量加入购物车后保留 5 秒“去结账 / 立即购买”快捷入口，不再要求用户再去顶部找购物车。
+- ✅ **查看其他商品/场景实现**：`ask_more` CTA 不再是 no-op；消费者推荐区可切换到下一个场景，并提供“查看全部商品”锚点直达商品目录。
+- ✅ **验证**：`haba npm run typecheck` 通过；本地 `http://localhost:3002` 验证首页 → 加入购物车 → 立即购买 → 购物车摘要，以及“我想再看其他场景”切换。
+
+追加修正：
+- ✅ **AI Advisor 多轮聊天**：消费者推荐区新增 Follow-up Chat；支持快捷问题与输入框连续追问，前端保留最近上下文并提交到 `/api/payment/advise`。
+- ✅ **后端多轮消息**：`/api/payment/advise` 支持 `messages[]`，继续沿用 MARVIE 目录约束；每次调用仍由 Netstars Token ledger 自动扣费，但 HABA 消费者侧不显示 Token 余额/扣费明细。
+- ✅ **布局防误换行**：导航、CTA、发送按钮、结账快捷按钮、SectionTitle 右侧元素补 `whitespace-nowrap` / flex 约束，减少商业页面中不必要的断行。
+- ✅ **Token 计费边界修正**：购物车从 `token-purchase` 改为 `merchant-checkout`，商品订单只走 x402/USDC 结算凭证，不再把消费者购买误记成 HABA Token 充值；`/api/payment/topup` 仍是内部显式 Token 充值能力，AI Advisor 调用仍通过 `/v1/messages` 自动 debit。
+- ✅ **运行态验收**：重建 `token-api` / `x402-api`；`merchant-checkout + admin-confirm` 验证 Token balance 前后不变，HABA `/api/payment/advise` 验证单次调用仍自动 debit（本次 `tokensConsumed=1614`）。
+
+---
+
+## 0a. 第六轮变更（2026-05-28 商业验收硬化）
+
+从“demo 跑通”推进到“上市公司可验收”的第一轮严格修正：
+
+- ✅ **AI Advisor 目录约束**：`haba/src/app/api/payment/advise/route.ts` 注入真实 7 款 MARVIE SKU 目录，要求 LLM 只能推荐目录内 SKU，并禁止编造商品、价格、库存、医疗功效或血糖承诺。
+- ✅ **结账金额一致性**：新增 `haba/src/lib/haba/checkout.ts` 作为前后端共享的 USDC 换算 / clamp 策略；购物车摘要现在直接显示链上实扣金额，避免摘要与成功页金额不一致。
+- ✅ **订单凭证补强**：`CheckoutFlow.tsx` 持久化并展示 `tx_hash`、`chain_mode`、`status`、`explorer_url`；真实 Devnet 时可直接进入 Solana Explorer。
+- ✅ **企业验收面板**：新增 `EnterpriseAcceptancePanel`，并落在 `/b2b` 与 `/resale` 页面，明确品牌责任分层、调用计费、对账证据、治理控制、生态叙事边界。
+- ✅ **验证**：`haba` 与 `netstars/token/console` TypeScript 检查通过；本地 `http://localhost:3002` 验证 `/b2b`、`/resale`、`/cart` 新文案与金额显示。
+
+商业判断：这轮优先处理的是“观众会在会后追问、法务/财务会卡住”的信任问题，而不是继续堆动画或新页面。
 
 ---
 
@@ -19,9 +51,9 @@
 
 | 表面 | 验证 | 结果 |
 |---|---|---|
-| 首页 | Hero 双栏 / EcosystemFlow / LiveMetricsBar | ✅ |
+| 首页 | Hero / AdvisorPreview / Follow-up Chat / 商品目录 | ✅ |
 | AI Advisor | 真 Anthropic 调用 + Token 扣减 | ✅ `−1,652` token/次 |
-| /topup | +10M Token | ✅ |
+| 内部 top-up API | +10M Token | ✅ |
 | /cart | 真 Devnet USDC tx + Explorer 按钮 | ✅ 链上确认 |
 | /agent | 5 连击 + B2B 多渠道（真 LLM） | ✅ |
 | /b2b | B2BCallNotice 实时计数 | ✅ `41 → 42` |
@@ -35,7 +67,7 @@
 
 ## 1. 一句话状态
 
-> HABA AI 健康食品电商 demo 端到端真实运转：4 个相关方独立部署，3 个表面共享一份 ledger，AI Advisor 调真 Claude，`/cart` 结算落真 Solana Devnet 链，所有动作在 token-api / Console / HABA pill 三处同步可见。
+> HABA AI 健康食品电商 demo 端到端真实运转：4 个相关方独立部署；AI Advisor 调真 Claude 并由 Netstars Token ledger 自动扣费，`/cart` 商品结算落真 Solana Devnet 链但不充值 Token，消费端与商户运营账本边界清晰。
 
 ---
 
@@ -59,7 +91,7 @@
 ## 3. 已完成 (按层)
 
 ### 3.1 后端 services
-- ✅ **token-api** (`netstars/token/api/`): HMAC verify · `/v1/balance` · `/v1/recent-activity` · `/v1/token-purchase` · `/v1/messages` (真 LLM 调用 + 预检余额 + debit ledger + stub fallback)
+- ✅ **token-api** (`netstars/token/api/`): HMAC verify · `/v1/balance` · `/v1/recent-activity` · `/v1/token-purchase` · `/v1/merchant-checkout` · `/v1/messages` (真 LLM 调用 + 预检余额 + debit ledger + stub fallback)
 - ✅ **x402-api** (`netstars/x402/`): payment requirements · `/v1/settlements` · `/v1/admin/payments/{id}/confirm` (DEV shortcut)
 - ✅ **wea-api** (`wea/`): pending→broadcasting→confirmed→done 状态机 · HMAC-signed webhook 回调 · 5 档重试
 - ✅ **token-worker** (`netstars/token/worker/`): 后台任务
@@ -74,10 +106,10 @@
 - ✅ TopBar 商户切换器 → HABA
 
 ### 3.4 HABA 站点 (`haba/`)
-- ✅ **6 个路由**: `/` (Hero + Agent + 商品 + 跨页 teaser) · `/topup` · `/resale` · `/b2b` · `/cart` · `/agent`
-- ✅ **真后端集成** (`src/lib/netstars/client.ts`): HMAC 签名 · INTERNAL DNS · `fetchBalance` / `fetchRecentActivity` / `createTokenPurchase` / `adminConfirm` / `chatCompletion`
+- ✅ **4 个公开路由**: `/` (Hero + Advisor + 商品 + 跨页 teaser) · `/resale` · `/b2b` · `/cart`；Token top-up 与 AI 调用保留为 server-only API 能力
+- ✅ **真后端集成** (`src/lib/netstars/client.ts`): HMAC 签名 · INTERNAL DNS · `fetchBalance` / `fetchRecentActivity` / `createTokenPurchase` / `createMerchantCheckout` / `adminConfirm` / `chatCompletion`
 - ✅ **5 个 server-only API 代理路由**: `/api/payment/{balance,topup,advise}` · `/api/checkout/order`
-- ✅ **AI Advisor 真调用**: 任一场景的 `真打一次` 按钮 → /v1/messages → 余额跳变 → Console Ticker 同步
+- ✅ **AI Advisor 真调用**: Follow-up Chat → `/v1/messages` → Netstars Token ledger debit → Console Ticker 同步；消费端隐藏内部余额
 - ✅ **购物车 + 结账**: React Context store · localStorage 持久化 · `/cart` 三态状态机 (cart-view → processing 动画 → success) · 真 tx hash + 自动清空
 - ✅ **终端 Agent 模拟器** (`/agent`): Terminal log + balance summary · 2 个 scenario (5 连击 / autopilot 自动 topup)
 - ✅ **多语言** (zh-CN / ja / en): TopBar `<LocaleSwitcher>` + server action 写 cookie + `router.refresh()` 立即生效
@@ -99,12 +131,12 @@
 
 | 场景 | 触发点 | 后端调用 | 可见效果 |
 |---|---|---|---|
-| Token 自充 (场景 A) | `/topup` "真打一笔" | token-purchase + admin-confirm | 余额 +10M / tx_hash 显示 / Console Ticker credit |
+| Token 自充 (内部运营) | `/api/payment/topup` | token-purchase + admin-confirm | 余额 +10M / tx_hash / Console Ticker credit |
 | AI Advisor 调用 | 任一场景的 "真打一次" | /v1/messages (HMAC + LLM stub + debit) | 余额 −150 / 真 AI 回复 / Console Ticker debit |
-| 消费者结账 (场景 B) | `/cart` "USDC 钱包结账" | token-purchase + admin-confirm | 订单号 + 链上 tx_hash / 购物车自动清空 |
+| 消费者结账 (场景 B) | `/cart` "USDC 钱包结账" | merchant-checkout + dev-checkout/admin-confirm | 订单号 + 链上 tx_hash / 购物车自动清空；不 credit Token |
 | 终端 Agent autopilot | `/agent` "Run #2" | 12 次连续调用 + autopilot topup | 中段累积扣 500 Token 触发自动充值 +10M |
 
-token-api 的 `/v1/recent-activity` 可见所有事件；Netstars Console Live Activity Ticker 同步看到。
+token-api 的 `/v1/recent-activity` 可见 Token top-up 与 AI debit；商品结账保留在 x402 payment order + tx_hash 证据链中，不混入 Token ledger。
 
 ---
 
@@ -137,17 +169,17 @@ token-api 的 `/v1/recent-activity` 可见所有事件；Netstars Console Live A
 - [x] **Demo 精品化 (耳目一新)**:
   - `HabaHero.tsx` 全面重写：双栏布局，左 = 标题/标语/分群 chip/实时指标；右 = `EcosystemFlowCard`（深森绿卡片，三方节点 + CSS 流动动画）
   - `EcosystemFlowCard.tsx` (NEW)：暗色主题，HABA → 支付协议 → Solana USDC，traveling-dot 连接线，三方状态实时点
-  - `LiveMetricsBar.tsx` (NEW)：客户端组件拉取余额 API，展示 Token余额 / SKU数 / Devnet状态，带骨架屏
+  - 旧版 `LiveMetricsBar` / `TokenBalancePill` 已从消费者首页移除，避免前台暴露内部 Token 余额；运营证据回到 Netstars Console
   - `CheckoutFlow.tsx` 成功页分两态：devnet = 脉冲环确认动画 + 深色链上证明卡（tx高亮）+ 大号 Explorer 按钮；dev = 简洁版
   - `globals.css`：5 个 keyframes (haba-fade-up / pulse-ring / flow-dot / shimmer / breathe) + 8 个 utility 类
   - 全站 hover/入场动画：产品卡 `-translate-y-0.5 hover:shadow-e3`；Teaser 格同步；TopBar Logo 渐变升级
   - Footer 新增技术栈行：HABA · x402 Protocol · Solana USDC chip
 
 ### P2/P3 — 下次开工继续（第五轮 smoke test 新发现）
-- [ ] **AI Advisor system prompt 注入真实 MARVIE 目录**：现在真 LLM 会"编"出 catalog 里没有的 SKU 名（如「罗汉果糖浆」）。需把 `marvieProducts` 的 SKU + 卖点拼进 `haba/src/app/api/payment/advise/route.ts` 的 `HABA_SYSTEM_PROMPT`，约束它只推真实 7 款。**演示前最好补**——否则推荐与下方商品卡对不上。
-- [ ] **`/cart` 订单摘要 USDC 显示与实扣不一致**：摘要按原始换算显示（如 `10.5333 USDC`），但后端 clamp 到 `MAX_USDC=$9`，成功页才显示 $9。应在购物车摘要也显示 clamp 后金额，避免观众疑惑。
+- [x] **AI Advisor system prompt 注入真实 MARVIE 目录**：已把 `marvieProducts` 的 SKU / 名称 / 卖点 / 卡路里 / 甜度 / 成分注入 `HABA_SYSTEM_PROMPT`，并要求只推真实 7 款。
+- [x] **`/cart` 订单摘要 USDC 显示与实扣不一致**：已抽出共享 checkout policy，购物车摘要显示实际链上实扣金额与演示上限说明。
 - [ ] **`/agent` B2B 多渠道剧本超时**：12 次调用 × 真 LLM（每次 2–3s）≈ 30s+，前端无硬超时但单页等待偏久。可缩短为 2 轮（8 次）或并发，或加进度提示。
-- [ ] **ledger 重置工具**：topup / checkout 都会 credit HABA Token，多轮演示后余额数字越滚越大。需要一个 `make reset-ledger` 或脚本（重建 mysql / 清表），让演示从干净状态开始。
+- [ ] **ledger 重置工具**：topup 与 AI 调用会改变 HABA Token 余额，多轮演示后余额数字会滚动。需要一个 `make reset-ledger` 或脚本（重建 mysql / 清表），让演示从干净状态开始。
 - [ ] 钱包 connect UI 真接 Phantom / Solflare (现在签名是 server-side mock)
 
 ### P4 — 范围外 / 长期

@@ -6,9 +6,9 @@
  *   2. processing  — x402CheckoutSteps animation + concurrent API call
  *   3. success     — order id + tx hash + "继续购物"
  *
- * Real backend: POST /api/checkout/order which fires a token-purchase +
- * admin-confirm chain so a real tx_hash + ledger entry land. The HABA
- * Token balance will move as a side effect (see route.ts comment).
+ * Real backend: POST /api/checkout/order creates a merchant-checkout x402
+ * payment. It can produce a real tx_hash without crediting the Netstars
+ * Token ledger, keeping product payment separate from AI metering.
  */
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -28,9 +28,9 @@ export default function CartPage() {
       </Link>
 
       <SectionTitle
-        eyebrow="消费者结账 · 场景 B"
-        title="MARVIE 购物车 · USDC 钱包微支付"
-        description="把 AI Advisor 推荐的商品一键加入购物车后，用 USDC 钱包结账。下面的 8 步动画展示链上确认过程，订单完成后会显示真实的 tx hash。"
+        eyebrow="购物车"
+        title="MARVIE 购物车"
+        description="把 AI Advisor 推荐的商品加入购物车，用 USDC 钱包一键结账。"
       />
 
       <CheckoutFlow />

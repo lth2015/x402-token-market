@@ -1,5 +1,5 @@
 /**
- * POST /api/checkout/order — consumer USDC checkout with real Solana Devnet support.
+ * POST /api/checkout/order — consumer product checkout with real Solana Devnet support.
  *
  * Payment path (in priority order):
  *   1. REAL CHAIN  — x402-api dev-checkout builds + signs + broadcasts a real
@@ -8,9 +8,14 @@
  *   2. DEV BYPASS  — admin-confirm shortcut: no on-chain activity, instant mock tx_hash.
  *                    Used when the demo wallet is not configured or Solana RPC is down.
  *
+ * Business boundary:
+ *   This is a MARVIE product-order payment, not a Netstars Token purchase.
+ *   The x402 order is marked as `merchant_checkout`, so confirmation produces
+ *   a payment proof without crediting HABA's Token ledger.
+ *
  * Amount:
- *   Cart total in JPY → USDC at 150 JPY/USDC, clamped to [MIN_USDC, MAX_USDC].
- *   MAX_USDC = 9 keeps every demo transaction well under $10 as requested.
+ *   Cart total in JPY → USDC at 150 JPY/USDC, clamped by
+ *   `@/lib/haba/checkout` so every demo transaction stays under 10 USDC.
  *
  * Body: { items: Array<{ productId: string; qty: number }>;
  *         totalUsdc?: number; idempotencyKey?: string }
@@ -19,18 +24,14 @@ import { NextResponse } from "next/server";
 import { randomBytes } from "node:crypto";
 import {
   adminConfirm,
-  createTokenPurchase,
+  createMerchantCheckout,
   devCheckout,
   NetstarsError,
 } from "@/lib/netstars/client";
 import { getProductById } from "@/lib/haba";
+import { jpyToCheckoutUsdc } from "@/lib/haba/checkout";
 
 export const dynamic = "force-dynamic";
-
-const USDC_RATE_JPY = 150;
-// Keep every demo payment under $10 USDC as instructed.
-const MIN_USDC = 0.10;   // 10¢ floor so tiny demo carts still trigger real tx
-const MAX_USDC = 9.00;   // $9 ceiling — well within the "under $10" requirement
 
 type ItemIn = { productId?: unknown; qty?: unknown };
 type Body = { items?: ItemIn[]; totalUsdc?: unknown; idempotencyKey?: unknown };
@@ -75,18 +76,27 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "no valid line items" }, { status: 400 });
   }
 
-  // JPY → USDC conversion, clamped to [MIN_USDC, MAX_USDC].
-  let amountUsdc = +(totalJpy / USDC_RATE_JPY).toFixed(4);
-  if (amountUsdc < MIN_USDC) amountUsdc = MIN_USDC;
-  if (amountUsdc > MAX_USDC) amountUsdc = MAX_USDC;
+  // JPY → USDC conversion, clamped by the shared demo payment policy.
+  const amountUsdc = jpyToCheckoutUsdc(totalJpy);
 
   const idem = typeof body.idempotencyKey === "string" && body.idempotencyKey
     ? body.idempotencyKey
     : `haba-checkout-${randomBytes(6).toString("hex")}`;
+  const orderInternalId = `ord_${randomBytes(5).toString("hex")}`;
 
   try {
-    // Step 1: Create payment order via token-api → x402-api.
-    const order = await createTokenPurchase({ amountUsdc, idempotencyKey: idem });
+    // Step 1: Create a product-order payment via token-api → x402-api.
+    // This path is intentionally separated from /v1/token-purchase.
+    const order = await createMerchantCheckout({
+      amountUsdc,
+      idempotencyKey: idem,
+      orderReference: orderInternalId,
+      metadata: {
+        channel: "haba-cart",
+        total_jpy: totalJpy,
+        line_count: lineSummary.length,
+      },
+    });
 
     // Step 2: Attempt real Devnet USDC payment; fall back to admin-confirm.
     let chainMode: ChainMode = "dev";
@@ -112,8 +122,6 @@ export async function POST(req: Request) {
       txHash      = (adminResult.order as { tx_hash?: string }).tx_hash ?? null;
       finalStatus = (adminResult.order as { status?: string }).status ?? null;
     }
-
-    const orderInternalId = `ord_${randomBytes(5).toString("hex")}`;
 
     return NextResponse.json({
       ok: true,

@@ -1,28 +1,24 @@
-import { Check, Tag } from "lucide-react";
+import { Check } from "lucide-react";
 import {
   getBundleById,
   getProductById,
   type Recommendation,
 } from "@/lib/haba";
 import { formatJpy } from "@/lib/utils";
-import { DemoBadge } from "@/components/shared/DemoBadge";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 
 /**
- * One recommended SKU as Agent output.
- *  - Shows product card (emoji + name + pitch + price).
- *  - Lists ≥ 3 "为什么推荐" bullet reasons.
- *  - Optional badge ("Best for Diabetic" etc.).
- *  - Optional bundle suggestion link.
- *
- * Pure server component — no client state.
+ * One recommended SKU — a compact, fixed-width card designed to sit in a
+ * horizontal scroll row (see AgentChatDemo). Vertical layout: emoji + short
+ * name + top reasons + price/add-to-cart. Uses shortName (not the long full
+ * name) to avoid awkward wrapping.
  */
 export function RecommendationCard({ recommendation }: { recommendation: Recommendation }) {
   const product = getProductById(recommendation.productId);
   if (!product) {
     return (
-      <li className="rounded-lg border border-semantic-danger/30 bg-semantic-danger/5 p-4 text-caption text-semantic-danger">
-        broken recommendation: product {recommendation.productId} not in catalog
+      <li className="w-64 shrink-0 rounded-2xl border border-semantic-danger/30 bg-semantic-danger/5 p-4 text-caption text-semantic-danger">
+        broken recommendation: {recommendation.productId}
       </li>
     );
   }
@@ -31,56 +27,46 @@ export function RecommendationCard({ recommendation }: { recommendation: Recomme
     : undefined;
 
   return (
-    <li className="rounded-xl border border-border-subtle bg-surface-base p-5 shadow-e1">
-      <div className="flex items-start gap-4">
-        <span className="text-3xl leading-none" aria-hidden>
+    <li className="flex w-64 shrink-0 snap-start flex-col rounded-2xl border border-border-subtle bg-surface-base p-4 shadow-e1">
+      {/* emoji + badge */}
+      <div className="flex items-start justify-between gap-2">
+        <span className="text-4xl leading-none" aria-hidden>
           {product.imageEmoji}
         </span>
-        <div className="flex-1">
-          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-            <h4 className="text-body font-semibold text-brand-ink">{product.name}</h4>
-            {recommendation.badge && (
-              <span className="rounded-full bg-brand-accent/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-brand-accent">
-                {recommendation.badge}
-              </span>
-            )}
-          </div>
-          <p className="mt-1 text-caption text-ink-secondary">{product.shortPitch}</p>
-
-          {/* reasons — agent-design §4.1 demands ≥3 dimensions */}
-          <ul className="mt-3 space-y-1.5">
-            {recommendation.reasons.map((r) => (
-              <li key={r} className="flex gap-2 text-small text-ink-secondary">
-                <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-primary" aria-hidden />
-                <span>{r}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="shrink-0 text-right">
-          <div className="text-body font-semibold text-brand-ink">
-            {formatJpy(product.priceJpy)}
-          </div>
-          <DemoBadge className="mt-1" />
-          <div className="mt-2">
-            <AddToCartButton productId={product.id} />
-          </div>
-        </div>
+        {recommendation.badge && (
+          <span className="shrink-0 rounded-full bg-brand-accent/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-accent">
+            {recommendation.badge}
+          </span>
+        )}
       </div>
 
-      {/* bundle deal footer */}
+      {/* name + pitch */}
+      <h4 className="mt-3 text-small font-bold leading-snug text-brand-ink">
+        {product.shortName}
+      </h4>
+      <p className="mt-1 text-caption leading-snug text-ink-tertiary">{product.shortPitch}</p>
+
+      {/* reasons — keep top 3, compact */}
+      <ul className="mt-3 flex-1 space-y-1.5">
+        {recommendation.reasons.slice(0, 3).map((r) => (
+          <li key={r} className="flex gap-1.5 text-caption leading-snug text-ink-secondary">
+            <Check className="mt-0.5 h-3 w-3 shrink-0 text-brand-primary" aria-hidden />
+            <span>{r}</span>
+          </li>
+        ))}
+      </ul>
+
+      {/* price + add to cart */}
+      <div className="mt-4 flex items-center justify-between border-t border-border-subtle pt-3">
+        <span className="text-body font-bold text-brand-ink">{formatJpy(product.priceJpy)}</span>
+        <AddToCartButton productId={product.id} />
+      </div>
+
+      {/* optional bundle hint — compact */}
       {bundle && (
-        <div className="mt-4 flex items-center gap-2 rounded-lg border border-dashed border-brand-primary/40 bg-brand-primary/5 px-3 py-2 text-small">
-          <Tag className="h-3.5 w-3.5 text-brand-primary" aria-hidden />
-          <span className="font-medium text-brand-primary">{bundle.pitch}</span>
-          <span className="ml-auto flex items-baseline gap-2">
-            <span className="text-ink-tertiary line-through">{formatJpy(bundle.originalTotalJpy)}</span>
-            <span className="font-semibold text-brand-ink">{formatJpy(bundle.bundlePriceJpy)}</span>
-            <span className="rounded bg-brand-primary/15 px-1.5 py-0.5 text-caption text-brand-primary">
-              {bundle.saveLabel}
-            </span>
-          </span>
-        </div>
+        <p className="mt-2 text-[10px] text-brand-primary">
+          套餐价 {formatJpy(bundle.bundlePriceJpy)} · {bundle.saveLabel}
+        </p>
       )}
     </li>
   );

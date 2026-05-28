@@ -10,16 +10,17 @@ import {
   type ReactNode,
 } from "react";
 import { getProductById, type MarvieProduct } from "@/lib/haba";
+import { getCheckoutClampState } from "@/lib/haba/checkout";
 
 /**
  * Consumer cart — client-side only. Persisted to localStorage so a refresh
  * during a demo doesn't drop the items. Items are stored by SKU id; the
  * MarvieProduct itself is looked up on the fly from the static catalog.
  *
- * Demo USDC rate: 1 USDC = 150 JPY (matches RealTopupButton elsewhere).
+ * USDC checkout amount follows the shared demo payment policy in
+ * `@/lib/haba/checkout`.
  */
 const STORAGE_KEY = "haba.cart.v1";
-const USDC_RATE_JPY = 150;
 
 export type CartItem = { productId: MarvieProduct["id"]; qty: number };
 
@@ -30,6 +31,9 @@ type CartCtx = {
   totalItems: number;
   totalJpy: number;
   totalUsdc: number;
+  checkoutUsdc: number;
+  isCheckoutCapped: boolean;
+  isCheckoutFloored: boolean;
   addItem: (productId: MarvieProduct["id"], qty?: number) => void;
   addItems: (productIds: MarvieProduct["id"][]) => void;
   removeItem: (productId: MarvieProduct["id"]) => void;
@@ -80,7 +84,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     () => hydrated.reduce((acc, it) => acc + it.product.priceJpy * it.qty, 0),
     [hydrated],
   );
-  const totalUsdc = useMemo(() => +(totalJpy / USDC_RATE_JPY).toFixed(4), [totalJpy]);
+  const checkoutState = useMemo(() => getCheckoutClampState(totalJpy), [totalJpy]);
+  const totalUsdc = checkoutState.rawUsdc;
+  const checkoutUsdc = checkoutState.checkoutUsdc;
 
   const addItem = useCallback((productId: MarvieProduct["id"], qty = 1) => {
     setRawItems((prev) => {
@@ -122,13 +128,29 @@ export function CartProvider({ children }: { children: ReactNode }) {
       totalItems,
       totalJpy,
       totalUsdc,
+      checkoutUsdc,
+      isCheckoutCapped: checkoutState.isCapApplied,
+      isCheckoutFloored: checkoutState.isFloorApplied,
       addItem,
       addItems,
       removeItem,
       setQty,
       clear,
     }),
-    [hydrated, totalItems, totalJpy, totalUsdc, addItem, addItems, removeItem, setQty, clear],
+    [
+      hydrated,
+      totalItems,
+      totalJpy,
+      totalUsdc,
+      checkoutUsdc,
+      checkoutState.isCapApplied,
+      checkoutState.isFloorApplied,
+      addItem,
+      addItems,
+      removeItem,
+      setQty,
+      clear,
+    ],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

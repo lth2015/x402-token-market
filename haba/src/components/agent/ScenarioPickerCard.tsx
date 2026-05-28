@@ -23,33 +23,33 @@ export function ScenarioPickerCard({
       onClick={() => onSelect(scenario.id)}
       aria-pressed={active}
       className={cn(
-        "group flex w-full items-start gap-3 rounded-xl border p-4 text-left transition-all",
+        "group flex w-full items-start gap-4 rounded-2xl border p-5 text-left transition-all",
         active
-          ? "border-brand-primary bg-brand-primary/5 shadow-e2"
-          : "border-border-subtle bg-surface-base hover:border-brand-primary/40 hover:shadow-e1",
+          ? "border-brand-primary bg-brand-primary/6 shadow-e3"
+          : "border-border-subtle bg-surface-base hover:border-brand-primary/40 hover:shadow-e2",
       )}
     >
       <span
         aria-hidden
         className={cn(
-          "mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-caption font-semibold",
+          "mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl font-semibold",
           active ? "bg-brand-primary text-white" : "bg-surface-muted text-ink-tertiary",
         )}
       >
         💬
       </span>
       <div className="flex-1">
-        <p className={cn("text-small font-medium", active ? "text-brand-primary" : "text-brand-ink")}>
+        <p className={cn("text-[15px] font-semibold leading-6", active ? "text-brand-primary" : "text-brand-ink")}>
           {scenario.title}
         </p>
-        <p className="mt-1 line-clamp-2 text-caption text-ink-tertiary">
+        <p className="mt-1.5 line-clamp-2 text-small leading-5 text-ink-tertiary">
           {scenario.userPrompt}
         </p>
       </div>
       <ChevronRight
         aria-hidden
         className={cn(
-          "mt-0.5 h-4 w-4 shrink-0 transition-transform",
+          "mt-1 h-5 w-5 shrink-0 transition-transform",
           active ? "translate-x-0.5 text-brand-primary" : "text-ink-tertiary",
         )}
       />

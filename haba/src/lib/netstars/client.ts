@@ -116,11 +116,63 @@ export async function createTokenPurchase(args: {
   return (await res.json()) as Awaited<ReturnType<typeof createTokenPurchase>>;
 }
 
+/**
+ * POST /v1/merchant-checkout — HMAC signed product-order settlement.
+ *
+ * This still uses the x402 payment rail and can produce a real Solana USDC
+ * transaction, but it is explicitly not a Token top-up. Confirming this order
+ * must not credit the merchant's Netstars Token balance.
+ */
+export async function createMerchantCheckout(args: {
+  amountUsdc: number;
+  idempotencyKey: string;
+  orderReference: string;
+  metadata?: Record<string, unknown>;
+}): Promise<{
+  payment_order_id: string;
+  amount_usdc_micro: number;
+  recipient: string;
+  nonce: string;
+  status: string;
+  expires_at: string;
+}> {
+  const path = "/v1/merchant-checkout";
+  const bodyObj = {
+    amount_usdc: args.amountUsdc,
+    idempotency_key: args.idempotencyKey,
+    order_reference: args.orderReference,
+    metadata: args.metadata ?? {},
+  };
+  const body = JSON.stringify(bodyObj);
+  const headers = signRequest({
+    method: "POST",
+    path,
+    body,
+    apiKeyId: API_KEY_ID,
+    apiKeySecret: API_KEY_SECRET,
+  });
+  const res = await fetch(`${TOKEN_API}${path}`, {
+    method: "POST",
+    headers: { ...headers, "Content-Type": "application/json" },
+    body,
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new NetstarsError(res.status, `merchant-checkout ${res.status}`, text);
+  }
+  return (await res.json()) as Awaited<ReturnType<typeof createMerchantCheckout>>;
+}
+
 /** POST /v1/admin/payments/{id}/confirm — DEV-only shortcut on x402-api. */
 export async function adminConfirm(args: {
   paymentOrderId: string;
   txHash?: string;
-}): Promise<{ ok: boolean; order: Record<string, unknown>; credit: Record<string, unknown> }> {
+}): Promise<{
+  ok: boolean;
+  order: Record<string, unknown>;
+  credit: Record<string, unknown> | null;
+}> {
   const path = `/v1/admin/payments/${args.paymentOrderId}/confirm`;
   const bodyObj = { tx_hash: args.txHash ?? `DEV_HABA_${Date.now().toString(16)}` };
   const body = JSON.stringify(bodyObj);
