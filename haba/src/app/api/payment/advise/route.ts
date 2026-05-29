@@ -18,7 +18,7 @@ import { marvieProducts } from "@/lib/haba";
 
 export const dynamic = "force-dynamic";
 
-const DEFAULT_MODEL = process.env.HABA_ADVISOR_MODEL ?? "claude-haiku-4-5";
+const DEFAULT_MODEL = process.env.HABA_ADVISOR_MODEL ?? "gpt-4.1";
 
 const MARVIE_CATALOG_FOR_LLM = marvieProducts
   .map((p) => {
@@ -45,7 +45,7 @@ const HABA_SYSTEM_PROMPT = [
   "",
   "Allowed MARVIE catalog:",
   MARVIE_CATALOG_FOR_LLM,
-].join(" ");
+].join("\n");
 
 type RequestBody = {
   scenarioId?: string;

@@ -44,6 +44,7 @@ export const MODELS: ModelRow[] = [
   { id: "claude-opus-4-7",   provider: "Anthropic", inputPer1K: 15_000, outputPer1K: 75_000, docsUrl: "https://docs.anthropic.com", ok: true },
   { id: "claude-sonnet-4-6", provider: "Anthropic", inputPer1K:  3_000, outputPer1K: 15_000, docsUrl: "https://docs.anthropic.com", ok: true },
   { id: "claude-haiku-4-5",  provider: "Anthropic", inputPer1K:    800, outputPer1K:  4_000, docsUrl: "https://docs.anthropic.com", ok: true },
+  { id: "gpt-5.5",           provider: "OpenAI",    inputPer1K:  5_000, outputPer1K: 30_000, docsUrl: "https://developers.openai.com/api/docs/models/gpt-5.5/", ok: true },
   { id: "gpt-4.1",           provider: "OpenAI",    inputPer1K: 10_000, outputPer1K: 30_000, docsUrl: "https://platform.openai.com/docs", ok: true },
   { id: "gpt-4.1-mini",      provider: "OpenAI",    inputPer1K:  2_000, outputPer1K:  6_000, docsUrl: "https://platform.openai.com/docs", ok: true },
   { id: "grok-4",            provider: "xAI",       inputPer1K:  8_000, outputPer1K: 24_000, docsUrl: "https://docs.x.ai", ok: true },
@@ -70,7 +71,7 @@ export type UsageSummary = {
 
 export function getUsageMock(): UsageSummary {
   // Per-model split with realistic proportions
-  const shares = [0.42, 0.29, 0.22, 0.04, 0.02, 0.005, 0.005]; // sums ~1.0
+  const shares = [0.38, 0.24, 0.16, 0.12, 0.04, 0.025, 0.01, 0.005]; // sums ~1.0
   const totalSpendJpy = 234_500;
   const totalRequests = 18_420;
   const perModel: UsageRow[] = MODELS.map((m, i) => {
@@ -135,7 +136,7 @@ export function getApiKeysMock(): ApiKeyRow[] {
       ratePerMin: 600,
       tokensPerMin: 100_000_000,
       dailyLimitJpy: 10_000,
-      allowedModels: ["claude-*", "gpt-4.1"],
+      allowedModels: ["gpt-5.5", "gpt-4.1", "claude-*"],
     },
     {
       id: "agk_01HX7P3Q9L",
@@ -147,7 +148,7 @@ export function getApiKeysMock(): ApiKeyRow[] {
       ratePerMin: 300,
       tokensPerMin: 30_000_000,
       dailyLimitJpy: 5_000,
-      allowedModels: ["claude-haiku-*"],
+      allowedModels: ["gpt-5.5"],
     },
     {
       id: "agk_01HX7P3QAM",

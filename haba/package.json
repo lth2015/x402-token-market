@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start -p 3001",
     "lint": "next lint",
+    "test:advise": "node scripts/test-advise-api.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

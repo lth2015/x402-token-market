@@ -39,6 +39,8 @@ PRICING: dict[str, Price] = {
     "claude-opus-4-7":   Price(15_000, 75_000),
     "claude-sonnet-4-6": Price( 3_000, 15_000),
     "claude-haiku-4-5":  Price(   800,  4_000),
+    "gpt-5.5":           Price( 5_000, 30_000),
+    "gpt-5.5-2026-04-23": Price(5_000, 30_000),
     "gpt-4.1":           Price(10_000, 30_000),
     "gpt-4.1-mini":      Price( 2_000,  6_000),
     "grok-4":            Price( 8_000, 24_000),

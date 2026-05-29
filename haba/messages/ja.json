@@ -26,8 +26,8 @@
   },
   "agent": {
     "eyebrow": "AI 商品アドバイザー",
-    "sectionTitle": "5 つの健康ニーズを、AI が商品でこたえる",
-    "sectionDescription": "左のシナリオをクリックすると、HABA AI Advisor が MARVIE 商品を 3 つの軸(カロリー・甘さ・利用シーン)で推薦します。",
+    "sectionTitle": "AI Advisor を本物の相談カウンターへ",
+    "sectionDescription": "健康ニーズを選び、追加質問・比較・買い物リスト化まで続けられます。回答は MARVIE カタログ事実に基づきます。",
     "userLabel": "お客様",
     "agentLabel": "HABA AI Advisor",
     "b2bCallNotice": "1 回呼び出し → HABA 月額 Token プランへ計上(デモ値 18,432 / 100,000)"

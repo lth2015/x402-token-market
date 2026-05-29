@@ -33,28 +33,26 @@ export function ConsumerScenarioSection() {
   }
 
   return (
-    <section id="advisor" className="mx-auto max-w-6xl px-6 py-16 lg:px-12 lg:py-20 scroll-mt-20">
+    <section id="advisor" className="mx-auto max-w-7xl px-6 py-16 lg:px-12 lg:py-20 scroll-mt-20">
       <SectionTitle
         eyebrow={t("eyebrow")}
         title={t("sectionTitle")}
         description={t("sectionDescription")}
       />
 
-      <div className="grid gap-9 lg:grid-cols-12">
-        <div className="space-y-3 lg:col-span-5">
-          {scenarios.map((s) => (
-            <ScenarioPickerCard
-              key={s.id}
-              scenario={s}
-              active={s.id === selectedId}
-              onSelect={setSelectedId}
-            />
-          ))}
-        </div>
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+        {scenarios.map((s) => (
+          <ScenarioPickerCard
+            key={s.id}
+            scenario={s}
+            active={s.id === selectedId}
+            onSelect={setSelectedId}
+          />
+        ))}
+      </div>
 
-        <div className="lg:col-span-7">
-          {selected && <AgentChatDemo scenario={selected} onAskMore={showNextScenario} />}
-        </div>
+      <div className="mt-8">
+        {selected && <AgentChatDemo scenario={selected} onAskMore={showNextScenario} />}
       </div>
     </section>
   );

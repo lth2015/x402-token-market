@@ -719,7 +719,7 @@ const AUDIT_ACTIONS = [
 
 ## 9. 不在本次范围
 
-- 不接 OpenAI/Claude 真模型；Agent 推荐走 mock 函数 + 静态映射
+- AI Advisor 默认接 GPT-5.5；未配置真实 `OPENAI_API_KEY` 时走 stub fallback。推荐卡仍由 MARVIE 静态目录兜底，避免 LLM 编造 SKU。
 - 不引入图片资产（emoji + Tailwind 占位）
 - 不做付款真链 demo（仍 DEV mode）
 - 不做多 tenant 切换 UI（只 HABA 一家）

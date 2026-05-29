@@ -391,12 +391,12 @@ type Recommendation = {
 
 | 调用 | 谁发 | 谁收 | 真假 |
 |------|------|------|------|
-| Token 余额查询 | HABA 站点 | Netstars Token API (`/v1/balance`) | demo 中：mock；后续可对接 :8080 |
-| Token 购买（x402） | HABA SDK | Netstars x402 → WEA → Solana | demo 中：8 步动画 + mock |
-| AI 调用（Claude/GPT） | Agent | Netstars Token API (`/v1/messages`) | demo 中：本地静态推荐表，无真模型调 |
-| B2B 调用计费 | HABA 站点 | HABA 自己内部累加（mock） | demo 中：UI 显示用 |
+| Token 余额查询 | HABA 站点 | Netstars Token API (`/v1/balance`) | 已对接真 ledger；C 端不展示内部余额 |
+| Token 购买（x402） | HABA SDK | Netstars x402 → WEA → Solana | 内部 top-up 保留；商品 checkout 走 merchant-checkout，不 credit Token |
+| AI 调用（GPT-5.5） | Agent | Netstars Token API (`/v1/messages`) | 真实 key 时调用 OpenAI GPT-5.5；无 key 时 stub fallback，仍 debit ledger |
+| B2B 调用计费 | HABA 站点 | Netstars Token ledger + HABA B2B 统计 | 从 ledger 聚合月度调用；UI 显示合同化边界 |
 
-**注意**：本 demo 不实际接 Anthropic/OpenAI，Agent 的"推荐结果"完全是 [§5 推荐算法 mock](#5-推荐算法-mockdemo-用不是真模型) 里的静态映射。
+**注意**：当前 UI 推荐卡仍由 MARVIE 静态目录保证可控性；Advisor Desk 的多轮追问会经 `/api/payment/advise` 调 Netstars Token API。配置真实 `OPENAI_API_KEY` 时默认模型为 GPT-5.5；未配置时使用 stub fallback 以保持演示可用。
 
 ---
 

@@ -12,8 +12,8 @@ Endpoints in this version:
     POST /internal/credit         X402 calls this after payment confirms
     GET  /                        service info + TODO list
 
-Not yet implemented (Tier 5+): real AI provider calls, invoice generator,
-per-key rate limiter, real KMS-decrypted secrets (KMS_MODE=dev for now).
+Not yet implemented (Tier 5+): invoice generator, per-key rate limiter,
+real KMS-decrypted secrets (KMS_MODE=dev for now).
 """
 from __future__ import annotations
 

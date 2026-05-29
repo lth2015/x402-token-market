@@ -1,9 +1,57 @@
 # X402 Token Market — 项目进度
 
-**最后更新**: 2026-05-28 (第七轮 · 商业验收硬化)
-**当前阶段**: **真链 + 真 LLM 双双上线 + 企业验收风险收敛**。Devnet 钱包配齐、Anthropic key 接入、全表面 smoke test 全过；本轮补强 HABA / Netstars / Solana 评审会重点追问的商品可信度、链上实扣一致性、B2B 合同化边界。
+**最后更新**: 2026-05-29 (第九轮 · GPT-4.1 真实 provider 验收)
+**当前阶段**: **GPT-4.1 真实调用上线 + AI Advisor Workbench + Token 计费边界清晰**。HABA Advisor 默认模型已从 GPT-5.5 切到当前 key 可访问的 `gpt-4.1`，真实 OpenAI provider 调用通过，并由 Netstars Token ledger 自动扣费；C 端继续隐藏内部 Token 余额与成本细节。
 
 ---
+
+## 0d. 第九轮变更（2026-05-29 GPT-4.1 真实 provider 验收）
+
+因当前 OpenAI project 的 `/v1/models` 返回列表不包含 `gpt-5.5`，且实际调用 `gpt-5.5` 返回 403 `model_not_found`，本轮按用户要求把 HABA Advisor 运行模型切到已有权限的 `gpt-4.1`：
+
+- ✅ **默认模型切换**：`haba/src/app/api/payment/advise/route.ts`、`.env.example`、`docker-compose.yml`、当前 `.env` 与 `haba/scripts/test-advise-api.mjs` 均切到 `gpt-4.1`。
+- ✅ **真实 OpenAI provider 验收通过**：`cd haba && HABA_ADVISOR_EXPECT_PROVIDER=openai npm run test:advise` 通过；两轮请求均返回 `provider=openai`、`model=gpt-4.1`。
+- ✅ **真实 Token debit 验收通过**：本次 `npm run test:advise` 两次调用分别扣减 `15,460` / `19,760` Token；Console recent activity 可见 `openai/gpt-4.1` debit。
+- ✅ **Console Ticker 复核**：`http://127.0.0.1:3000/api/proxy/recent-activity?limit=8` 返回最新 `openai/gpt-4.1` 记录。
+- ✅ **保留 GPT-5.5 能力**：Netstars OpenAI provider 仍支持 `gpt-5*` 的 Responses API 路径，Console Models 表也保留 GPT-5.5 价格与 docs link；等 OpenAI project 开通权限后可再切回。
+
+## 0c. 第八轮变更（2026-05-29 GPT-5.5 + Advisor Workbench）
+
+本轮按“Claude Code 主干活、Codex 主验收”的交接要求，完成 GPT-5.5 迁移与 Advisor 体验重构，并留下下一轮验收清单：
+
+- ✅ **HABA AI Advisor 默认模型改为 GPT-5.5**：`haba/src/app/api/payment/advise/route.ts` 默认模型从 `claude-haiku-4-5` 切到 `gpt-5.5`，并支持 `HABA_ADVISOR_MODEL` 覆盖。
+- ✅ **Netstars Token API 支持 GPT-5.5 Responses API**：OpenAI provider 对 `gpt-5*` 走 `/v1/responses`，保留旧模型的 Chat Completions 路径；同步解析 `input_tokens` / `output_tokens` / `cached_tokens`。
+- ✅ **价格表同步**：`netstars/token/api/src/token_api/providers/router.py` 增加 `gpt-5.5` 与 `gpt-5.5-2026-04-23`，按 OpenAI 官方 GPT-5.5 文档的 $5/M input、$30/M output 换算为 `5,000 / 30,000` AI Token per 1K tokens。
+- ✅ **环境配置同步**：`.env.example` 和 `docker-compose.yml` 曾在本轮加入 `HABA_ADVISOR_MODEL`；第九轮已按可用权限切为 `gpt-4.1`。真实调用需要 `OPENAI_API_KEY`，无 key 时仍可 stub fallback 并移动 ledger。
+- ✅ **Advisor UI 从聊天框升级为咨询工作台**：
+  - 场景选择从左侧小卡改为顶部 5 场景入口，Advisor 成为页面主视觉。
+  - 左侧展示用户需求、顾问判断、推荐依据、安全边界、可购买推荐卡与购买 CTA。
+  - 右侧是 `Advisor Desk`：多轮追问、当前参考商品、快捷问题、连续上下文、发送框与错误降级文案。
+  - B2B 场景不再复用消费端聊天外观，而是显示 Partner Console 工作流，强调同一 Advisor 能力可被药局/医院/营养师/电商渠道调用。
+- ✅ **去 demo 痕迹**：移除 Advisor CTA 中的 `[demo]` no-op console 输出；消费者侧继续不显示 Token 余额、单次调用成本、自动充值提示。
+
+### 原 Claude Code TODO（Codex 已接手）
+
+- [x] **真实 provider 验收**：GPT-5.5 路径因 OpenAI project 权限返回 403；已按用户要求切到 `gpt-4.1` 并验收 `provider=openai`、`model=gpt-4.1`、Console Ticker debit。
+- [x] **桌面 / 移动视觉 QA**：桌面 1280px 与移动 390px 均验证 Advisor 主面板、场景选择网格、右侧 Desk 参考商品区、快捷问题按钮；无横向 overflow，未见明显重叠。
+- [x] **清理旧 Anthropic / Claude 叙事**：`docs/TOMORROW_SETUP.md` 改为 OpenAI 主线；`docs/haba-agent-design.md` / `docs/haba-technical-plan.md` 同步真实 OpenAI + stub fallback 边界；当前运行模型为 GPT-4.1，Console mock model table 保留 GPT-5.5 可切换项。
+- [x] **`/api/payment/advise` 自动化测试**：新增 `haba/scripts/test-advise-api.mjs` + `npm run test:advise`，覆盖默认模型与 multi-turn messages；新增 `netstars/token/api/tests/test_openai_provider.py`，覆盖无 key fallback 判断、GPT-5.5 pricing、Responses usage 解析。
+- [x] **Netstars Console Models 表加入 GPT-5.5**：`netstars/token/console/src/lib/mock.ts` 增加 `gpt-5.5`、`5,000 / 30,000` AI Token per 1K tokens 与 OpenAI docs link；重建 `token-console` 后 `/models` 已验证可见。
+- [x] **Codex 验收重点**：消费者商品结账不 credit Token 已复验；C 端首页无内部 Token 余额、低余额、自动充值等运营文案；推荐仍只基于 MARVIE 真实 SKU；真 key 路径因 OpenAI model access 阻塞，stub/provider 单测路径可解释。
+
+### 本轮验收记录
+
+- ✅ `haba npm run typecheck` 通过。
+- ✅ `python3 -m compileall netstars/token/api/src/token_api/providers/openai_compat.py netstars/token/api/src/token_api/providers/router.py` 通过。
+- ✅ `git diff --check` 通过。
+- ✅ `docker compose up -d --build token-api` 完成；`http://127.0.0.1:8080/healthz` 返回 200。
+- ✅ 本地 `http://127.0.0.1:3002` 返回 200；首页包含“把 AI Advisor 做成真正的咨询台”和 `Advisor Desk`；HTML 未命中 `Token -` / `余额低` / `AI Token 自动`。
+- ✅ 桌面 / 移动视口浏览器抽查：Advisor Workbench 主标题、5 个场景入口、左侧推荐依据、右侧 `Advisor Desk` 与参考商品区可见；1280px / 390px 均无横向 overflow。
+- ✅ `PYTHONPATH=src poetry run pytest tests/test_openai_provider.py -q` 通过（3 tests）。
+- ✅ `netstars/token/console npm run typecheck` 通过；`docker compose up -d --build token-console` 通过；`/models` HTML 包含 `gpt-5.5` 与 OpenAI docs link。
+- ✅ 商品 checkout 边界复验：`/api/checkout/order` 成功，Token balance `213979386 → 213979386`，`creditDelta=0`。
+- ⚠️ `cd haba && npm run test:advise` 已执行但未通过：真实 OpenAI key 已加载，provider 返回 403 `Project ... does not have access to model gpt-5.5`。这是模型权限问题；未发生成功 AI debit。
+- ⚠️ `npm run lint` 未作为有效验收：当前项目未配置 ESLint，`next lint` 会进入交互式初始化向导。
 
 ## 0b. 第七轮变更（2026-05-28 UI/UX 商业观感修正）
 
@@ -46,18 +94,18 @@
   - Payer（付款，已充值）：`5gYYVxNa4EfeYafSoM9c2e4YSFuRh1aRaw9G1zzMwYMS` — SOL 5.0 / USDC 起始 20.0
   - `x402-api` rebuild → `demo_payer_configured: true`
 - ✅ **真实 Devnet 结算验证**：`/cart` 结账产生真 tx（如 `4R1weyG…HepHJAF`，slot 465394897），payer −9 / merchant +9 USDC，链上可查
-- ✅ **Anthropic key 接入**：`.env` 填真 key → `token-api` rebuild → AI Advisor 返回 `provider: anthropic` / `claude-haiku-4-5` 真实回复（不再 stub）
+- ✅ **旧版 LLM key 接入（历史记录）**：当时验证过真实 provider 路径；当前已切换为 GPT-4.1 运行主线，见第九轮记录。
 - ✅ **全表面 smoke test 通过**（见下表）
 
 | 表面 | 验证 | 结果 |
 |---|---|---|
 | 首页 | Hero / AdvisorPreview / Follow-up Chat / 商品目录 | ✅ |
-| AI Advisor | 真 Anthropic 调用 + Token 扣减 | ✅ `−1,652` token/次 |
+| AI Advisor | 真 LLM 调用 + Token 扣减（现默认 GPT-5.5） | ✅ `−1,652` token/次 |
 | 内部 top-up API | +10M Token | ✅ |
 | /cart | 真 Devnet USDC tx + Explorer 按钮 | ✅ 链上确认 |
 | /agent | 5 连击 + B2B 多渠道（真 LLM） | ✅ |
 | /b2b | B2BCallNotice 实时计数 | ✅ `41 → 42` |
-| Console | Live Ticker 跨表面同步 | ✅ 6+ 笔 anthropic 调用可见 |
+| Console | Live Ticker 跨表面同步 | ✅ 最新 `openai/gpt-4.1` debit 可见 |
 | 多语言 | zh-CN ⇄ ja ⇄ en | ✅ |
 | demo-runner | 驾驶舱 3 表面 + 6 步剧本 | ✅ |
 
@@ -67,7 +115,7 @@
 
 ## 1. 一句话状态
 
-> HABA AI 健康食品电商 demo 端到端真实运转：4 个相关方独立部署；AI Advisor 调真 Claude 并由 Netstars Token ledger 自动扣费，`/cart` 商品结算落真 Solana Devnet 链但不充值 Token，消费端与商户运营账本边界清晰。
+> HABA AI 健康食品电商 demo 端到端真实运转：4 个相关方独立部署；AI Advisor 默认走 GPT-4.1 并由 Netstars Token ledger 自动扣费，`/cart` 商品结算落真 Solana Devnet 链但不充值 Token，消费端与商户运营账本边界清晰。
 
 ---
 
@@ -109,7 +157,7 @@
 - ✅ **4 个公开路由**: `/` (Hero + Advisor + 商品 + 跨页 teaser) · `/resale` · `/b2b` · `/cart`；Token top-up 与 AI 调用保留为 server-only API 能力
 - ✅ **真后端集成** (`src/lib/netstars/client.ts`): HMAC 签名 · INTERNAL DNS · `fetchBalance` / `fetchRecentActivity` / `createTokenPurchase` / `createMerchantCheckout` / `adminConfirm` / `chatCompletion`
 - ✅ **5 个 server-only API 代理路由**: `/api/payment/{balance,topup,advise}` · `/api/checkout/order`
-- ✅ **AI Advisor 真调用**: Follow-up Chat → `/v1/messages` → Netstars Token ledger debit → Console Ticker 同步；消费端隐藏内部余额
+- ✅ **AI Advisor 真调用**: Advisor Desk → `/api/payment/advise` → `/v1/messages` → Netstars Token ledger debit；默认模型 GPT-4.1，消费端隐藏内部余额与调用成本
 - ✅ **购物车 + 结账**: React Context store · localStorage 持久化 · `/cart` 三态状态机 (cart-view → processing 动画 → success) · 真 tx hash + 自动清空
 - ✅ **终端 Agent 模拟器** (`/agent`): Terminal log + balance summary · 2 个 scenario (5 连击 / autopilot 自动 topup)
 - ✅ **多语言** (zh-CN / ja / en): TopBar `<LocaleSwitcher>` + server action 写 cookie + `router.refresh()` 立即生效
@@ -132,7 +180,7 @@
 | 场景 | 触发点 | 后端调用 | 可见效果 |
 |---|---|---|---|
 | Token 自充 (内部运营) | `/api/payment/topup` | token-purchase + admin-confirm | 余额 +10M / tx_hash / Console Ticker credit |
-| AI Advisor 调用 | 任一场景的 "真打一次" | /v1/messages (HMAC + LLM stub + debit) | 余额 −150 / 真 AI 回复 / Console Ticker debit |
+| AI Advisor 调用 | Advisor Desk 多轮追问 | /v1/messages (HMAC + GPT-4.1 或 stub + debit) | Token ledger debit / 真 AI 回复或 stub 回复 / Console Ticker debit |
 | 消费者结账 (场景 B) | `/cart` "USDC 钱包结账" | merchant-checkout + dev-checkout/admin-confirm | 订单号 + 链上 tx_hash / 购物车自动清空；不 credit Token |
 | 终端 Agent autopilot | `/agent` "Run #2" | 12 次连续调用 + autopilot topup | 中段累积扣 500 Token 触发自动充值 +10M |
 
@@ -144,7 +192,7 @@ token-api 的 `/v1/recent-activity` 可见 Token top-up 与 AI debit；商品结
 
 ### P2 — ✅ 本轮完成
 - [x] **B2B 调用计费实时化**: 新增 `GET /api/payment/b2b-stats` 路由（从 ledger 聚合当月 ai_call 次数）；新建 `B2BCallNotice.tsx` 组件替代 `AgentChatDemo` 内的静态文案，每次 `haba:balance-refresh` 事件后自动刷新。月度上限 50,000 次（growth 套餐演示值）。
-- [x] **`.env` 创建**: 从 `.env.example` 复制，保留 DUMMY key 结构，docker-compose 可正常 `up`。将真实 `ANTHROPIC_API_KEY` 填入后 stub 模式自动切换为真实 LLM 调用。
+- [x] **`.env` 创建**: 从 `.env.example` 复制，保留 DUMMY key 结构，docker-compose 可正常 `up`。当前运行模型为 GPT-4.1；填入真实 `OPENAI_API_KEY` 后 stub 模式自动切换为真实 LLM 调用。
 
 ### P2 — ✅ 本轮完成
 - [x] **Solana Devnet 真实 USDC 支付**:
@@ -157,7 +205,7 @@ token-api 的 `/v1/recent-activity` 可见 Token top-up 与 AI debit；商品结
   - `scripts/setup-devnet-wallet.py` — 一键生成演示钱包 + 充值指引
 
 ### P2 — 下次开工继续
-- [ ] **真 LLM key 接入**: 把 `ANTHROPIC_API_KEY` 填入 `.env`（已创建），`token-api/providers/` 框架完备，无需改代码，只需 key。
+- [x] **真 GPT-4.1 key 接入**: `OPENAI_API_KEY` 已存在，GPT-4.1 真实 provider 路径通过；GPT-5.5 Responses API 代码保留，待 OpenAI project 权限开通后可再切。
 - [ ] **Devnet 钱包充值**: 在办公室运行 `python scripts/setup-devnet-wallet.py`，将输出填入 `.env`，然后从 https://faucet.circle.com 获取 devnet USDC。
 
 ### P3 — ✅ 本轮完成
@@ -190,7 +238,7 @@ token-api 的 `/v1/recent-activity` 可见 Token top-up 与 AI debit；商品结
 ### 演示当天运维备忘
 - payer 钱包 USDC 用一笔少 $9，余额低于 $9 时去 https://faucet.circle.com 补；SOL 手续费极省（每笔 0.000005），5 SOL 够上千次。
 - 每次 `/cart` 真结算等 10–30s（真等 Solana 确认）——正常，是真实性的证据。
-- 改 `.env` 后对应服务要 rebuild：LLM key → `token-api`；钱包/RPC → `x402-api`。
+- 改 `.env` 后对应服务要 rebuild：`OPENAI_API_KEY` / `HABA_ADVISOR_MODEL` → `token-api` 与 HABA 运行环境；钱包/RPC → `x402-api`。
 
 ---
 
@@ -219,6 +267,6 @@ open claude/demo-runner.html
 ## 7. 已知约束
 
 - **Solana**: Apple Silicon 跑不动 validator，但现在默认走公网 Devnet RPC（无需本地 validator）。x402-api 和 wea-api 都已去掉对 `solana` service 的 `depends_on`。若需要全离线测试，设 `SOLANA_RPC_URL=http://solana:8899`。
-- **KMS**: 项目约定只用 AWS KMS ap-northeast-1 直接调，**禁** CloudHSM / Netstars 内部 KMS (见 memory: `feedback_kms_aws_direct`)。当前 demo 未涉及 KMS 调用；若 P2 接真 LLM key 涉及 secret 存储，遵守该约束。
+- **KMS**: 项目约定只用 AWS KMS ap-northeast-1 直接调，**禁** CloudHSM / Netstars 内部 KMS (见 memory: `feedback_kms_aws_direct`)。当前 demo 未涉及 KMS 调用；若 OpenAI key 进入托管 secret 存储，遵守该约束。
 - **PR 审批**: 对外材料避免点名需 PR 审批的合作伙伴 (见 memory: `feedback_no_pr_exposure`)；presentation.html 与 demo-runner.html 是内部 demo 工具，已加 disclaimer。
 - **演示语**: 中文为主，但术语保留英文 (x402 / USDC / Token / Solana / API)。

@@ -26,8 +26,8 @@
   },
   "agent": {
     "eyebrow": "AI product advisor",
-    "sectionTitle": "5 health needs, picked for you by AI",
-    "sectionDescription": "Click a scenario on the left and see HABA AI Advisor recommend MARVIE products across three axes — calories, sweetness, and use case.",
+    "sectionTitle": "Make AI Advisor the consultation desk",
+    "sectionDescription": "Pick a health need, then keep asking, comparing, and turning recommendations into a shopping list. Answers stay grounded in MARVIE catalog facts.",
     "userLabel": "Customer",
     "agentLabel": "HABA AI Advisor",
     "b2bCallNotice": "1 call → counted toward HABA's monthly Token plan (demo: 18,432 / 100,000)"

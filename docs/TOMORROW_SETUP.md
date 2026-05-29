@@ -16,12 +16,12 @@ docker compose ps   # 确认所有服务 healthy（需要先 make up）
 
 ---
 
-## 🔑 Step 1 — 申请 Anthropic API Key（真实 LLM 调用）
+## 🔑 Step 1 — 配置 OpenAI API Key（GPT-4.1 真实 LLM 调用）
 
-1. 登录 https://console.anthropic.com
-2. 用公司信用卡充值（建议先充 $10）
-3. 创建 API Key（Project Key）
-4. 复制 `sk-ant-api03-...` 开头的 key
+1. 登录 https://platform.openai.com/api-keys
+2. 确认项目可调用 GPT-4.1，并完成必要的 billing 设置
+3. 创建 API Key
+4. 复制 `sk-...` 开头的 key
 
 然后编辑 `.env`：
 
@@ -29,13 +29,15 @@ docker compose ps   # 确认所有服务 healthy（需要先 make up）
 # 打开 .env（在项目根目录）
 nano .env
 # 找到这一行：
-#   ANTHROPIC_API_KEY=sk-ant-DUMMY
+#   OPENAI_API_KEY=sk-DUMMY
 # 改为：
-#   ANTHROPIC_API_KEY=sk-ant-api03-你的真实key...
+#   OPENAI_API_KEY=sk-你的真实key...
 ```
 
-**效果**：`/topup` 和 `/agent` 的"真打一次"按钮会调用真实 Claude claude-haiku-4-5 模型，回复内容更智能。
-目前 stub 模式已能展示，如果 demo 时间紧可以先跳过这步。
+HABA Advisor 默认模型由 `HABA_ADVISOR_MODEL=gpt-4.1` 控制；如需临时切换模型，改 `.env` 后重建 `token-api` 与 HABA 运行环境。
+
+**效果**：首页 Advisor Desk 与 `/api/payment/advise` 会调用真实 OpenAI GPT-4.1，经 Netstars Token ledger 自动扣费，并在 Console Ticker 里显示 `openai/gpt-4.1` debit。
+目前 stub 模式已能展示扣费闭环，如果 demo 时间紧可以先跳过真实 key。
 
 ---
 
@@ -131,10 +133,12 @@ https://explorer.solana.com/address/<PAYER_USDC_ATA>?cluster=devnet
 
 ```bash
 # 在项目根目录
+docker compose up -d --build token-api
 docker compose build x402-api
 docker compose up -d --no-deps x402-api
 
 # 等待 x402-api 变成 healthy（约30秒）
+docker compose ps token-api
 docker compose ps x402-api
 ```
 
@@ -143,6 +147,15 @@ docker compose ps x402-api
 ## ✔ Step 6 — 验证配置
 
 ```bash
+# 检查 GPT-4.1 Advisor 是否能走通
+curl -s -X POST http://localhost:3001/api/payment/advise \
+  -H 'content-type: application/json' \
+  -d '{"userPrompt":"请推荐一款适合早餐的 MARVIE 商品"}' | python3 -m json.tool
+
+# 真实 key 生效时应看到：
+#   "provider": "openai",
+#   "model": "gpt-4.1",
+
 # 检查 demo_payer_configured 是否为 true
 curl -s http://localhost:8081/ | python3 -m json.tool | grep demo_payer
 
@@ -172,12 +185,15 @@ curl -s http://localhost:8081/ | python3 -m json.tool | grep demo_payer
 
 | 项目 | 状态 |
 |------|------|
-| `ANTHROPIC_API_KEY` 填入 `.env` | ⬜ |
+| `OPENAI_API_KEY` 填入 `.env` | ⬜ |
+| `HABA_ADVISOR_MODEL=gpt-4.1` 填入 `.env` | ⬜ |
 | `DEPOSIT_RECIPIENT_ADDRESS` 填入 `.env` | ⬜ |
 | `DEMO_PAYER_PRIVATE_KEY_B64` 填入 `.env` | ⬜ |
 | Payer 钱包有 SOL（手续费）| ⬜ |
 | Payer 钱包有 USDC-Dev（≥10）| ⬜ |
+| token-api 重建并重启 | ⬜ |
 | x402-api 重建并重启 | ⬜ |
+| `/api/payment/advise → provider=openai, model=gpt-4.1` | ⬜ |
 | `curl localhost:8081/ → demo_payer_configured: true` | ⬜ |
 | `/cart` 结账出现 Explorer 链接 | ⬜ |
 
@@ -212,4 +228,4 @@ curl -s http://localhost:8081/ | python3 -m json.tool | grep demo_payer
 
 ---
 
-*Last updated: 2026-05-27 · 对应代码 commit: 见 git log*
+*Last updated: 2026-05-29 · GPT-4.1 运行模型更新；对应代码 commit: 见 git log*

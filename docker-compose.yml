@@ -250,6 +250,7 @@ services:
       # non-demo deployment.
       NETSTARS_API_KEY:        ${NETSTARS_API_KEY:-ak_localdev_test}
       NETSTARS_API_KEY_SECRET: ${NETSTARS_API_KEY_SECRET:-secret_localdev_test}
+      HABA_ADVISOR_MODEL:      ${HABA_ADVISOR_MODEL:-gpt-4.1}
     # HABA site is intentionally NOT in token-api's depends_on chain — it's a
     # separate merchant deployment, comes up on its own. token-api healthiness
     # only matters when we actually wire SDK calls (Milestone 3+).

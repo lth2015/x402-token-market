@@ -26,8 +26,8 @@
   },
   "agent": {
     "eyebrow": "AI 商品顾问",
-    "sectionTitle": "5 种健康需求，AI 帮你选商品",
-    "sectionDescription": "点击左侧场景，看 HABA AI Advisor 根据用户需求挑选 MARVIE 商品并解释推荐理由。所有推荐都基于卡路里、甜度、适用场景三个维度。",
+    "sectionTitle": "把 AI Advisor 做成真正的咨询台",
+    "sectionDescription": "先选一个健康需求，再继续追问、比较、整理购物清单。推荐只基于 MARVIE 目录、卡路里、甜度、适用场景与成分事实。",
     "userLabel": "消费者",
     "agentLabel": "HABA AI Advisor",
     "b2bCallNotice": "本次调用 1 次 → 计入 HABA 月度 Token 套餐(演示数据 18,432 / 100,000)"
