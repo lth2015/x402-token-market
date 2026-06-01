@@ -1,7 +1,17 @@
 # X402 Token Market — 项目进度
 
-**最后更新**: 2026-05-29 (第九轮 · GPT-4.1 真实 provider 验收)
-**当前阶段**: **GPT-4.1 真实调用上线 + AI Advisor Workbench + Token 计费边界清晰**。HABA Advisor 默认模型已从 GPT-5.5 切到当前 key 可访问的 `gpt-4.1`，真实 OpenAI provider 调用通过，并由 Netstars Token ledger 自动扣费；C 端继续隐藏内部 Token 余额与成本细节。
+**最后更新**: 2026-06-01 (第六轮 · 标准 x402 协议层 + 双 console)
+**当前阶段**: **标准 x402 协议层可演示 + 双 console 可观测 + GPT-4.1 Advisor 运行主线**。HABA Advisor 默认模型为 `gpt-4.1`；消费者商品结账走 HTTP 402 / `X-PAYMENT` 重试协议并由 Wea Facilitator 结算到 Solana Devnet USDC；C 端继续隐藏内部 Token 余额与成本细节。
+
+## 第六轮 · 标准 x402 协议层 + 双 console
+
+v0.8.0 将商品结账从旧的订单确认捷径收敛为标准 x402 wire protocol:
+
+- ✅ **协议层变化**：x402-api 作为 resource server 返回 HTTP 402 + `WWW-Authenticate: X402` + `paymentRequirements`；客户端生成 `X-PAYMENT` header 后重试同一资源；gateway 在解锁前校验 resource binding、scheme/network、USDC mint/decimals、recipient、amount、nonce、expiry 与 replay。
+- ✅ **WebAuthn 绑定**：HABA Touch ID 仍是真实 `navigator.credentials.create()`；challenge 从 `PaymentRequirements` 派生,并随支付 payload 作为 user verification 证据提交。
+- ✅ **角色边界**：HABA 是 consumer / merchant surface；NetStars x402 Gateway 是资源服务器与协议验证者；Wea Facilitator 负责 verify + settle,通过 Solana JSON-RPC 广播已签名交易；Solana Devnet 是 USDC settlement layer。
+- ✅ **四个可视表面**：HABA consumer site `:3001`、Token Console `:3000`、NetStars X402 Console `:3002`、Wea Facilitator Console `:3003`。X402 / Wea 两个新 console 均带 ArchitectureCrumb 与 live telemetry。
+- ✅ **E2E 覆盖**：`python3 scripts/x402_protocol_e2e.py` 覆盖正常支付、错误 header、resource/network tamper、replay、expiry、facilitator verify/settle 等协议断言。
 
 ---
 
@@ -66,8 +76,8 @@
 - ✅ **AI Advisor 多轮聊天**：消费者推荐区新增 Follow-up Chat；支持快捷问题与输入框连续追问，前端保留最近上下文并提交到 `/api/payment/advise`。
 - ✅ **后端多轮消息**：`/api/payment/advise` 支持 `messages[]`，继续沿用 MARVIE 目录约束；每次调用仍由 Netstars Token ledger 自动扣费，但 HABA 消费者侧不显示 Token 余额/扣费明细。
 - ✅ **布局防误换行**：导航、CTA、发送按钮、结账快捷按钮、SectionTitle 右侧元素补 `whitespace-nowrap` / flex 约束，减少商业页面中不必要的断行。
-- ✅ **Token 计费边界修正**：购物车从 `token-purchase` 改为 `merchant-checkout`，商品订单只走 x402/USDC 结算凭证，不再把消费者购买误记成 HABA Token 充值；`/api/payment/topup` 仍是内部显式 Token 充值能力，AI Advisor 调用仍通过 `/v1/messages` 自动 debit。
-- ✅ **运行态验收**：重建 `token-api` / `x402-api`；`merchant-checkout + admin-confirm` 验证 Token balance 前后不变，HABA `/api/payment/advise` 验证单次调用仍自动 debit（本次 `tokensConsumed=1614`）。
+- ✅ **Token 计费边界修正**：购物车商品订单只走标准 x402/USDC 结算凭证，不再把消费者购买误记成 HABA Token 充值；AI Advisor 调用仍通过 `/v1/messages` 自动 debit。
+- ✅ **运行态验收**：重建 `token-api` / `x402-api`；商品 checkout 验证 Token balance 前后不变，HABA `/api/payment/advise` 验证单次调用仍自动 debit（本次 `tokensConsumed=1614`）。
 
 ---
 
@@ -126,11 +136,13 @@
 | **HABA** | 商户 (实业 / 买 Token / 卖商品) | `haba-site` :3001 (独立 Next.js) | ✅ healthy |
 | **Netstars** | x402 + Token 网关 | `token-api` :8080 + `x402-api` :8081 + `token-console` :3000 + `token-worker` | ✅ healthy |
 | **WEA Japan** | x402 链上执行 | `wea-api` :8082 (Rust) | ✅ healthy |
-| **Solana** | USDC SPL 公链 | `solana` validator (Apple Silicon 跑不起来) | ❌ 范围外，DEV 模式跳过 |
+| **Solana** | USDC SPL 公链 | Public Devnet RPC | ✅ settlement layer |
 
-3 个表面：
+4 个表面：
 - HABA 消费端 `http://localhost:3001/`
 - Netstars Console `http://localhost:3000/`
+- NetStars X402 Console `http://localhost:3002/`
+- Wea Facilitator Console `http://localhost:3003/`
 - 经营层简报 `claude/presentation.html`
 - 演示驾驶舱 `claude/demo-runner.html` (给演示者用，不部署)
 
@@ -139,8 +151,8 @@
 ## 3. 已完成 (按层)
 
 ### 3.1 后端 services
-- ✅ **token-api** (`netstars/token/api/`): HMAC verify · `/v1/balance` · `/v1/recent-activity` · `/v1/token-purchase` · `/v1/merchant-checkout` · `/v1/messages` (真 LLM 调用 + 预检余额 + debit ledger + stub fallback)
-- ✅ **x402-api** (`netstars/x402/`): payment requirements · `/v1/settlements` · `/v1/admin/payments/{id}/confirm` (DEV shortcut)
+- ✅ **token-api** (`netstars/token/api/`): HMAC verify · `/v1/balance` · `/v1/recent-activity` · `/v1/messages` (真 LLM 调用 + 预检余额 + debit ledger + stub fallback)
+- ✅ **x402-api** (`netstars/x402/`): standard x402 protected resource · HTTP 402 requirements · `X-PAYMENT` decode/verify · resource binding · replay/expiry rejection · WEA settle orchestration
 - ✅ **wea-api** (`wea/`): pending→broadcasting→confirmed→done 状态机 · HMAC-signed webhook 回调 · 5 档重试
 - ✅ **token-worker** (`netstars/token/worker/`): 后台任务
 - ✅ MySQL + Redis (docker-compose) healthy
@@ -179,9 +191,9 @@
 
 | 场景 | 触发点 | 后端调用 | 可见效果 |
 |---|---|---|---|
-| Token 自充 (内部运营) | `/api/payment/topup` | token-purchase + admin-confirm | 余额 +10M / tx_hash / Console Ticker credit |
+| Token 自充 (内部运营) | `/api/payment/topup` | legacy path removed; route returns 410 until protected x402 top-up lands | 不暴露给消费者 |
 | AI Advisor 调用 | Advisor Desk 多轮追问 | /v1/messages (HMAC + GPT-4.1 或 stub + debit) | Token ledger debit / 真 AI 回复或 stub 回复 / Console Ticker debit |
-| 消费者结账 (场景 B) | `/cart` "USDC 钱包结账" | merchant-checkout + dev-checkout/admin-confirm | 订单号 + 链上 tx_hash / 购物车自动清空；不 credit Token |
+| 消费者结账 (场景 B) | `/cart` "USDC 钱包结账" | HTTP 402 requirements + `X-PAYMENT` retry + WEA settle | 订单号 + 链上 tx_hash / 购物车自动清空；不 credit Token |
 | 终端 Agent autopilot | `/agent` "Run #2" | 12 次连续调用 + autopilot topup | 中段累积扣 500 Token 触发自动充值 +10M |
 
 token-api 的 `/v1/recent-activity` 可见 Token top-up 与 AI debit；商品结账保留在 x402 payment order + tx_hash 证据链中，不混入 Token ledger。
@@ -197,8 +209,8 @@ token-api 的 `/v1/recent-activity` 可见 Token top-up 与 AI debit；商品结
 ### P2 — ✅ 本轮完成
 - [x] **Solana Devnet 真实 USDC 支付**:
   - `netstars/x402/src/x402/tx_builder.py` — 构建 SPL TransferChecked + Memo 交易
-  - x402-api `POST /v1/payments/{id}/dev-checkout` — server-side 签名 + 广播 + 等待确认
-  - HABA checkout 优先走真实链，失败自动降级 admin-confirm（无缝 fallback）
+  - x402-api `POST /v1/protected/checkout/order` — 标准 HTTP 402 → `X-PAYMENT` → WEA settle
+  - HABA checkout 走真实链路；失败显示明确错误,不再使用旧确认捷径
   - 金额上限改为 MAX_USDC = $9（原错误值 10,000）
   - 成功页展示 "真实 Devnet 链上交易" 徽章 + "在 Solana Explorer 查看" 按钮
   - `SOLANA_RPC_URL` 默认改为 `https://api.devnet.solana.com`（不再依赖本地 validator）

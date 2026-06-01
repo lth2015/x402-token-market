@@ -18,6 +18,7 @@ payment_orders = Table(
     Column("nonce", String(64), nullable=False),
     Column("network", VARCHAR(16), nullable=False, server_default="solana"),
     Column("asset", VARCHAR(16), nullable=False, server_default="USDC"),
+    Column("resource", String(512)),  # x402 protocol — URL/path this proof unlocks
     Column("status", VARCHAR(20), nullable=False, server_default="created"),
     Column("status_reason", String(255)),
     Column("expires_at", DateTime(6), nullable=False),
@@ -41,6 +42,7 @@ payment_proofs = Table(
     Column("id", BigInteger, primary_key=True, autoincrement=True),
     Column("payment_order_id", VARCHAR(40), nullable=False),
     Column("signed_tx_b64", MEDIUMTEXT, nullable=False),
+    Column("signed_tx_hash", String(64)),   # SHA-256(signed_tx_b64) — UNIQUE for replay protection
     Column("parsed_tx", JSON),
     Column("verification_result", JSON, nullable=False),
     Column("submitted_at", DateTime(6), nullable=False, server_default=func.current_timestamp(6)),

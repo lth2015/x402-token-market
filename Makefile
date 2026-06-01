@@ -4,7 +4,7 @@
 .DEFAULT_GOAL := help
 
 .PHONY: help up down restart logs ps build pull migrate seed test fmt lint \
-        sdk-test sdk-example console-dev clean solana-bootstrap
+        sdk-test sdk-example test-x402 topup-check topup-airdrop console-dev clean solana-bootstrap
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / { printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
@@ -41,6 +41,7 @@ pull: ## Pull latest base images
 
 # ── Database migrations (uses golang-migrate via docker run) ──────
 MIGRATE_IMG = migrate/migrate:v4.17.1
+X402_PYTHON ?= /Users/lidawei/.pyenv/versions/3.10.6/bin/python3
 # Compose's --format json drops the project name in v2.2.1, and the bare
 # "internal" name isn't what Docker stores. Query Docker for the network that
 # carries both the compose-network=internal label and (some) project label.
@@ -80,6 +81,15 @@ sdk-test: ## Run SDK unit tests
 sdk-example: ## Run the quickstart example (needs services up + migrations applied)
 	cd sdk && poetry run python examples/quickstart.py
 
+test-x402: ## Run x402 protocol unit tests
+	cd netstars/x402 && PYTHONPATH=src $(X402_PYTHON) -m pytest tests/
+
+topup-check: ## Check demo payer SOL + USDC balances
+	$(X402_PYTHON) scripts/topup_demo_wallet.py --print-faucet-url
+
+topup-airdrop: ## Request 1 Devnet SOL for the demo payer
+	$(X402_PYTHON) scripts/topup_demo_wallet.py --airdrop --print-faucet-url
+
 # ── Wea ──────────────────────────────────────────────────────────
 wea-smoke: ## Closed-loop test: POST settlement, listen for HMAC callback, assert done
 	python3 scripts/wea_smoke.py
@@ -111,3 +121,4 @@ clean: ## Remove containers + volumes (DESTROYS LOCAL DATA)
 
 test: ## Run all test suites
 	$(MAKE) sdk-test
+	$(MAKE) test-x402

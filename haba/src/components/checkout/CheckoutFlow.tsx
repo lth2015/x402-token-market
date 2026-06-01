@@ -85,12 +85,16 @@ export function CheckoutFlow() {
     setSavedAddress(loadSavedAddress());
   }, []);
 
-  async function placeOrder(address: ShippingAddress) {
+  async function placeOrder(
+    address: ShippingAddress,
+    auth: { idempotencyKey: string; userVerification: string | null },
+  ) {
     setPhase({ kind: "processing", address });
     try {
       const body = {
         items: cart.items.map((it) => ({ productId: it.productId, qty: it.qty })),
-        totalUsdc: cart.checkoutUsdc,
+        idempotencyKey: auth.idempotencyKey,
+        userVerification: auth.userVerification,
       };
       const res = await fetch("/api/checkout/order", {
         method: "POST",
@@ -160,7 +164,7 @@ export function CheckoutFlow() {
       <ConfirmStep
         address={phase.address}
         onBack={() => setPhase({ kind: "address" })}
-        onConfirmed={() => void placeOrder(phase.address)}
+        onConfirmed={(auth) => void placeOrder(phase.address, auth)}
       />
     );
   }

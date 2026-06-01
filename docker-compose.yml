@@ -105,6 +105,13 @@ services:
       WEA_API_BASE_URL: http://wea-api:8080
       TOKEN_API_BASE_URL: http://token-api:8080
       INTERNAL_AUTH_SECRET: ${INTERNAL_AUTH_SECRET:-internal_localdev_token}
+      # x402 protocol layer (v0.4.0)
+      X402_NETWORK: ${X402_NETWORK:-solana-devnet}
+      X402_EXPIRY_SECONDS: ${X402_EXPIRY_SECONDS:-600}
+      # Public-facing URL the gateway puts into PaymentRequirements.resource.
+      # Browsers / agents reach the gateway through this URL; service-to-service
+      # uses the docker network name. Both must resolve to the same endpoint.
+      GATEWAY_PUBLIC_BASE_URL: ${GATEWAY_PUBLIC_BASE_URL:-http://x402-api:8080}
       # x402-api uses its own SOLANA_RPC_URL (not the x-app-defaults one)
       # so we can independently point it to Devnet while wea-api still uses mock.
       SOLANA_RPC_URL: ${SOLANA_RPC_URL:-https://api.devnet.solana.com}
@@ -211,9 +218,19 @@ services:
     environment:
       ENV: local
       DATABASE_URL: mysql://wea_app:wea_app_dev@mysql:3306/wea_qa
-      # wea-api uses MockRpc internally; SOLANA_RPC_URL is not actively called.
-      # Defaults to Devnet for consistency; local validator can be set via .env.
+      # x402 facilitator (v0.3.0) — talks to Solana RPC directly via reqwest,
+      # delegates SPL tx parsing to x402-api/internal/verify-payment-payload.
+      X402_API_BASE_URL: http://x402-api:8080
+      INTERNAL_AUTH_SECRET: ${INTERNAL_AUTH_SECRET:-internal_localdev_token}
+      SOLANA_RPC_URL_DEVNET:  ${SOLANA_RPC_URL_DEVNET:-https://api.devnet.solana.com}
+      SOLANA_RPC_URL_MAINNET: ${SOLANA_RPC_URL_MAINNET:-https://api.mainnet-beta.solana.com}
+      # Legacy async settlement queue (kept for compat)
       X402_CALLBACK_BASE_URL: http://x402-api:8080
+      # Wallet config — surfaced by /v1/_console/metrics so the WEA console
+      # can render demo payer + recipient balances on Devnet.
+      USDC_MINT: ${USDC_MINT:-4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU}
+      DEPOSIT_RECIPIENT_ADDRESS: ${DEPOSIT_RECIPIENT_ADDRESS:-61e1MSTEN5dTjNGNQcwUivRVubYz6ebYfmz9qvYtkeNr}
+      DEMO_PAYER_PUBKEY: ${DEMO_PAYER_PUBKEY:-5gYYVxNa4EfeYafSoM9c2e4YSFuRh1aRaw9G1zzMwYMS}
     depends_on:
       mysql: { condition: service_healthy }
       # Solana validator dependency removed — wea-api uses MockRpc and does not
@@ -223,6 +240,48 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
+
+  # ── Wea Facilitator Console — verify/settle activity + wallet status ─────
+  wea-console:
+    <<: *app-defaults
+    container_name: x402m_wea_console
+    build:
+      context: ./wea/console
+      dockerfile: Dockerfile
+    ports: ["3003:3003"]
+    environment:
+      NODE_ENV: production
+      WEA_API_BASE_URL:   http://wea-api:8080
+      X402_API_BASE_URL:  http://x402-api:8080
+      INTERNAL_AUTH_SECRET: ${INTERNAL_AUTH_SECRET:-internal_localdev_token}
+    depends_on:
+      wea-api:  { condition: service_healthy }
+      x402-api: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3003/ || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  # ── NetStars X402 Console — protocol observability + demo scenarios ──────
+  x402-console:
+    <<: *app-defaults
+    container_name: x402m_x402_console
+    build:
+      context: ./netstars/x402/console
+      dockerfile: Dockerfile
+    ports: ["3002:3002"]
+    environment:
+      NODE_ENV: production
+      X402_API_BASE_URL: http://x402-api:8080
+      INTERNAL_AUTH_SECRET: ${INTERNAL_AUTH_SECRET:-internal_localdev_token}
+    depends_on:
+      x402-api: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3002/ || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
 
   # ── HABA AI Commerce demo site (independent merchant; see docs/haba-*.md) ──
   haba-site:

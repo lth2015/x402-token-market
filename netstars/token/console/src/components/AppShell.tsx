@@ -7,6 +7,7 @@
  */
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
+import { ArchitectureCrumb } from "./ArchitectureCrumb";
 import { api } from "@/lib/api";
 
 export async function AppShell({ children }: { children: React.ReactNode }) {
@@ -21,6 +22,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-dvh bg-surface-page text-ink-primary">
       <TopBar />
+      <ArchitectureCrumb current="gateway" />
       <div className="flex">
         <Sidebar backendOk={backendOk} />
         <div className="flex-1 min-w-0">{children}</div>

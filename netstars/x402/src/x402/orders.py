@@ -58,6 +58,7 @@ class OrderService:
         expiry_seconds: int = 1800,
         trace_id: Optional[str] = None,
         webhook_url: Optional[str] = None,
+        resource: Optional[str] = None,
     ) -> dict:
         """
         Idempotent create. Returns the order row (existing or new) as a plain dict
@@ -95,6 +96,7 @@ class OrderService:
                 metadata=metadata or {},
                 created_trace_id=trace_id,
                 webhook_url=webhook_url,
+                resource=resource,
             ))
         except IntegrityError:
             # Race — another caller won. Re-fetch.
@@ -175,6 +177,7 @@ def _row_to_dict(row) -> dict:
         "nonce": row.nonce,
         "network": row.network,
         "asset": row.asset,
+        "resource": getattr(row, "resource", None),
         "status": row.status,
         "status_reason": row.status_reason,
         "expires_at": row.expires_at.replace(tzinfo=timezone.utc).isoformat() if row.expires_at else None,

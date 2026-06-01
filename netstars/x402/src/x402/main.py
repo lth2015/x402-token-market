@@ -45,8 +45,10 @@ from solders.pubkey import Pubkey
 from sqlalchemy import select, text
 
 from . import db
+from .console_routes import ConsoleDeps, make_router as make_console_router
 from .orders import OrderService, OrderStateConflictError
 from .proof import ProofError, verify_proof
+from .protected_routes import ProtectedDeps, make_router as make_protected_router
 from .solana_rpc import SolanaRpc, SolanaRpcError
 from .tx_builder import TxBuildError, build_x402_payment_tx, keypair_from_b64
 from .webhooks import (
@@ -102,6 +104,12 @@ DEMO_PAYER_PRIVATE_KEY_B64: Optional[str] = os.environ.get("DEMO_PAYER_PRIVATE_K
 CONFIRMER_POLL_INTERVAL_SECS = float(os.environ.get("CONFIRMER_POLL_INTERVAL_SECS", "2.0"))
 CONFIRMER_BATCH_SIZE = int(os.environ.get("CONFIRMER_BATCH_SIZE", "50"))
 
+# x402 protocol layer config
+X402_NETWORK = os.environ.get("X402_NETWORK", "solana-devnet")
+WEA_API_BASE_URL = os.environ.get("WEA_API_BASE_URL", "http://wea-api:8080")
+GATEWAY_PUBLIC_BASE_URL = os.environ.get("GATEWAY_PUBLIC_BASE_URL", "http://localhost:8081")
+X402_EXPIRY_SECONDS = int(os.environ.get("X402_EXPIRY_SECONDS", "600"))
+
 # 1 USDC = 1,000,000 AI Token (must match token-api)
 TOKEN_PER_USDC = 1_000_000
 
@@ -150,11 +158,34 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="X402 Gateway",
-    version="0.2.0",
+    version="0.4.0",
     docs_url="/docs" if ENV in ("local", "qa") else None,
     redoc_url=None,
     lifespan=lifespan,
 )
+
+# Mount the standard x402 protected-resource routes.
+# These speak the HTTP-402 + X-PAYMENT-header protocol; everything else on
+# this service is the internal /v1/payments order-book API.
+app.include_router(make_protected_router(ProtectedDeps(
+    network=X402_NETWORK,
+    usdc_mint=USDC_MINT,
+    deposit_recipient=DEPOSIT_RECIPIENT,
+    facilitator_url=WEA_API_BASE_URL,
+    gateway_public_base_url=GATEWAY_PUBLIC_BASE_URL,
+    internal_auth_secret=INTERNAL_AUTH_SECRET,
+    demo_payer_key_b64=DEMO_PAYER_PRIVATE_KEY_B64,
+    expiry_seconds=X402_EXPIRY_SECONDS,
+)))
+
+# Console read-only endpoints — surface protocol state to the X402 Console UI.
+app.include_router(make_console_router(ConsoleDeps(
+    network=X402_NETWORK,
+    usdc_mint=USDC_MINT,
+    deposit_recipient=DEPOSIT_RECIPIENT,
+    facilitator_url=WEA_API_BASE_URL,
+    demo_payer_key_b64=DEMO_PAYER_PRIVATE_KEY_B64,
+)))
 
 
 # ── Auth (internal-only deps) ─────────────────────────────────────
@@ -223,11 +254,6 @@ class PaymentOut(BaseModel):
 
 class SubmitProofIn(BaseModel):
     signed_tx_base64: str = Field(..., min_length=4)
-
-
-class AdminConfirmIn(BaseModel):
-    """Dev shortcut: simulate Wea callback. Skips Solana, just transitions state."""
-    tx_hash: str = "DEV_FAKE_TX_HASH"
 
 
 def _settlement_kind(order: dict) -> str:
@@ -365,57 +391,12 @@ async def submit_proof(order_id: str, body: SubmitProofIn):
     }
 
 
-@app.post("/v1/admin/payments/{order_id}/confirm")
-async def admin_confirm(order_id: str, body: AdminConfirmIn):
-    """
-    Dev shortcut: bypass real Solana entirely. Transitions through pending →
-    broadcasting → confirmed, then credits Token only for Token top-up orders.
-    Useful when running the quickstart without funding a real USDC ATA.
-    """
-    if ENV not in ("local", "qa"):
-        raise HTTPException(403, "admin/confirm is dev-only")
-
-    now = datetime.now(timezone.utc).replace(tzinfo=None)
-
-    async with app.state.db.begin() as conn:
-        order = await OrderService.fetch(conn, order_id)
-        if not order:
-            raise HTTPException(404, f"order {order_id} not found")
-        if order["status"] == "created":
-            order = await OrderService.transition(
-                conn, order_id, from_status="created", to_status="pending"
-            )
-        if order["status"] == "pending":
-            order = await OrderService.transition(
-                conn, order_id, from_status="pending", to_status="broadcasting"
-            )
-        if order["status"] == "broadcasting":
-            order = await OrderService.transition(
-                conn, order_id, from_status="broadcasting", to_status="confirmed",
-                updates={"tx_hash": body.tx_hash, "confirmed_at": now},
-            )
-
-    if not _should_credit_token(order):
-        await _enqueue_event(order, "payment.confirmed")
-        log.info("payment.admin_confirmed", order_id=order_id, tx_hash=body.tx_hash,
-                 settlement_kind=_settlement_kind(order))
-        return {"ok": True, "order": order, "credit": None}
-
-    credit = await _credit_via_token_api(order, body.tx_hash)
-
-    async with app.state.db.begin() as conn:
-        try:
-            order = await OrderService.transition(
-                conn, order_id, from_status="confirmed", to_status="token_credited",
-                updates={"token_ledger_entry_id": credit["ledger_entry_id"]},
-            )
-        except OrderStateConflictError:
-            order = await OrderService.fetch(conn, order_id)
-
-    await _enqueue_event(order, "payment.token_credited")
-    log.info("payment.admin_confirmed", order_id=order_id, tx_hash=body.tx_hash,
-             settlement_kind=_settlement_kind(order))
-    return {"ok": True, "order": order, "credit": credit}
+# NOTE: /v1/admin/payments/{id}/confirm was removed in v0.4.0.
+# It bypassed the on-chain settlement entirely and was unauthenticated,
+# which contradicted the x402 protocol's "verify before unlock" invariant.
+# The standard flow is now: /v1/protected/checkout/order returns 402,
+# client retries with X-PAYMENT, gateway delegates to WEA verify + settle,
+# WEA broadcasts to real Solana. No bypass.
 
 
 # ── Webhook ops + dev sink ────────────────────────────────────────
@@ -485,166 +466,13 @@ async def dev_webhook_sink(request: Request):
     return {"ok": True, "event": event, "delivery": delivery, "signature_valid": True}
 
 
-@app.post("/v1/payments/{order_id}/dev-checkout")
-async def dev_checkout(order_id: str) -> dict:
-    """
-    DEV/QA: Build, sign, and broadcast a real Solana Devnet USDC payment
-    using the DEMO_PAYER_PRIVATE_KEY_B64 keypair, then wait for on-chain
-    confirmation and credit tokens.
-
-    Returns the final order state + tx_hash + Solana Explorer URL.
-    Useful for demos on machines without a user wallet (Phantom/Solflare).
-
-    Prerequisites:
-      - DEMO_PAYER_PRIVATE_KEY_B64 configured in .env (run setup-devnet-wallet.py)
-      - Payer ATA funded with at least [order amount] USDC on Devnet
-      - SOLANA_RPC_URL pointing to Devnet (default: https://api.devnet.solana.com)
-    """
-    if ENV not in ("local", "qa"):
-        raise HTTPException(403, "dev-checkout is dev-only (ENV must be local or qa)")
-
-    if not DEMO_PAYER_PRIVATE_KEY_B64:
-        raise HTTPException(
-            503,
-            "DEMO_PAYER_PRIVATE_KEY_B64 not configured. "
-            "Run scripts/setup-devnet-wallet.py and add the key to .env",
-        )
-
-    # ── 1. Fetch order ───────────────────────────────────────────────
-    async with app.state.db.connect() as conn:
-        order = await OrderService.fetch(conn, order_id)
-    if not order:
-        raise HTTPException(404, f"order {order_id} not found")
-    if order["status"] != "created":
-        raise HTTPException(
-            409,
-            f"order is in state {order['status']!r}; "
-            "dev-checkout only works from 'created' state",
-        )
-
-    # ── 2. Get latest blockhash from Solana ──────────────────────────
-    try:
-        blockhash_data = await app.state.solana_rpc.get_latest_blockhash()
-    except SolanaRpcError as e:
-        raise HTTPException(502, f"Solana RPC unreachable: {e}") from e
-
-    # ── 3. Build + sign transaction ──────────────────────────────────
-    try:
-        payer_kp = keypair_from_b64(DEMO_PAYER_PRIVATE_KEY_B64)
-    except TxBuildError as e:
-        raise HTTPException(500, f"demo keypair decode error: {e}") from e
-
-    try:
-        tx_bytes = build_x402_payment_tx(
-            payer_keypair=payer_kp,
-            recipient_owner=Pubkey.from_string(DEPOSIT_RECIPIENT),
-            mint=Pubkey.from_string(USDC_MINT),
-            amount_micro=order["amount_usdc_micro"],
-            nonce=order["nonce"],
-            recent_blockhash=Hash.from_string(blockhash_data["blockhash"]),
-            ensure_dest_ata=True,
-        )
-    except (TxBuildError, Exception) as e:
-        raise HTTPException(500, f"tx build failed: {e}") from e
-
-    signed_tx_b64 = base64.b64encode(tx_bytes).decode()
-
-    # ── 4. Self-verify proof (catch tx_builder bugs early) ───────────
-    try:
-        proof_result = verify_proof(
-            signed_tx_b64=signed_tx_b64,
-            expected_recipient_owner=DEPOSIT_RECIPIENT,
-            expected_amount_usdc_micro=order["amount_usdc_micro"],
-            expected_nonce=order["nonce"],
-            usdc_mint=USDC_MINT,
-        )
-    except ProofError as e:
-        raise HTTPException(500, f"self-verification failed (tx_builder bug): {e}") from e
-
-    # ── 5. Persist proof + transition created → pending ──────────────
-    async with app.state.db.begin() as conn:
-        await conn.execute(db.payment_proofs.insert().values(
-            payment_order_id=order_id,
-            signed_tx_b64=signed_tx_b64,
-            parsed_tx=None,
-            verification_result={
-                "verified": True,
-                "payer": proof_result.payer,
-                "memo": proof_result.memo,
-                "signature": proof_result.signature_b58,
-                "mode": "dev-checkout",
-            },
-        ))
-        try:
-            order = await OrderService.transition(
-                conn, order_id, from_status="created", to_status="pending",
-            )
-        except OrderStateConflictError as e:
-            raise HTTPException(409, str(e)) from e
-
-    # ── 6. Broadcast to Solana ───────────────────────────────────────
-    try:
-        rpc_sig = await app.state.solana_rpc.send_transaction(signed_tx_b64)
-    except SolanaRpcError as e:
-        async with app.state.db.begin() as conn:
-            try:
-                await OrderService.transition(
-                    conn, order_id, from_status="pending", to_status="failed",
-                    updates={"status_reason": f"rpc_broadcast: {str(e)[:200]}"},
-                )
-            except OrderStateConflictError:
-                pass
-        log.error("dev_checkout.broadcast_failed", order_id=order_id, err=str(e))
-        raise HTTPException(502, f"Solana RPC broadcast failed: {e}") from e
-
-    # ── 7. Transition pending → broadcasting ─────────────────────────
-    async with app.state.db.begin() as conn:
-        try:
-            order = await OrderService.transition(
-                conn, order_id, from_status="pending", to_status="broadcasting",
-                updates={"tx_hash": rpc_sig},
-            )
-        except OrderStateConflictError as e:
-            raise HTTPException(409, str(e)) from e
-
-    log.info("dev_checkout.broadcasting",
-             order_id=order_id, tx_hash=rpc_sig, payer=proof_result.payer,
-             amount_micro=order["amount_usdc_micro"])
-
-    # ── 8. Poll for on-chain confirmation (max 30 seconds, 15 × 2 s) ─
-    # We call _confirmer_advance_one directly so we don't have to wait
-    # for the background loop's next tick.
-    for attempt in range(15):
-        await asyncio.sleep(2.0)
-        try:
-            await _confirmer_advance_one(app, order_id, rpc_sig)
-        except Exception as poll_err:
-            log.warning("dev_checkout.poll_error",
-                        attempt=attempt, order_id=order_id, err=str(poll_err))
-        async with app.state.db.connect() as conn:
-            order = await OrderService.fetch(conn, order_id) or order
-        terminal_statuses = (
-            ("token_credited", "failed")
-            if _should_credit_token(order)
-            else ("confirmed", "failed")
-        )
-        if order["status"] in terminal_statuses:
-            break
-        log.debug("dev_checkout.awaiting_confirmation",
-                  attempt=attempt + 1, status=order["status"])
-
-    explorer_url = f"{_SOLANA_EXPLORER_BASE}/{rpc_sig}?cluster={_SOLANA_NETWORK_PARAM}"
-    log.info("dev_checkout.complete",
-             order_id=order_id, final_status=order["status"], tx_hash=rpc_sig)
-
-    return {
-        "ok": True,
-        "order": order,
-        "tx_hash": rpc_sig,
-        "payer": proof_result.payer,
-        "explorer_url": explorer_url,
-        "chain": _SOLANA_NETWORK_PARAM,
-    }
+# NOTE: /v1/payments/{id}/dev-checkout was removed in v0.4.0.
+# It used a server-side hot wallet (DEMO_PAYER_PRIVATE_KEY_B64) to sign on the
+# user's behalf, fusing the "wallet" and "gateway" roles. The standard x402 flow
+# does not put a payer key inside the gateway. Demo signing now happens in
+# /internal/build-payment-payload (see protected_routes.py), which is only
+# reachable with the internal-auth header and is documented as a demo
+# convenience until real client wallets land in HABA.
 
 
 @app.get("/")
@@ -653,11 +481,12 @@ async def root():
         "service": "x402-api",
         "version": "0.3.0",
         "endpoints": [
-            "POST /v1/payments                         (internal)",
+            "POST /v1/protected/checkout/order         (standard x402: 402 → X-PAYMENT → 200)",
+            "POST /internal/build-payment-payload      (DEV: build X-PAYMENT via demo wallet)",
+            "POST /internal/verify-payment-payload     (internal: SPL parser for WEA delegation)",
+            "POST /v1/payments                         (internal order-book API)",
             "GET  /v1/payments/{id}",
-            "POST /v1/payments/{id}/proof              (real chain — client wallet)",
-            "POST /v1/payments/{id}/dev-checkout       (DEV — server-side Devnet signing)",
-            "POST /v1/admin/payments/{id}/confirm      (DEV — skip chain entirely)",
+            "POST /v1/payments/{id}/proof              (legacy: submit signed tx out-of-band)",
         ],
         "demo_payer_configured": bool(DEMO_PAYER_PRIVATE_KEY_B64),
         "solana_rpc": SOLANA_RPC_URL,

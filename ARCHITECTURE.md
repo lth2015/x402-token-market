@@ -2,7 +2,7 @@
 
 > **文档定位**：基于 [prd.md](prd.md) v1.1 的系统级架构设计；为各模块 `<module>/ARCHITECTURE.md` 提供顶层约束
 > **方法论**：C4 模型（Context / Container / Component） + AWS Well-Architected + 12-Factor
-> **版本**：v1.0 · **日期**：2026-05-26 · **状态**：Draft
+> **版本**：v1.1 · **日期**：2026-06-01 · **状态**：Draft
 > **下层文档**：[infra/ARCHITECTURE.md](infra/ARCHITECTURE.md) · 各模块 `ARCHITECTURE.md`
 
 ---
@@ -150,8 +150,10 @@
 详见各模块 `ARCHITECTURE.md`：
 - [sdk/ARCHITECTURE.md](sdk/ARCHITECTURE.md)
 - [netstars/x402/ARCHITECTURE.md](netstars/x402/ARCHITECTURE.md)
+- [netstars/x402/console/README.md](netstars/x402/console/README.md)
 - [netstars/token/ARCHITECTURE.md](netstars/token/ARCHITECTURE.md)
 - [wea/ARCHITECTURE.md](wea/ARCHITECTURE.md)
+- [wea/console/README.md](wea/console/README.md)
 
 ---
 
@@ -181,62 +183,95 @@
 
 ## 6. 关键流程的架构视图
 
-### 6.1 支付黄金路径（成功 case）
+### 6.1 支付黄金路径(成功 case · v0.4.0 标准 x402 协议)
+
+整条路径严格遵循 [x402.org](https://x402.org) 的 HTTP 402 + `X-PAYMENT` header 重试规范。Solana USDC 作为结算资产。
 
 ```
-[Customer Agent]
+[Client / Customer Agent]
    │
-   │ POST /v1/token-purchase  (via SDK)
+   │ ① POST /v1/protected/checkout/order  (no X-PAYMENT)
    ▼
-[ALB] ──► [token-api Pod]
+[ALB] ──► [x402-api Gateway]  (NetStars)
               │
-              │ create payment intent (internal HTTPS, mTLS)
+              │ ② 402 Payment Required
+              │    WWW-Authenticate: X402
+              │    Body: { x402Version, accepts: [paymentRequirements] }
+              │    requirements 含:scheme/network/maxAmountRequired/payTo
+              │      /resource(URL binding)/asset(USDC mint)
+              │      /extra: { nonce, decimals, facilitator, expiresAt }
               ▼
-        [x402-api Pod] ── persist order (RDS Postgres) ── idempotency check (Redis)
-              │
-              │ 402 + payment_required
-              ▼
-        [token-api] ── return 402 to SDK
-              │
-              │ (SDK signs USDC transfer locally)
-              │
-[Agent SDK] signs tx
+[Client] reads requirements
    │
-   │ POST /v1/payments/{id}/proof (signed_tx)
+   │ ③ 客户端签名(production: 浏览器钱包 Phantom/Solflare;
+   │   demo: x402-api 提供 /internal/build-payment-payload 用 demo wallet 代签)
+   │   → 得到 X-PAYMENT header (base64 of PaymentPayload JSON)
+   │   payload 含 signedTxBase64 + WebAuthn userVerification(可选)
+   │
+   │ ④ POST /v1/protected/checkout/order  X-PAYMENT: <base64>
    ▼
-[ALB] ──► [x402-api] ── verify signature ── enqueue settlement
+[x402-api Gateway]
+   │
+   ├─ 解码 X-PAYMENT → PaymentPayload
+   ├─ assert_payload_matches_requirements:
+   │    payload.scheme/network/resource ⇄ requirements ⇄ actual URL
+   ├─ resource binding(payload.resource = 实际请求 URL,防跨资源复用)
+   ├─ expiry check(requirements.expiresAt 未过期)
+   ├─ replay protection(SHA256(signed_tx_b64) 在 payment_proofs UNIQUE)
+   ├─ 本地预验(proof.py 解析 SPL TransferChecked:mint/decimals/recipient/amount/memo nonce 全部对照)
+   │
+   │ ⑤ POST {facilitator}/facilitator/verify  (WEA, mTLS in prod)
+   ▼
+        [wea-api Facilitator]
               │
-              │ POST /v1/settlements (mTLS to Wea)
+              │ verify:re-check requirements ⇄ payload
+              │   委托 x402-api/internal/verify-payment-payload(SPL 强校验)
+              │ → { isValid: true, payer, signature }
               ▼
-        [wea-api] ── persist (RDS) ── ack
-              │ (async)
-              ▼
-        [wea-worker] ── broadcast to Solana RPC ── poll until confirmed
-              │ (confirmed)
-              ▼
-        [wea-callback] ── HMAC sign ── POST to x402 webhook
+   ⑥ POST {facilitator}/facilitator/settle
+        [wea-api Facilitator]
               │
+              │ Solana JSON-RPC sendTransaction(signed_tx_b64)
+              │ poll getSignatureStatuses 直到 confirmed/finalized
+              │ → { success, transaction, network, payer }
               ▼
-        [x402-api] ── verify HMAC ── update order to confirmed
-              │
-              │ POST /internal/credit (mTLS)
-              ▼
-        [token-api] ── DB tx { ledger.insert + balance.update + order.credited } ── ack
-              │
-              ▼
-        [x402-api] ── push webhook to SDK callback url (HMAC signed)
-              │
-              ▼
-[Agent SDK] receives webhook → resolves pending purchase promise
+[x402-api Gateway]
+   │
+   ├─ payment_orders FSM: created → pending → broadcasting → confirmed
+   ├─ tx_hash UNIQUE 写库
+   │
+   │ ⑦ 200 OK + 业务 body
+   │    X-PAYMENT-RESPONSE: <base64 settlement receipt>
+   ▼
+[Client] 拿到资源 + 链上结算凭证
 
-观测：trace_id 贯穿 SDK → x402 → wea → solana → wea callback → x402 → token → SDK callback
+观测:trace_id 贯穿 client → gateway → facilitator → Solana → gateway → client
+合规要点 |x402.org spec| ✓全部实现:
+  HTTP 402 / WWW-Authenticate / paymentRequirements / X-PAYMENT header
+  / resource binding / verify before unlock / settlement receipt / replay
+  / expiry / wrong-amount/network/recipient 拒绝
 ```
+
+**角色边界**:
+
+| 组件 | 角色 | 是否持密钥 | Solana 直连 |
+|---|---|---|---|
+| HABA | 业务消费方(MCP + 商品 + 顾问) | demo 期通过 `/internal/build` 调用 demo wallet;production 用浏览器钱包 | 否 |
+| x402-api | NetStars Gateway(资源服务器) | 否(v0.4.0 起 demo wallet 移到 internal-only 端点) | 否(只本地解析,链上工作给 WEA) |
+| wea-api | x402 Facilitator(Web3 payment provider) | 否(只 broadcast 不签名) | 是,直连 Solana JSON-RPC |
+| Solana Devnet | USDC settlement layer | — | — |
+
+**Legacy v0.3.0 removed paths**(kept here only as migration notes, not user-facing API):
+- The old gateway-side signed checkout shortcut was removed because it made the resource server hold the demo wallet path.
+- The old manual confirmation shortcut was removed because it skipped the x402 verify-before-unlock contract.
+- HABA's old internal top-up proxy now returns 410 Gone until a protected standard x402 top-up resource is added.
 
 ### 6.2 反向路径与对账（详见各模块 ARCHITECTURE.md）
 
-- **支付超时**：token-api 检测 X402 异步通道无响应 → 主动 GET /v1/payments/{id} 拉取状态 → 状态机收敛
-- **Wea 回调丢失**：每小时 reconciliation worker 对比三方记录（X402 订单 vs Wea 结算 vs Token credit）→ 补单
-- **Token credit 失败但链上已成功**：x402 状态保持 confirmed → reconciliation worker 重试 credit → 5 次后人工告警
+- **支付超时**：x402-api 发出 PaymentRequirements 后等待客户端重试；过期后订单收敛为 expired,资源不会解锁。
+- **Wea settlement 失败**：x402-api 将订单保持在 failed / pending 可观测状态,控制台显示 facilitator reason 与 trace_id。
+- **链上已确认但业务响应失败**：tx_hash 与 payment proof 以 UNIQUE 约束入库；客户端可用同一幂等键查询/重试业务响应,避免重复扣款。
+- **Token ledger 边界**：商品 checkout 只写 x402 payment order 与 settlement proof；AI usage debit 仍由 token-api `/v1/messages` 单独计量。
 
 ---
 

@@ -28,10 +28,11 @@ sqlx       = { version = "0.7", default-features = false, features = [
     "json",
 ] }
 
-# Outbound HTTP (callbacks)
+# Outbound HTTP (callbacks + facilitator delegation + Solana JSON-RPC)
 reqwest    = { version = "0.12", default-features = false, features = [
     "json", "rustls-tls",
 ] }
+# Re-export reqwest::Client as the shared HTTP client for facilitator + worker.
 
 # HMAC signing
 hmac   = "0.12"

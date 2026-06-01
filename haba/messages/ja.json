@@ -1,43 +1,14 @@
 {
   "brand": {
-    "name": "HABA",
-    "fullName": "HABA / ハーバー研究所",
-    "productLine": "MARVIE Medical Foods",
-    "tagline": "AI アドバイザーで、ご家族にもっとスマートな食を"
-  },
-  "hero": {
-    "eyebrow": "ハーバー研究所 · 東証プライム上場",
-    "headline": "甘いものを、がまんしない。",
-    "headlineAccent": "AI アドバイザーが選びます",
-    "sub": "あなたの健康ニーズを HABA AI アドバイザーへ。数秒で低カロリー・砂糖無添加の MARVIE 商品をご提案——ご自身にも、ご家族にも。",
-    "ctaPrimary": "AI に相談する",
-    "ctaSecondary": "商品をすべて見る",
-    "value1": "0 kcal から",
-    "value2": "砂糖無添加",
-    "previewLabel": "AI アドバイザー · リアルタイム提案",
-    "previewQuestion": "糖尿病の家族に、コーヒーにも料理にも使える低カロリー甘味料がほしい。",
-    "previewBadge": "AI おすすめ",
-    "previewReason": "0 kcal・甘さは砂糖の約 200 倍、数滴で十分"
-  },
-  "nav": {
-    "home": "ホーム"
-  },
-  "agent": {
-    "eyebrow": "AI 商品アドバイザー",
-    "sectionTitle": "AI Advisor を本物の相談カウンターへ",
-    "sectionDescription": "健康ニーズを選び、追加質問・比較・買い物リスト化まで続けられます。回答は MARVIE カタログ事実に基づきます。",
-    "userLabel": "お客様",
-    "agentLabel": "HABA AI Advisor",
-    "b2bCallNotice": "1 回呼び出し → HABA 月額 Token プランへ計上(デモ値 18,432 / 100,000)"
+    "productLine": "MARVIE Medical Foods"
   },
   "products": {
-    "eyebrow": "MARVIE カタログ",
-    "sectionTitle": "MARVIE Medical Foods 全シリーズ",
-    "sectionDescription": "液体 / 粉末甘味料、料理用代替糖、低カロリージャム、低カロリーキャンディーをカバー。すべて「低カロリー + 砂糖無添加」を基準に設計。",
+    "eyebrow": "MARVIE 商品カタログ",
+    "sectionTitle": "MARVIE Medical Foods 全ラインアップ",
+    "sectionDescription": "液体・粉末甘味料、料理用の砂糖代替品、低カロリージャム、低カロリーキャンディーを展開。すべて「低カロリー + 砂糖無添加」を基準に設計しています。",
     "count": "{n} SKU"
   },
   "footer": {
-    "disclaimer": "本ページは HABA 社内 demo 用です。未公開の商品計画・提携意向を含み、外部公開は両社書面合意に基づきます。",
-    "demoData": "デモデータ"
+    "disclaimer": "本ページの情報は一般的な参考情報であり、医師・管理栄養士など専門家の助言に代わるものではありません。健康状態に合わせて商品をお選びください。"
   }
 }

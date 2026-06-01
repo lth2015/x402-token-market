@@ -1,34 +1,6 @@
 {
   "brand": {
-    "name": "HABA",
-    "fullName": "HABA / ハーバー研究所",
-    "productLine": "MARVIE Medical Foods",
-    "tagline": "AI 智能顾问 · 帮你为家人挑更聪明的饮食"
-  },
-  "hero": {
-    "eyebrow": "ハーバー研究所 · 東証プライム上場",
-    "headline": "想吃甜，又要控糖？",
-    "headlineAccent": "让 AI 顾问帮你选对",
-    "sub": "把你的健康需求告诉 HABA AI 顾问，几秒钟挑出适合的低卡・无添加蔗糖食品——为自己，也为家人。",
-    "ctaPrimary": "问问 AI 顾问",
-    "ctaSecondary": "看全部商品",
-    "value1": "0 kcal 起",
-    "value2": "无添加蔗糖",
-    "previewLabel": "AI 顾问 · 实时推荐",
-    "previewQuestion": "想给糖尿病的家人买低卡甜味料，咖啡和料理都能用。",
-    "previewBadge": "AI 推荐",
-    "previewReason": "0 kcal · 甜度约砂糖 200 倍，一两滴就够"
-  },
-  "nav": {
-    "home": "首页"
-  },
-  "agent": {
-    "eyebrow": "AI 商品顾问",
-    "sectionTitle": "把 AI Advisor 做成真正的咨询台",
-    "sectionDescription": "先选一个健康需求，再继续追问、比较、整理购物清单。推荐只基于 MARVIE 目录、卡路里、甜度、适用场景与成分事实。",
-    "userLabel": "消费者",
-    "agentLabel": "HABA AI Advisor",
-    "b2bCallNotice": "本次调用 1 次 → 计入 HABA 月度 Token 套餐(演示数据 18,432 / 100,000)"
+    "productLine": "MARVIE Medical Foods"
   },
   "products": {
     "eyebrow": "MARVIE 商品目录",
@@ -37,7 +9,6 @@
     "count": "{n} 件 SKU"
   },
   "footer": {
-    "disclaimer": "本页面为 HABA 内部 demo 展示，含未公开商品规划与合作意向；外部披露以双方书面文件为准。",
-    "demoData": "演示数据"
+    "disclaimer": "本页面信息仅供一般参考，不能替代医生、营养师或其他专业人士的建议。请根据自身健康状况选择商品。"
   }
 }

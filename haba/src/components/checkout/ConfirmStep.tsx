@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   Fingerprint,
@@ -8,10 +8,22 @@ import {
   ShieldCheck,
   XCircle,
 } from "lucide-react";
-import { isBiometricAvailable, requestBiometric } from "@/lib/biometric";
+import {
+  isBiometricAvailable,
+  paymentRequirementsChallenge,
+  requestBiometric,
+} from "@/lib/biometric";
 import type { ShippingAddress } from "@/lib/haba/checkout";
 import { formatJpy } from "@/lib/utils";
 import { useCart } from "@/lib/cart/store";
+
+/** Shape passed back to the parent so it can drive the x402 retry loop. */
+export type ConfirmedAuth = {
+  /** Stable per-attempt key; gateway binds 402 + retry to the same order. */
+  idempotencyKey: string;
+  /** Base64 WebAuthn attestation envelope, or null if biometric unsupported. */
+  userVerification: string | null;
+};
 
 export function ConfirmStep({
   address,
@@ -20,12 +32,19 @@ export function ConfirmStep({
 }: {
   address: ShippingAddress;
   onBack: () => void;
-  onConfirmed: () => void;
+  onConfirmed: (auth: ConfirmedAuth) => void;
 }) {
   const cart = useCart();
   const [biometricSupported, setBiometricSupported] = useState<boolean | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Stable per-attempt idempotency key — also seeds the biometric challenge
+  // so the Touch ID prompt is bound to this specific payment.
+  const idempotencyKey = useMemo(
+    () => `haba-checkout-${Math.random().toString(36).slice(2, 10)}-${Date.now().toString(36)}`,
+    [],
+  );
 
   useEffect(() => {
     void isBiometricAvailable().then(setBiometricSupported);
@@ -34,12 +53,23 @@ export function ConfirmStep({
   async function confirm() {
     setPending(true);
     setError(null);
+    const amountMicro = Math.round(cart.checkoutUsdc * 1_000_000).toString();
+    const challenge = await paymentRequirementsChallenge({
+      resource: "/v1/protected/checkout/order",
+      payTo: "HABA",          // unknown until the 402 fires; binding via idem key
+      amountMicro,
+      nonce: idempotencyKey,  // pin to this attempt
+    });
     const result = await requestBiometric(
+      challenge,
       `${formatJpy(cart.totalJpy)} · ${cart.checkoutUsdc.toFixed(2)} USDC`,
     );
     setPending(false);
     if (result.ok) {
-      onConfirmed();
+      onConfirmed({
+        idempotencyKey,
+        userVerification: result.userVerificationEnvelope,
+      });
       return;
     }
     if (result.reason === "cancelled") {
@@ -47,8 +77,8 @@ export function ConfirmStep({
       return;
     }
     if (result.reason === "unsupported") {
-      // Fallback: still let payment proceed on a click confirmation.
-      onConfirmed();
+      // Fallback: proceed with a UI gate, no cryptographic envelope.
+      onConfirmed({ idempotencyKey, userVerification: null });
       return;
     }
     setError(result.detail ?? "指纹识别失败,请再试一次。");

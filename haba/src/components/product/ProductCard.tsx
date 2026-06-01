@@ -1,6 +1,5 @@
 import type { MarvieProduct } from "@/lib/haba";
 import { cn, formatJpy } from "@/lib/utils";
-import { DemoBadge } from "@/components/shared/DemoBadge";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 
 /**
@@ -62,9 +61,6 @@ export function ProductCard({ product, className }: { product: MarvieProduct; cl
         <span className="text-7xl leading-none drop-shadow-sm transition-transform duration-300 group-hover:scale-110" aria-hidden>
           {product.imageEmoji}
         </span>
-        <div className="absolute right-3 top-3">
-          <DemoBadge />
-        </div>
       </div>
 
       {/* ── Card body ──────────────────────────────────────────── */}
@@ -105,7 +101,7 @@ export function ProductCard({ product, className }: { product: MarvieProduct; cl
         <div className="mt-auto pt-4">
           <div className="flex items-baseline justify-between border-t border-border-subtle pt-4">
             <span className="text-2xl font-bold text-brand-ink">{formatJpy(product.priceJpy)}</span>
-            <span className="text-small text-ink-tertiary">含税 · 演示价</span>
+            <span className="text-small text-ink-tertiary">含税</span>
           </div>
           <div className="mt-4 flex justify-end">
             <AddToCartButton productId={product.id} size="md" />

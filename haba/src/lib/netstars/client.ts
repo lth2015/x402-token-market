@@ -164,65 +164,10 @@ export async function createMerchantCheckout(args: {
   return (await res.json()) as Awaited<ReturnType<typeof createMerchantCheckout>>;
 }
 
-/** POST /v1/admin/payments/{id}/confirm — DEV-only shortcut on x402-api. */
-export async function adminConfirm(args: {
-  paymentOrderId: string;
-  txHash?: string;
-}): Promise<{
-  ok: boolean;
-  order: Record<string, unknown>;
-  credit: Record<string, unknown> | null;
-}> {
-  const path = `/v1/admin/payments/${args.paymentOrderId}/confirm`;
-  const bodyObj = { tx_hash: args.txHash ?? `DEV_HABA_${Date.now().toString(16)}` };
-  const body = JSON.stringify(bodyObj);
-  // admin/confirm is unauthenticated in DEV mode (see x402/main.py:admin_confirm).
-  const res = await fetch(`${X402_API}${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body,
-    cache: "no-store",
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new NetstarsError(res.status, `admin-confirm ${res.status}`, text);
-  }
-  return (await res.json()) as Awaited<ReturnType<typeof adminConfirm>>;
-}
-
-/**
- * POST /v1/payments/{id}/dev-checkout — DEV-only real Devnet USDC payment.
- *
- * x402-api builds + signs a real SPL TransferChecked + Memo transaction using
- * the DEMO_PAYER_PRIVATE_KEY_B64 keypair, broadcasts to Solana Devnet, and
- * polls for on-chain confirmation. Returns a real tx_hash + Explorer URL.
- *
- * Throws NetstarsError (503) if DEMO_PAYER_PRIVATE_KEY_B64 is not configured.
- * Caller should catch and fall back to adminConfirm.
- */
-export async function devCheckout(args: { paymentOrderId: string }): Promise<{
-  ok: boolean;
-  tx_hash: string;
-  explorer_url: string;
-  payer: string;
-  chain: string;
-  order: Record<string, unknown>;
-}> {
-  const path = `/v1/payments/${args.paymentOrderId}/dev-checkout`;
-  const res = await fetch(`${X402_API}${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: "{}",
-    // Long timeout: includes Solana confirmation polling (~30 s max).
-    cache: "no-store",
-    signal: AbortSignal.timeout(45_000),
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new NetstarsError(res.status, `dev-checkout ${res.status}`, text);
-  }
-  return (await res.json()) as Awaited<ReturnType<typeof devCheckout>>;
-}
+// adminConfirm and devCheckout were removed in v0.4.0 — they bypassed the
+// x402 protocol (no 402 challenge, server-side hot wallet, unauthenticated
+// admin mutation). The consumer checkout now drives the standard 402-retry
+// loop via `lib/x402-client.ts`.
 
 /**
  * GET /v1/payments/{id} — poll payment order status on x402-api.

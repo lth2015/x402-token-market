@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: light; }
+
+html, body {
+  background: #F8FAFC;
+  color: #0F172A;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Subtle dot grid for empty/hero sections */
+.grid-bg {
+  background-image: radial-gradient(rgba(99,102,241,0.08) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* Animated chain line in the architecture breadcrumb */
+@keyframes chain-flow {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+.chain-flow {
+  background: linear-gradient(90deg, #DBEAFE, #BFDBFE, #DBEAFE);
+  background-size: 200% 100%;
+  animation: chain-flow 3s linear infinite;
+}

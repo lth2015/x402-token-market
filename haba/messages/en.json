@@ -1,43 +1,14 @@
 {
   "brand": {
-    "name": "HABA",
-    "fullName": "HABA / ハーバー研究所",
-    "productLine": "MARVIE Medical Foods",
-    "tagline": "AI advisor for smarter family food choices"
-  },
-  "hero": {
-    "eyebrow": "HABA Laboratories · TSE Prime listed",
-    "headline": "Love sweet, watch sugar?",
-    "headlineAccent": "Let the AI advisor pick for you",
-    "sub": "Tell the HABA AI Advisor your health needs and get the right low-cal, no-added-sugar MARVIE products in seconds — for you and your family.",
-    "ctaPrimary": "Ask the AI advisor",
-    "ctaSecondary": "Browse all products",
-    "value1": "From 0 kcal",
-    "value2": "No added sugar",
-    "previewLabel": "AI Advisor · live recommendation",
-    "previewQuestion": "Low-cal sweetener for my diabetic parent — for coffee and cooking.",
-    "previewBadge": "AI pick",
-    "previewReason": "0 kcal · ~200x sweeter than sugar, a few drops is enough"
-  },
-  "nav": {
-    "home": "Home"
-  },
-  "agent": {
-    "eyebrow": "AI product advisor",
-    "sectionTitle": "Make AI Advisor the consultation desk",
-    "sectionDescription": "Pick a health need, then keep asking, comparing, and turning recommendations into a shopping list. Answers stay grounded in MARVIE catalog facts.",
-    "userLabel": "Customer",
-    "agentLabel": "HABA AI Advisor",
-    "b2bCallNotice": "1 call → counted toward HABA's monthly Token plan (demo: 18,432 / 100,000)"
+    "productLine": "MARVIE Medical Foods"
   },
   "products": {
-    "eyebrow": "MARVIE catalog",
-    "sectionTitle": "MARVIE Medical Foods — full lineup",
-    "sectionDescription": "Liquid + powder sweeteners, cooking aids, low-cal jams, and low-cal candies. Every item is designed around 'low-cal + no added sugar'.",
+    "eyebrow": "MARVIE product catalog",
+    "sectionTitle": "MARVIE Medical Foods full lineup",
+    "sectionDescription": "Liquid and powder sweeteners, sugar alternatives for cooking, low-calorie jams, and low-calorie candies. Every product is designed around low calories and no added sugar.",
     "count": "{n} SKUs"
   },
   "footer": {
-    "disclaimer": "Internal HABA demo. Contains unreleased product plans and partnership intent; external disclosure requires written agreement.",
-    "demoData": "Demo data"
+    "disclaimer": "The information on this page is for general reference only and does not replace advice from a physician, dietitian, or other qualified professional. Please choose products according to your health needs."
   }
 }
