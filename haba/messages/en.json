@@ -20,9 +20,7 @@
     "previewReason": "0 kcal · ~200x sweeter than sugar, a few drops is enough"
   },
   "nav": {
-    "home": "Home",
-    "resale": "AI Advisor partner plans",
-    "b2b": "B2B partners"
+    "home": "Home"
   },
   "agent": {
     "eyebrow": "AI product advisor",
@@ -37,40 +35,6 @@
     "sectionTitle": "MARVIE Medical Foods — full lineup",
     "sectionDescription": "Liquid + powder sweeteners, cooking aids, low-cal jams, and low-cal candies. Every item is designed around 'low-cal + no added sugar'.",
     "count": "{n} SKUs"
-  },
-  "home": {
-    "teaser": {
-      "eyebrow": "HABA AI commerce",
-      "title": "How HABA builds AI into its business",
-      "description": "HABA packages the AI Advisor by call volume for partners — pharmacy / hospital / dietitian / EC, four B2B embedding modes. Each card below opens its own page.",
-      "resale": {
-        "eyebrow": "AI capacity partnership",
-        "title": "HABA AI Advisor resale",
-        "desc": "HABA packages the AI Advisor by monthly call volume and sells to pharmacies, hospitals, dietitians, and EC partners. Partners consume HABA's own Token quota.",
-        "cta": "See the model",
-        "metricCaption": "Demo data"
-      },
-      "b2b": {
-        "eyebrow": "B2B partners",
-        "title": "4 personas · 4 embed forms",
-        "desc": "Pharmacy SDK, hospital API, dietitian MCP, EC web widget — the same Advisor wearing 4 different skins.",
-        "cta": "See call samples",
-        "metricCaption": "Click to switch"
-      }
-    }
-  },
-  "resale": {
-    "backHome": "Back to home",
-    "eyebrow": "HABA AI Advisor partner plans",
-    "description": "HABA packages the AI Advisor by monthly call volume and sells to pharmacies, hospitals, dietitians, and EC partners. Partners pre-pay a Token quota by usage; HABA handles metering and reconciliation automatically.",
-    "plansHeading": "3 plan tiers",
-    "plansSubtitle": "Priced per monthly Token quota; overage at unit price. Real contract prices set per commercial conversation."
-  },
-  "b2b": {
-    "backHome": "Back to home",
-    "eyebrow": "B2B partners",
-    "sectionTitle": "Same HABA AI Advisor · 4 embedding modes",
-    "sectionDescription": "Click any persona to see how it actually calls HABA AI Advisor (prompt + Advisor output). Every call counts toward HABA's monthly Token plan."
   },
   "footer": {
     "disclaimer": "Internal HABA demo. Contains unreleased product plans and partnership intent; external disclosure requires written agreement.",

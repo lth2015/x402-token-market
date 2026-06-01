@@ -170,3 +170,7 @@ export function selectByTags(
 export function getProductById(id: string): MarvieProduct | undefined {
   return marvieProducts.find((p) => p.id === id);
 }
+
+export function getProductBySku(sku: string): MarvieProduct | undefined {
+  return marvieProducts.find((p) => p.sku === sku);
+}

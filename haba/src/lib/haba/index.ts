@@ -14,6 +14,7 @@ export {
   marvieProducts,
   selectByTags,
   getProductById,
+  getProductBySku,
   type RecallSortBy,
 } from "./products";
 export {

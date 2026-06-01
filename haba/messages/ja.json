@@ -20,9 +20,7 @@
     "previewReason": "0 kcal・甘さは砂糖の約 200 倍、数滴で十分"
   },
   "nav": {
-    "home": "ホーム",
-    "resale": "AI Advisor 提携プラン",
-    "b2b": "B2B パートナー"
+    "home": "ホーム"
   },
   "agent": {
     "eyebrow": "AI 商品アドバイザー",
@@ -37,40 +35,6 @@
     "sectionTitle": "MARVIE Medical Foods 全シリーズ",
     "sectionDescription": "液体 / 粉末甘味料、料理用代替糖、低カロリージャム、低カロリーキャンディーをカバー。すべて「低カロリー + 砂糖無添加」を基準に設計。",
     "count": "{n} SKU"
-  },
-  "home": {
-    "teaser": {
-      "eyebrow": "HABA AI コマース",
-      "title": "HABA が AI をビジネスに組み込む",
-      "description": "HABA は AI Advisor を呼び出し量でパッケージ化し提携先へ販売。薬局 / 病院 / 栄養士 / EC の 4 つの B2B 組み込み形態——下記 2 枚がそれぞれ独立ページに展開。",
-      "resale": {
-        "eyebrow": "AI 能力提携",
-        "title": "HABA AI Advisor 再販",
-        "desc": "HABA は AI Advisor を月額呼び出し量でパッケージ化し、薬局 / 病院 / 栄養士 / EC 提携先に販売。提携先が消費するのは HABA 自社の Token 枠。",
-        "cta": "ビジネスモデルを見る",
-        "metricCaption": "デモデータ"
-      },
-      "b2b": {
-        "eyebrow": "B2B パートナー",
-        "title": "4 ペルソナ · 4 つの組み込み",
-        "desc": "薬局カウンター SDK、病院栄養科 API、独立栄養士 MCP、提携 EC の Web ウィジェット — 同じ Advisor、4 つの皮膚。",
-        "cta": "呼び出し例を見る",
-        "metricCaption": "クリックで切替"
-      }
-    }
-  },
-  "resale": {
-    "backHome": "ホームへ戻る",
-    "eyebrow": "HABA AI Advisor 提携プラン",
-    "description": "HABA は AI Advisor を月額呼び出し量でパッケージ化し、薬局 / 病院 / 栄養士 / EC 提携先に販売。提携先は使用量で Token 枠を前払い、HABA が自動集計と精算を行う。",
-    "plansHeading": "3 段階プラン",
-    "plansSubtitle": "月額 Token 枠で課金、超過分は単価。実契約価格は商務調整による。"
-  },
-  "b2b": {
-    "backHome": "ホームへ戻る",
-    "eyebrow": "B2B パートナー",
-    "sectionTitle": "同じ HABA AI Advisor · 4 つの呼び出し形態",
-    "sectionDescription": "ペルソナをクリックすると、実際の呼び出し時のプロンプト + Advisor 応答が表示されます。1 回の呼び出しは HABA の月額 Token プランへ計上。"
   },
   "footer": {
     "disclaimer": "本ページは HABA 社内 demo 用です。未公開の商品計画・提携意向を含み、外部公開は両社書面合意に基づきます。",

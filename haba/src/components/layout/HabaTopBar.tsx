@@ -1,7 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { habaMerchant } from "@/lib/haba";
-import { HabaNav } from "./HabaNav";
 import { CartIconLink } from "@/components/cart/CartIconLink";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 
@@ -29,7 +28,6 @@ export async function HabaTopBar() {
         <div className="flex min-w-0 items-center gap-3">
           <CartIconLink />
           <LocaleSwitcher />
-          <HabaNav />
         </div>
       </div>
     </header>
