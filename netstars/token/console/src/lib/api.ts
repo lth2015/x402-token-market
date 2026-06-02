@@ -47,6 +47,17 @@ export type Balance = {
   as_of?: string;
 };
 
+export type MerchantProfile = {
+  merchant_id: string;
+  display_name: string;
+  abbr: string;
+  env_label: string;
+  legal_name: string | null;
+  tax_id: string | null;
+  currency_pref: string;
+  status: string;
+};
+
 /**
  * Server signs `request.url.path` which excludes the query string; we strip
  * it here too so HMAC matches. See sdk/src/netstars/transport.py for the
@@ -82,4 +93,5 @@ export const api = {
     get<RecentActivityResponse>(`/v1/recent-activity?limit=${limit}`),
   balance: () => get<Balance>("/v1/balance"),
   healthz: () => get<{ status: string }>("/healthz"),
+  merchantProfile: () => get<MerchantProfile>("/v1/merchant/profile"),
 };

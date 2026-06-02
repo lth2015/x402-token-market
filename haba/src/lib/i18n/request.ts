@@ -1,5 +1,5 @@
 // HABA i18n — independent from Netstars Console.
-// Default: zh-CN (per haba-demo-requirements: "文案中文为主").
+// Default: zh-CN (per product requirements: "文案中文为主").
 // Fallback chain: cookie > Accept-Language > zh-CN default.
 
 import { getRequestConfig } from "next-intl/server";

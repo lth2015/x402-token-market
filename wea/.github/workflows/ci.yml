@@ -33,12 +33,17 @@ jobs:
   test:
     runs-on: ubuntu-latest
     services:
-      postgres:
-        image: postgres:16
-        env: {POSTGRES_USER: wea_app, POSTGRES_PASSWORD: wea_app_test, POSTGRES_DB: wea_test}
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_USER: wea_app
+          MYSQL_PASSWORD: wea_app_test
+          MYSQL_DATABASE: wea_test
+          MYSQL_ROOT_PASSWORD: roottest
         options: >-
-          --health-cmd "pg_isready" --health-interval 10s --health-timeout 5s --health-retries 5
-        ports: [5432:5432]
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -uroot -proottest"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+        ports: [3306:3306]
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -53,11 +58,11 @@ jobs:
       - name: Clippy
         run: cargo clippy --all-targets --all-features -- -D warnings
       - name: Apply schema
-        env: {PGPASSWORD: wea_app_test}
-        run: psql -h localhost -U wea_app -d wea_test -f db/SCHEMA.sql
+        env: {MYSQL_PWD: wea_app_test}
+        run: mysql -h 127.0.0.1 -P 3306 -u wea_app wea_test < db/SCHEMA.sql
       - name: Test
         env:
-          DATABASE_URL: postgresql://wea_app:wea_app_test@localhost:5432/wea_test
+          DATABASE_URL: mysql://wea_app:wea_app_test@127.0.0.1:3306/wea_test
         run: cargo test --all-features
 
   security:

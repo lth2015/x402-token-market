@@ -6,11 +6,11 @@
  *   2.  POST {x402_api}/internal/build-payment-payload  → X-PAYMENT header
  *   3.  POST {resource}  X-PAYMENT: <header>         → 200 + business body
  *
- * Step 2 currently uses x402-api's demo-wallet builder. In production a
+ * Step 2 currently uses x402-api's server-side wallet builder. In production a
  * client wallet (Phantom / Solflare) would replace this with a browser-side
  * sign(); the rest of the loop is unchanged.
  *
- * NB: this module is server-only. HABA's browser never sees the demo wallet
+ * NB: this module is server-only. HABA's browser never sees the wallet
  * key, never builds Solana transactions, and never speaks directly to
  * x402-api / wea-api.
  */
@@ -120,7 +120,7 @@ export async function x402Fetch<T = unknown>(args: {
   }
   const requirements = challenge.accepts[0]!;
 
-  // ── Step 2. Build a PaymentPayload via x402-api's demo-wallet builder ──
+  // ── Step 2. Build a PaymentPayload via x402-api's server-side wallet builder ──
   // In production a wallet adapter (Phantom / Solflare / WalletConnect) would
   // sign in the browser; the resulting X-PAYMENT header has the same shape.
   const buildRes = await fetch(`${X402_API}/internal/build-payment-payload`, {

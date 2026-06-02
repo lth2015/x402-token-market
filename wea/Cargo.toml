@@ -39,11 +39,25 @@ hmac   = "0.12"
 sha2   = "0.10"
 hex    = "0.4"
 
+# AWS KMS — ap-northeast-1 direct (KMS_MODE=aws).
+# aws-config + aws-sdk-kms provide Encrypt/Decrypt for callback_secret at rest.
+# KMS_MODE=dev uses identity mode; no AWS credentials required locally.
+# Gated behind the `aws-kms` feature so dev builds don't need AWS SDK.
+# Production Docker builds: cargo build --features aws-kms
+aws-config  = { version = "1.1", features = ["behavior-version-latest"], optional = true }
+aws-sdk-kms = { version = "1.15", optional = true }
+
 # Misc
 anyhow  = "1.0"
 chrono  = { version = "0.4", default-features = false, features = ["clock", "serde"] }
 ulid    = { version = "1.1", features = ["serde"] }
 base64  = "0.22"
+
+[features]
+# Enable real AWS KMS for production builds. Requires Rust ≥ 1.91.1.
+# Dev builds omit this feature; KMS_MODE=dev is used instead.
+# Production Docker: cargo build --release --features aws-kms
+aws-kms = ["dep:aws-config", "dep:aws-sdk-kms"]
 
 [[bin]]
 name = "wea-api"

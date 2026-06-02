@@ -50,12 +50,31 @@ class SettleResult:
     error_reason: Optional[str] = None
 
 
+@dataclass(slots=True)
+class TxStatusResult:
+    """Result of GET /facilitator/tx/{signature}."""
+    signature: str
+    status: str                 # "pending" | "confirmed" | "finalized" | "failed"
+    slot: Optional[int]
+    confirmations: Optional[int]
+    err: Optional[str]          # non-null when status == "failed"
+
+
+INTERNAL_AUTH_SECRET = os.environ.get("INTERNAL_AUTH_SECRET", "internal_localdev_token")
+
+
 class WeaFacilitatorClient:
     """Stateless client; safe to share. Re-uses a single httpx.AsyncClient."""
 
-    def __init__(self, http: httpx.AsyncClient, base_url: str = WEA_API_BASE_URL):
+    def __init__(
+        self,
+        http: httpx.AsyncClient,
+        base_url: str = WEA_API_BASE_URL,
+        internal_auth_secret: str = INTERNAL_AUTH_SECRET,
+    ):
         self._http = http
         self._base = base_url.rstrip("/")
+        self._internal_auth = internal_auth_secret
 
     async def verify(self, *, payment_payload: dict, requirements: dict) -> VerifyResult:
         url = f"{self._base}/facilitator/verify"
@@ -63,6 +82,7 @@ class WeaFacilitatorClient:
             resp = await self._http.post(
                 url,
                 json={"paymentPayload": payment_payload, "paymentRequirements": requirements},
+                headers={"X-Internal-Auth": self._internal_auth},
                 timeout=WEA_TIMEOUT_SECS,
             )
         except httpx.HTTPError as e:
@@ -92,6 +112,7 @@ class WeaFacilitatorClient:
             resp = await self._http.post(
                 url,
                 json={"paymentPayload": payment_payload, "paymentRequirements": requirements},
+                headers={"X-Internal-Auth": self._internal_auth},
                 timeout=WEA_TIMEOUT_SECS,
             )
         except httpx.HTTPError as e:
@@ -117,6 +138,51 @@ class WeaFacilitatorClient:
             error_reason=body.get("errorReason"),
         )
 
+    async def get_tx_status(self, signature: str) -> TxStatusResult:
+        """
+        Delegate on-chain tx status query to WEA (AP4: x402 never polls Solana directly).
+
+        GET /facilitator/tx/{signature}
+        Header: X-Internal-Auth: <secret>
+
+        Returns a TxStatusResult. Raises WeaFacilitatorError on network/server errors.
+        """
+        url = f"{self._base}/facilitator/tx/{signature}"
+        try:
+            resp = await self._http.get(
+                url,
+                headers={"X-Internal-Auth": self._internal_auth},
+                timeout=WEA_TIMEOUT_SECS,
+            )
+        except httpx.HTTPError as e:
+            raise WeaFacilitatorError(f"WEA unreachable: {e}", reason="unreachable") from e
+
+        if resp.status_code == 401:
+            raise WeaFacilitatorError(
+                "WEA tx status: unauthorized (check INTERNAL_AUTH_SECRET)",
+                http_status=401,
+                reason="unauthorized",
+            )
+        if resp.status_code >= 400:
+            raise WeaFacilitatorError(
+                f"WEA tx status HTTP {resp.status_code}: {resp.text[:200]}",
+                http_status=resp.status_code,
+                reason="upstream_error",
+            )
+
+        try:
+            body = resp.json()
+        except ValueError as e:
+            raise WeaFacilitatorError(f"WEA tx status returned non-JSON: {e}", reason="malformed") from e
+
+        return TxStatusResult(
+            signature=str(body.get("signature", signature)),
+            status=str(body.get("status", "pending")),
+            slot=body.get("slot"),
+            confirmations=body.get("confirmations"),
+            err=body.get("err"),
+        )
+
 
 __all__ = [
     "WEA_API_BASE_URL",
@@ -124,4 +190,5 @@ __all__ = [
     "WeaFacilitatorError",
     "VerifyResult",
     "SettleResult",
+    "TxStatusResult",
 ]

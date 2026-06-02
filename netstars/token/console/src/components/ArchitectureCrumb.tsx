@@ -13,7 +13,7 @@ type Node = {
 };
 
 const NODES: Node[] = [
-  { key: "haba",        label: "HABA",             sub: "consumer site",   url: "http://localhost:3001", icon: <ShoppingBag className="h-4 w-4" />, brand: "emerald" },
+  { key: "haba",        label: "Consumer Site",    sub: "merchant app",    url: "http://localhost:3001", icon: <ShoppingBag className="h-4 w-4" />, brand: "emerald" },
   { key: "gateway",     label: "NetStars Gateway", sub: "x402 resource",   url: "http://localhost:3002", icon: <Cpu className="h-4 w-4" />, brand: "blue" },
   { key: "facilitator", label: "Wea Facilitator",  sub: "verify + settle", url: "http://localhost:3003", icon: <Network className="h-4 w-4" />, brand: "violet" },
   { key: "solana",      label: "Solana Devnet",    sub: "USDC settle",     url: "https://explorer.solana.com/?cluster=devnet", icon: <Sparkles className="h-4 w-4" />, brand: "cyan" },

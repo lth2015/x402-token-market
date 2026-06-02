@@ -30,7 +30,7 @@ export default function CartPage() {
       <SectionTitle
         eyebrow="购物车"
         title="MARVIE 购物车"
-        description="把 AI Advisor 推荐的商品加入购物车，用 USDC 钱包一键结账。"
+        description="确认商品无误后,下一步填写送货地址并完成支付确认。"
       />
 
       <CheckoutFlow />

@@ -8,6 +8,7 @@
  */
 import Link from "next/link";
 import { PageHeader, PhaseTwoBadge } from "@/components/PageHeader";
+import { getMerchantConfigFromApi } from "@/lib/merchant-config";
 
 type Tab = "account" | "team" | "webhooks" | "integrations" | "security";
 const TABS: { id: Tab; label: string }[] = [
@@ -89,28 +90,41 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
 }
 
 // ── Panels ────────────────────────────────────────────────────────
-function AccountPanel() {
+async function AccountPanel() {
+  // Primary: GET /v1/merchant/profile. Falls back to env vars if API is unreachable.
+  const merchant = await getMerchantConfigFromApi();
+  const merchantId = merchant.merchantId ?? process.env.CONSOLE_MERCHANT_ID ?? "—";
   return (
     <Card title="Organization">
       <dl>
-        <Row label="Organization name" value="HABA / ハーバー研究所" />
-        <Row label="Legal name (社名)" value="株式会社ハーバー研究所" />
-        <Row label="Tax ID (法人番号)" value={<code className="font-mono">1234567890123</code>} />
-        <Row label="Billing email"   value={<a className="text-brand-primary hover:underline" href="mailto:finance@haba-rd.jp">finance@haba-rd.jp</a>} />
-        <Row label="Country"         value="Japan" />
-        <Row label="Created"         value={<span className="font-mono text-[12px]">2026-02-15</span>} />
-        <Row label="Merchant ID"     value={<code className="font-mono text-[12px]">mch_haba_001</code>} />
+        <Row label="Organization name" value={merchant.displayName} />
+        <Row
+          label="Legal name (社名)"
+          value={
+            merchant.legalName
+              ? merchant.legalName
+              : <span className="text-ink-tertiary text-small">Contact support to update</span>
+          }
+        />
+        <Row
+          label="Tax ID (法人番号)"
+          value={
+            merchant.taxId
+              ? <code className="font-mono text-[12px]">{merchant.taxId}</code>
+              : <span className="text-ink-tertiary text-small">Contact support to update</span>
+          }
+        />
+        <Row label="Billing email"      value={<span className="text-ink-tertiary text-small">Contact support to update</span>} />
+        <Row label="Country"            value="Japan" />
+        <Row label="Merchant ID"        value={<code className="font-mono text-[12px]">{merchantId}</code>} />
       </dl>
     </Card>
   );
 }
 
-function TeamPanel() {
-  const members = [
-    { name: "鈴木 涼介",  email: "ops@haba-rd.jp",        role: "Admin" },
-    { name: "高橋 美咲",  email: "dev@haba-rd.jp",        role: "Developer" },
-    { name: "佐藤 健",    email: "finance@haba-rd.jp",    role: "Finance" },
-  ];
+async function TeamPanel() {
+  // TODO(Phase 2): replace with GET /v1/merchant/team API call.
+  const members: { name: string; email: string; role: string }[] = [];
   return (
     <Card
       title="Team"
@@ -120,19 +134,23 @@ function TeamPanel() {
         </button>
       }
     >
-      <ul className="divide-y divide-border-subtle">
-        {members.map((m) => (
-          <li key={m.email} className="flex items-center justify-between py-3">
-            <div>
-              <div className="text-small font-medium text-ink-primary">{m.name}</div>
-              <div className="text-caption text-ink-tertiary">{m.email}</div>
-            </div>
-            <span className="rounded bg-surface-muted px-2 py-0.5 text-[11px] font-medium text-ink-secondary">
-              {m.role}
-            </span>
-          </li>
-        ))}
-      </ul>
+      {members.length === 0 ? (
+        <p className="text-small text-ink-tertiary">Team member list available in Phase 2.</p>
+      ) : (
+        <ul className="divide-y divide-border-subtle">
+          {members.map((m) => (
+            <li key={m.email} className="flex items-center justify-between py-3">
+              <div>
+                <div className="text-small font-medium text-ink-primary">{m.name}</div>
+                <div className="text-caption text-ink-tertiary">{m.email}</div>
+              </div>
+              <span className="rounded bg-surface-muted px-2 py-0.5 text-[11px] font-medium text-ink-secondary">
+                {m.role}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
     </Card>
   );
 }

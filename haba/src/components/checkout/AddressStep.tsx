@@ -20,9 +20,7 @@ export function AddressStep({
   onNext: (address: ShippingAddress) => void;
 }) {
   const [addr, setAddr] = useState<ShippingAddress>(initial ?? EMPTY_ADDRESS);
-  const [touched, setTouched] = useState<
-    Partial<Record<keyof ShippingAddress, boolean>>
-  >({});
+  const [touched, setTouched] = useState<Partial<Record<keyof ShippingAddress, boolean>>>({});
 
   const { ok, errors } = validateAddress(addr);
 
@@ -59,39 +57,42 @@ export function AddressStep({
 
   return (
     <form onSubmit={submit} className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
-      <div className="space-y-4 lg:col-span-2">
-        <div className="rounded-2xl border border-border-subtle bg-surface-base p-6 shadow-e1">
-          <div className="flex items-center gap-2 text-body font-bold text-brand-ink">
-            <MapPin className="h-4 w-4 text-brand-primary" aria-hidden />
-            送货地址
+      <div className="space-y-5 lg:col-span-2 animate-fade-up">
+        <div className="rounded-2xl border border-border-subtle bg-surface-elevated p-6 shadow-e1 lg:p-8">
+          {/* Section header */}
+          <div className="flex items-center gap-2.5">
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-subtle">
+              <MapPin className="h-4 w-4 text-brand-primary" aria-hidden />
+            </span>
+            <div>
+              <p className="font-sans text-[15px] font-semibold text-ink-primary">送货地址</p>
+              <p className="font-sans text-[11px] text-ink-tertiary">仅本机存储 · 不发送给第三方</p>
+            </div>
           </div>
-          <p className="mt-1 text-caption text-ink-tertiary">
-            填一次,下次自动带出 · 仅本机记忆,不发送到第三方
-          </p>
 
-          <div className="mt-5 space-y-4">
-            <Field label="收件人" error={showErr("recipient")}>
-              <input
+          <div className="mt-6 space-y-5">
+            <Field label="収件人" required error={showErr("recipient")}>
+              <Input
                 value={addr.recipient}
-                onChange={(e) => set("recipient", e.target.value)}
+                onChange={(v) => set("recipient", v)}
                 onBlur={() => blur("recipient")}
                 placeholder="山田 太郎"
-                className={inputCls(Boolean(showErr("recipient")))}
+                hasError={Boolean(showErr("recipient"))}
               />
             </Field>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-[140px_1fr]">
-              <Field label="〒 邮编" error={showErr("postal")}>
-                <input
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-[150px_1fr]">
+              <Field label="〒 邮编" required error={showErr("postal")}>
+                <Input
                   value={addr.postal}
-                  onChange={(e) => set("postal", formatPostal(e.target.value))}
+                  onChange={(v) => set("postal", formatPostal(v))}
                   onBlur={() => blur("postal")}
                   inputMode="numeric"
                   placeholder="100-0001"
-                  className={inputCls(Boolean(showErr("postal")))}
+                  hasError={Boolean(showErr("postal"))}
                 />
               </Field>
-              <Field label="都道府県" error={showErr("prefecture")}>
+              <Field label="都道府県" required error={showErr("prefecture")}>
                 <select
                   value={addr.prefecture}
                   onChange={(e) => set("prefecture", e.target.value)}
@@ -100,54 +101,50 @@ export function AddressStep({
                 >
                   <option value="">— 请选择 —</option>
                   {JAPAN_PREFECTURES.map((p) => (
-                    <option key={p} value={p}>
-                      {p}
-                    </option>
+                    <option key={p} value={p}>{p}</option>
                   ))}
                 </select>
               </Field>
             </div>
 
-            <Field label="市区町村" error={showErr("city")}>
-              <input
+            <Field label="市区町村" required error={showErr("city")}>
+              <Input
                 value={addr.city}
-                onChange={(e) => set("city", e.target.value)}
+                onChange={(v) => set("city", v)}
                 onBlur={() => blur("city")}
                 placeholder="千代田区 千代田"
-                className={inputCls(Boolean(showErr("city")))}
+                hasError={Boolean(showErr("city"))}
               />
             </Field>
 
-            <Field label="番地 / 建物名" error={showErr("street")}>
-              <input
+            <Field label="番地 / 建物名" required error={showErr("street")}>
+              <Input
                 value={addr.street}
-                onChange={(e) => set("street", e.target.value)}
+                onChange={(v) => set("street", v)}
                 onBlur={() => blur("street")}
                 placeholder="1-1 HABA ビル 7F"
-                className={inputCls(Boolean(showErr("street")))}
+                hasError={Boolean(showErr("street"))}
               />
             </Field>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Field label="电话" error={showErr("phone")}>
-                <input
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <Field label="电话" required error={showErr("phone")}>
+                <Input
                   value={addr.phone}
-                  onChange={(e) =>
-                    set("phone", e.target.value.replace(/[^0-9-]/g, ""))
-                  }
+                  onChange={(v) => set("phone", v.replace(/[^0-9-]/g, ""))}
                   onBlur={() => blur("phone")}
                   inputMode="tel"
                   placeholder="090-1234-5678"
-                  className={inputCls(Boolean(showErr("phone")))}
+                  hasError={Boolean(showErr("phone"))}
                 />
               </Field>
-              <Field label="邮箱 (选填,用于发货通知)">
-                <input
+              <Field label="邮箱" hint="用于发货通知（选填）">
+                <Input
                   value={addr.email ?? ""}
-                  onChange={(e) => set("email", e.target.value)}
+                  onChange={(v) => set("email", v)}
                   type="email"
                   placeholder="you@example.com"
-                  className={inputCls(false)}
+                  hasError={false}
                 />
               </Field>
             </div>
@@ -155,18 +152,23 @@ export function AddressStep({
         </div>
       </div>
 
-      <aside className="space-y-3 lg:sticky lg:top-24 lg:h-fit">
-        <div className="rounded-2xl border border-border-subtle bg-surface-base p-5 shadow-e1">
-          <p className="text-caption font-semibold uppercase tracking-widest text-ink-tertiary">
+      {/* Aside */}
+      <aside className="animate-fade-up-1 space-y-3 lg:sticky lg:top-24 lg:h-fit">
+        <div className="rounded-2xl border border-border-subtle bg-surface-elevated p-5 shadow-e1">
+          <p className="font-sans text-[11px] font-medium uppercase tracking-[0.16em] text-ink-tertiary">
             下一步
           </p>
-          <p className="mt-2 text-small text-ink-secondary">
-            填完地址后,用 Mac 的 Touch ID 按一下指纹就能确认 USDC 支付 ——
-            不需要输入密码。
+          <p className="mt-2.5 font-sans text-small leading-relaxed text-ink-secondary">
+            填完地址后,用 Touch ID 按一下指纹就能完成支付确认 —— 无需输入密码。
           </p>
           <button
             type="submit"
-            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-primary px-4 py-3 text-body font-semibold text-white hover:bg-brand-primary-hover"
+            className={cn(
+              "mt-5 inline-flex w-full items-center justify-center gap-2",
+              "rounded-xl bg-brand-primary px-4 py-3",
+              "font-sans text-small font-semibold text-white shadow-e1",
+              "transition-all duration-200 hover:bg-brand-primary-hover hover:shadow-e2",
+            )}
           >
             前往支付确认
             <ArrowRight className="h-4 w-4" aria-hidden />
@@ -174,7 +176,12 @@ export function AddressStep({
           <button
             type="button"
             onClick={onBack}
-            className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border-default bg-surface-base px-4 py-2.5 text-small font-medium text-ink-secondary hover:border-brand-primary/40 hover:text-brand-primary"
+            className={cn(
+              "mt-2 inline-flex w-full items-center justify-center gap-2",
+              "rounded-xl border border-border-default bg-surface-base px-4 py-2.5",
+              "font-sans text-small font-medium text-ink-secondary",
+              "transition-colors duration-150 hover:border-brand-primary/40 hover:text-brand-primary",
+            )}
           >
             <ArrowLeft className="h-4 w-4" aria-hidden />
             返回购物车
@@ -185,27 +192,81 @@ export function AddressStep({
   );
 }
 
+/* ── Field wrapper ──────────────────────────────────────────────────────── */
 function Field({
   label,
+  required,
+  hint,
   error,
   children,
 }: {
   label: string;
+  required?: boolean;
+  hint?: string;
   error?: string;
   children: React.ReactNode;
 }) {
   return (
-    <label className="block text-small">
-      <span className="font-semibold text-brand-ink">{label}</span>
-      <div className="mt-1.5">{children}</div>
-      {error && <p className="mt-1 text-caption text-semantic-danger">{error}</p>}
-    </label>
+    <div className="space-y-1.5">
+      <div className="flex items-baseline gap-1.5">
+        <span className="font-sans text-[13px] font-medium text-ink-primary">{label}</span>
+        {required && (
+          <span className="font-sans text-[11px] text-brand-accent" aria-hidden>*</span>
+        )}
+        {hint && (
+          <span className="font-sans text-[11px] text-ink-tertiary">{hint}</span>
+        )}
+      </div>
+      {children}
+      {error && (
+        <p role="alert" className="font-sans text-[12px] text-semantic-danger">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/* ── Input primitive ────────────────────────────────────────────────────── */
+function Input({
+  value,
+  onChange,
+  onBlur,
+  placeholder,
+  hasError,
+  type = "text",
+  inputMode,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  onBlur?: () => void;
+  placeholder?: string;
+  hasError: boolean;
+  type?: string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+}) {
+  return (
+    <input
+      value={value}
+      type={type}
+      inputMode={inputMode}
+      onChange={(e) => onChange(e.target.value)}
+      onBlur={onBlur}
+      placeholder={placeholder}
+      className={inputCls(hasError)}
+    />
   );
 }
 
 function inputCls(hasError: boolean) {
   return cn(
-    "h-11 w-full rounded-xl border bg-surface-base px-3 text-small text-brand-ink outline-none placeholder:text-ink-tertiary focus:border-brand-primary",
-    hasError ? "border-semantic-danger/50" : "border-border-default",
+    "h-12 w-full rounded-xl border bg-surface-base px-4",
+    "font-sans text-small text-ink-primary",
+    "outline-none placeholder:text-ink-tertiary placeholder:font-light",
+    "transition-colors duration-150",
+    "focus:border-brand-primary/60 focus:bg-surface-elevated",
+    hasError
+      ? "border-semantic-danger/50 bg-red-50/30"
+      : "border-border-default hover:border-border-strong",
   );
 }

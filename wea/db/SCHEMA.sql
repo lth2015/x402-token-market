@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS settlements (
 
     CONSTRAINT chk_settlements_amount CHECK (expected_amount_micro > 0),
     CONSTRAINT chk_settlements_status CHECK (status IN (
-        'pending','broadcasting','confirmed','callback_pending',
+        'pending','broadcasting','confirmed',
         'done','failed','callback_failed'
     )),
     CONSTRAINT chk_settlements_conf_level CHECK (confirmation_level IN

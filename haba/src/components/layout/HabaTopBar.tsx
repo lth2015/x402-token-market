@@ -2,38 +2,50 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { habaMerchant } from "@/lib/haba";
 import { CartIconLink } from "@/components/cart/CartIconLink";
-import { HabaArchitectureCrumb } from "./HabaArchitectureCrumb";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 
 /**
- * Top bar — HABA brand + main nav + cart + locale switcher.
+ * Top bar — HABA brand editorial identity.
+ * Warm cream base, forest green accents, Bodoni wordmark.
  */
 export async function HabaTopBar() {
   const t = await getTranslations("brand");
   return (
-    <>
-      <header className="sticky top-0 z-30 border-b border-border-subtle bg-surface-base/90 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-4 lg:px-12">
-          <Link href="/" className="flex shrink-0 items-center gap-3 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-brand-primary">
-            {/* Logo mark: gradient background */}
-            <span
-              aria-hidden
-              className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-primary to-emerald-700 text-[18px] font-bold text-white shadow-e1"
-            >
-              H
-            </span>
-            <div className="leading-tight">
-              <div className="text-[17px] font-bold text-brand-ink">{habaMerchant.displayName}</div>
-              <div className="text-[11px] uppercase tracking-wider text-ink-tertiary">{t("productLine")}</div>
+    <header className="sticky top-0 z-30 border-b border-border-subtle bg-surface-base/95 backdrop-blur-md">
+      <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-5 py-4 lg:gap-6 lg:px-8">
+
+        {/* Brand mark */}
+        <Link
+          href="/"
+          className="flex min-w-0 items-center gap-3.5 rounded outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+        >
+          {/* Logo: serif wordmark block */}
+          <span
+            aria-hidden
+            className={[
+              "inline-flex h-10 w-10 items-center justify-center rounded-xl",
+              "bg-brand-primary text-white",
+              "font-serif text-[18px] font-medium shadow-e1",
+            ].join(" ")}
+          >
+            H
+          </span>
+          <div className="min-w-0 leading-tight">
+            <div className="truncate font-serif text-[16px] font-medium tracking-tight text-ink-primary">
+              {habaMerchant.displayName}
             </div>
-          </Link>
-          <div className="flex min-w-0 items-center gap-3">
-            <CartIconLink />
-            <LocaleSwitcher />
+            <div className="truncate font-sans text-[10px] uppercase tracking-[0.18em] text-ink-tertiary">
+              {t("productLine")}
+            </div>
           </div>
+        </Link>
+
+        {/* Actions */}
+        <div className="flex shrink-0 items-center gap-2.5">
+          <CartIconLink />
+          <LocaleSwitcher />
         </div>
-      </header>
-      <HabaArchitectureCrumb />
-    </>
+      </div>
+    </header>
   );
 }

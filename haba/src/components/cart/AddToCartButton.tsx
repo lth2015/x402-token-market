@@ -71,7 +71,7 @@ export function AddToCartButton({
 }
 
 /**
- * Bulk variant — used by AgentChatDemo's "全部加入购物车" CTA. Adds every
+ * Bulk variant — used by the AI Advisor's "全部加入购物车" CTA. Adds every
  * recommended product in one click.
  */
 export function AddAllToCartButton({

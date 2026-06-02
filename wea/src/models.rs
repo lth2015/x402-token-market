@@ -13,6 +13,11 @@ pub mod status {
     pub const CONFIRMED:        &str = "confirmed";
     pub const DONE:             &str = "done";
     pub const FAILED:           &str = "failed";
+    // TODO(phase2): surface callback_failed as a distinct terminal state
+    // (currently a settlement stays FAILED regardless of callback outcome).
+    // This constant is retained so the DB CHECK constraint value is
+    // documented in code.
+    #[allow(dead_code)]
     pub const CALLBACK_FAILED:  &str = "callback_failed";
 }
 
@@ -26,13 +31,16 @@ pub mod callback_status {
 /// Row shape used by workers — includes columns the workers actually read.
 /// (Not every column from the schema; e.g. parsed_tx / status_reason are
 /// orthogonal to the loop logic.)
+///
+/// TODO(phase2): replace raw sqlx::query() with sqlx::query_as!(SettlementRow, ...)
+/// macros once we have a compile-time DB connection for macro expansion in CI.
 #[derive(Debug, Clone, FromRow)]
+#[allow(dead_code)] // Fields are hydrated via FromRow; the struct is the canonical query shape.
 pub struct SettlementRow {
     pub id:                       String,
     pub payment_order_id:         String,
     pub expected_amount_micro:    i64,
     pub expected_recipient:       String,
-    #[allow(dead_code)]
     pub expected_asset:           String,
     pub signed_tx_b64:            String,
     pub confirmation_level:       String,

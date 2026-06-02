@@ -14,8 +14,6 @@ import {
 import { useCart, type CartHydratedItem } from "@/lib/cart/store";
 import { formatJpy } from "@/lib/utils";
 import {
-  MAX_CHECKOUT_USDC,
-  USDC_RATE_JPY,
   loadSavedAddress,
   saveAddress,
   type ShippingAddress,
@@ -239,15 +237,15 @@ function CartView({
       )}
 
       {cart.items.length === 0 ? (
-        <div className="mt-10 rounded-2xl border border-dashed border-border-default bg-surface-base p-12 text-center">
+        <div className="mt-10 rounded-2xl border border-dashed border-border-default bg-surface-elevated p-12 text-center">
           <ShoppingBag className="mx-auto h-10 w-10 text-ink-tertiary" aria-hidden />
-          <h3 className="mt-4 text-body font-semibold text-brand-ink">购物车空空</h3>
-          <p className="mt-2 text-small text-ink-secondary">
-            回到首页,让 HABA AI Advisor 帮你挑几款 MARVIE 商品。
+          <h3 className="mt-4 font-serif text-[20px] font-normal text-ink-primary">购物车暂无商品</h3>
+          <p className="mt-2 font-sans text-small text-ink-secondary">
+            回到首页,让 HABA 顾问帮你挑几款 MARVIE 商品。
           </p>
           <Link
             href="/"
-            className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-brand-primary px-3 py-2 text-small font-semibold text-white hover:bg-brand-primary-hover"
+            className="mt-5 inline-flex items-center gap-1.5 rounded-xl bg-brand-primary px-5 py-2.5 font-sans text-small font-semibold text-white shadow-e1 hover:bg-brand-primary-hover"
           >
             去和顾问聊聊
           </Link>
@@ -259,31 +257,22 @@ function CartView({
               <CartLine key={item.productId} item={item} />
             ))}
           </ul>
-          <aside className="rounded-2xl border border-border-subtle bg-surface-base p-6 shadow-e1 lg:sticky lg:top-24 lg:h-fit">
-            <h3 className="text-body font-semibold text-brand-ink">订单摘要</h3>
-            <dl className="mt-4 space-y-2 text-small">
+          <aside className="rounded-2xl border border-border-subtle bg-surface-elevated p-6 shadow-e1 lg:sticky lg:top-24 lg:h-fit">
+            <h3 className="font-sans text-[15px] font-semibold text-ink-primary">订单摘要</h3>
+            <dl className="mt-4 space-y-2 font-sans text-small">
               <Row label="件数" value={`${cart.totalItems} 件`} />
-              <Row label="合计 (JPY)" value={formatJpy(cart.totalJpy)} />
-              <Row
-                label="本次扣款 USDC"
-                value={`${cart.checkoutUsdc.toFixed(2)} USDC`}
-                sub={
-                  cart.isCheckoutCapped
-                    ? `单笔最高 ${MAX_CHECKOUT_USDC.toFixed(2)} USDC,超出按上限扣款`
-                    : `1 USDC ≈ ${USDC_RATE_JPY} JPY`
-                }
-              />
+              <Row label="合计" value={formatJpy(cart.totalJpy)} />
             </dl>
             <button
               type="button"
               onClick={onCheckout}
-              className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-primary px-4 py-3 text-body font-semibold text-white hover:bg-brand-primary-hover"
+              className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-primary px-4 py-3 font-sans text-small font-semibold text-white shadow-e1 transition-all duration-200 hover:bg-brand-primary-hover hover:shadow-e2"
             >
-              下一步 · 填送货地址
+              填写送货地址
               <ArrowRight className="h-4 w-4" aria-hidden />
             </button>
-            <p className="mt-3 text-caption text-ink-tertiary">
-              支付环节用 Mac Touch ID 确认 USDC,无需输密码。
+            <p className="mt-3 font-sans text-[11px] text-ink-tertiary">
+              下一步用 Touch ID 确认支付 —— 无需输入密码。
             </p>
           </aside>
         </div>
@@ -295,41 +284,42 @@ function CartView({
 function CartLine({ item }: { item: CartHydratedItem }) {
   const cart = useCart();
   return (
-    <li className="flex items-center gap-4 rounded-2xl border border-border-subtle bg-surface-base p-4 shadow-e1">
-      <span className="text-3xl leading-none" aria-hidden>
-        {item.product.imageEmoji}
+    <li className="flex items-center gap-4 rounded-2xl border border-border-subtle bg-surface-elevated p-4 shadow-e1">
+      {/* Warm tint tile instead of emoji */}
+      <span
+        aria-hidden
+        className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-surface-deep border border-border-subtle font-serif text-[11px] text-brand-primary/50"
+      >
+        M
       </span>
-      <div className="flex-1">
-        <p className="text-small font-semibold text-brand-ink">
+      <div className="flex-1 min-w-0">
+        <p className="font-sans text-small font-semibold text-ink-primary truncate">
           {item.product.shortName}
         </p>
-        <p className="text-caption text-ink-tertiary">{item.product.sku}</p>
-        <p className="mt-1 text-caption text-ink-secondary">
-          {item.product.shortPitch}
-        </p>
+        <p className="font-sans text-caption text-ink-tertiary">{item.product.sku}</p>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         <button
           type="button"
           aria-label="减少"
           onClick={() => cart.setQty(item.productId, item.qty - 1)}
-          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-border-default text-ink-secondary hover:border-brand-primary/40 hover:text-brand-primary"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border-default text-ink-secondary transition-colors hover:border-brand-primary/40 hover:text-brand-primary"
         >
-          <Minus className="h-3 w-3" aria-hidden />
+          <Minus className="h-3.5 w-3.5" aria-hidden />
         </button>
-        <span className="min-w-6 text-center text-small font-medium text-brand-ink">
+        <span className="min-w-7 text-center font-sans text-small font-medium tabular-nums text-ink-primary">
           {item.qty}
         </span>
         <button
           type="button"
           aria-label="增加"
           onClick={() => cart.setQty(item.productId, item.qty + 1)}
-          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-border-default text-ink-secondary hover:border-brand-primary/40 hover:text-brand-primary"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border-default text-ink-secondary transition-colors hover:border-brand-primary/40 hover:text-brand-primary"
         >
-          <Plus className="h-3 w-3" aria-hidden />
+          <Plus className="h-3.5 w-3.5" aria-hidden />
         </button>
       </div>
-      <div className="w-24 text-right text-small font-semibold text-brand-ink">
+      <div className="w-20 text-right font-sans text-small font-semibold tabular-nums text-ink-primary">
         {formatJpy(item.product.priceJpy * item.qty)}
       </div>
     </li>
@@ -361,7 +351,7 @@ function ProcessingView() {
     <div className="mt-10 flex flex-col items-center justify-center gap-4 rounded-2xl border border-border-subtle bg-surface-base px-6 py-16 text-center shadow-e1">
       <Loader2 className="h-8 w-8 animate-spin text-brand-primary" aria-hidden />
       <div>
-        <p className="text-body font-semibold text-brand-ink">指纹通过 · 正在向链上发送支付…</p>
+        <p className="text-body font-semibold text-brand-ink">指纹通过 · 正在安全处理支付…</p>
         <p className="mt-1 text-small text-ink-secondary">几秒钟,请稍候。</p>
       </div>
     </div>

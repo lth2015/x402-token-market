@@ -6,8 +6,10 @@
  */
 import Link from "next/link";
 import { Search, Globe } from "lucide-react";
+import { getMerchantConfigClient } from "@/lib/merchant-config";
 
 export function TopBar() {
+  const merchant = getMerchantConfigClient();
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border-subtle bg-surface-base px-4 lg:px-6">
       {/* Logo */}
@@ -22,9 +24,9 @@ export function TopBar() {
       </Link>
 
       <div className="hidden md:flex items-center gap-3">
-        {/* Org switcher (stub) */}
+        {/* Org switcher (stub — Phase 2 will call GET /v1/merchant/profile) */}
         <div className="rounded border border-border-subtle bg-surface-muted px-3 py-1 text-small text-ink-secondary">
-          HABA / ハーバー研究所 · <span className="text-ink-tertiary">prod</span>
+          {merchant.displayName} · <span className="text-ink-tertiary">{merchant.envLabel}</span>
         </div>
 
         {/* ⌘K (stub — wire up Phase 2) */}
@@ -56,7 +58,7 @@ export function TopBar() {
           className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-primary/15 text-[11px] font-semibold text-brand-primary"
           aria-label="Account"
         >
-          HABA
+          {merchant.displayAbbr}
         </div>
       </div>
     </header>

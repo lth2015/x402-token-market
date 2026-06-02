@@ -1,7 +1,79 @@
 # X402 Token Market — 项目进度
 
-**最后更新**: 2026-06-01 (第六轮 · 标准 x402 协议层 + 双 console)
+**最后更新**: 2026-06-02 (第十一轮 · 待立项全部落地 + E2E 验收 40 passed)
 **当前阶段**: **标准 x402 协议层可演示 + 双 console 可观测 + GPT-4.1 Advisor 运行主线**。HABA Advisor 默认模型为 `gpt-4.1`；消费者商品结账走 HTTP 402 / `X-PAYMENT` 重试协议并由 Wea Facilitator 结算到 Solana Devnet USDC；C 端继续隐藏内部 Token 余额与成本细节。
+
+## 第十一轮 · 待立项全部落地 + E2E 验收（2026-06-02）
+
+把第十轮列出的待立项**全部认真做完**，并以本地栈 + E2E 实测验收（不止单测/cargo check）。
+
+### token 线（token-engineer）
+- ✅ **FX 去硬编码**：`FX_JPY_PER_USDC` env 注入，`/v1/balance` 不再字面写死 150。
+- ✅ **per-key rate limiter + last_used**：Redis 滑窗 RPM + 分钟桶 TPM，超限 429+`Retry-After`；`_touch_last_used` fire-and-forget 不阻塞请求；无配置值不限流（向后兼容）。
+- ✅ **GET /v1/merchant/profile + console 动态读取**：从 merchants 表读，console 走 API（env 降级为 fallback）。
+- ✅ **worker 真正落地**：reconciler / invoice_generator / usage_aggregator / anomaly_detector 用 APScheduler 实现；reconciler 通过 x402 `GET /v1/payments` 拉单写 `payment_orders_mirror`（AP2 只走 API）。**容器实测 4 job 全绿**（修复见下）。
+
+### wea 线（wea-engineer）
+- ✅ **GET /facilitator/tx/:signature**：x402 confirmer 委托此端点查链上状态（pending/confirmed/finalized/failed），x402 不再直连 Solana 读。
+- ✅ **KMS 真实集成**：`aws-sdk-kms`（ap-northeast-1 direct，optional feature `aws-kms`）；KMS_MODE=aws 走真实 Encrypt/Decrypt，dev 明文 fallback；wire format 0x00(dev)/0x01(aws)。生产编译需 Rust ≥1.91 + `--features aws-kms`。
+- ✅ **depeg 守护**：worker 每 60s 拉价（PriceFeed trait，dev=MockPriceFeed 健康价 / 生产 http），连续越界 window 翻 `accepting_new_settlements=false`；settle 入口检查 flag。
+- ✅ **生产硬化**：`WEA_LISTEN_ADDR` env 可配；`rpc_endpoints` 表多 RPC pool + failover；`/facilitator/*` 与 `/v1/settlements` interim `X-Internal-Auth` guard（统一 middleware layer，mTLS 留 TODO）。
+- ✅ **dead-code 清理**：正当保留项加 `#[allow]`+TODO。
+
+### x402 线（x402-engineer）
+- ✅ **confirmer 改委托 wea**：彻底完成 AP4——支付路径与遗留 proof 路径均不再直连 Solana（仅剩 readyz 探针 + demo-only blockhash 端点）。
+- ✅ **GET /v1/payments**：only-read，internal-auth，供 token worker reconciler 对账。
+- ✅ **清理**：`__version__` 单一来源（三处统一 0.4.0）；`signed_tx_hash` 加 UniqueConstraint 对齐 migration；Dockerfile 支持已提交 lock。
+
+### haba 线（haba-engineer）
+- ✅ 删除死代码 `ProductGrid` / `DemoBadge`；清理全仓库注释/命名里的 `demo` 字样；typecheck/build 干净。
+
+### E2E 验收 + 过程中发现并修复的 3 个集成回归
+rebuild 全部受影响服务 → `python3 scripts/x402_protocol_e2e.py` → **40 passed · 0 failed**。过程中暴露并修复（单测/cargo check 抓不到、只有真实运行才暴露）：
+1. **wea RpcPool 选到占位 URL**：`rpc_endpoints` seed 全是 `REPLACE.*` 占位 → settle 502。修：pool 过滤占位/不可达 URL，无有效端点时 fallback 到 env `SOLANA_RPC_URL`（真 devnet）。
+2. **depeg 本地拉 CoinGecko 失败空转**：dev 默认改 `DEPEG_PRICE_FEED=mock` 健康价，不再每分钟刷 WARN。
+3. **token-worker async/sync 不匹配**：docker-compose 把 worker `DATABASE_URL` 误配 `aiomysql`（async）而代码是 sync `create_engine` → 每个 job `greenlet_spawn` 报错。修：改回 `pymysql` + db 层 driver guard；新增 migration 003 建齐 `invoices/invoice_items/audit_log/usage_daily` 等 worker 依赖表（此前只在 SCHEMA.sql 未进 migrations）。容器实测 4 job 全绿。
+4. **安全一致性**：补齐 `/facilitator/verify`/`settle` 的 internal-auth guard（此前裸奔），x402 调用同步带 header，加 guard 后 E2E 仍 40 passed。
+
+### 遗留（生产前事项 / 不阻塞 demo）
+- **poetry.lock 未提交**：本机 Python 3.10（项目要 3.12），需在 CI/3.12 环境 `poetry lock` 后提交（x402）。
+- **KMS aws feature 编译**：需 Rust ≥1.91.1（当前 1.88）+ `cargo build --features aws-kms` + 配 `KMS_KEY_ID`。
+- **reconciler 对账规则待细化**：当前把所有 x402 confirmed 都期望有 ledger credit，对"商品结算（by-design 不充值 token）"误报 missing_credit。需按订单类型区分对账规则。
+- **mTLS**：当前 wea 为 interim `X-Internal-Auth` guard，生产替换为 mTLS（DESIGN §9）。
+
+---
+
+## 第十轮 · 4-agent 并行自检 + P0/P1 修复（2026-06-02）
+
+4 个模块 agent（haba / x402 / token / wea）并行做只读健康自检，定位问题后并行修复。本轮聚焦 **P0（违反用户级硬规则的对外禁词 + 违反 AP4 架构原则）+ P1（明确运行时 bug / 数据正确性）**；需大工程或跨模块决策的项列为待立项（见 §5）。
+
+- ✅ **haba 清除对外禁词**（消费端不得出现 上链/x402/Solana/USDC 钱包 等技术字眼，build 通过）：
+  - `checkout/CheckoutFlow.tsx:364`「正在向链上发送支付」→「正在安全处理支付」
+  - `checkout/ConfirmStep.tsx:98/170` 去「上链/稳定币」,保留「支付确认后不可撤销」正当提示
+  - **删除 `layout/HabaArchitectureCrumb.tsx`** + 从 HabaTopBar 移除引用（x402 flow / Solana Devnet 面包屑彻底消失）
+  - `app/cart/page.tsx:33`「用 USDC 钱包一键结账」→「一键安全结账」
+- ✅ **x402 修 bug + AP4 退役**（8 单测通过，未改 E2E 依赖的标准路径）：
+  - `webhooks.py:233` structlog 保留字 `event=` → `event_type=`（运行时会 KeyError/覆盖字段）
+  - `protocol.py:211` 运算符优先级 bug 修正,x402Version 校验现真正生效（比对 `X402_VERSION=1`）
+  - **AP4**：遗留 `/v1/payments/{id}/proof` 路由内部改为委托 wea `settle()`,保留路由签名/响应契约（守 AP6），标 `DEPRECATED v0.4.0`
+- ✅ **token 修 schema 漂移 + 禁词 + 去硬编码合作方**（build 通过）：
+  - `api/.../db.py` 三表（requests / merchants / projects）补齐缺失列对齐 migration；`request_hash` 不再被 SQLAlchemy 静默丢弃（audit 可追溯恢复）；日元发票必需的 `merchants.tax_id/legal_name` 等可写入
+  - `console/.../invoices/page.tsx`「on-chain Solana tx hashes」→「決済参照番号 / Settlements」
+  - 硬编码「HABA / ハーバー研究所」→ 新建 `lib/merchant-config.ts` 走 env（dashboard/TopBar/settings/sidebar），留 TODO 走 `GET /v1/merchant/profile`
+- ✅ **wea 修 CI 方言 + 枚举对齐**（cargo check 0 error）：
+  - `.github/workflows/ci.yml` PostgreSQL 16 → MySQL 8.0 + `mysql://` URL（CI 测试不再必挂）
+  - 移除死值 `callback_pending`：新增 `db/migrations/002_drop_callback_pending_status.{up,down}.sql` + 更新 SCHEMA.sql,不改历史 migration（保 golang-migrate checksum）
+
+⚠️ **本轮未跑整体 E2E**（本地 Docker 未起）。AP4 委托 wea 的新路径建议起栈跑一次 `python3 scripts/x402_protocol_e2e.py` 验收。
+⚠️ token 新增 `CONSOLE_MERCHANT_NAME` 等 env,部署配置需补,否则 console 显示默认占位。
+
+### 待立项（本轮按约定未碰，见 §5 详列）
+- confirmer loop `get_signature_status` 直连 Solana（需 wea 先提供 tx status 端点）
+- KMS 真实集成（wea callback_secret 仍明文 stub）
+- token worker 空壳（reconciler / invoice / aggregator + `payment_orders_mirror` 无写入）
+- wea depeg 守护 / mTLS / 多 RPC failover；token FX 硬编码 / rate limiter 未接线
+
+---
 
 ## 第六轮 · 标准 x402 协议层 + 双 console
 
@@ -241,6 +313,18 @@ token-api 的 `/v1/recent-activity` 可见 Token top-up 与 AI debit；商品结
 - [ ] **`/agent` B2B 多渠道剧本超时**：12 次调用 × 真 LLM（每次 2–3s）≈ 30s+，前端无硬超时但单页等待偏久。可缩短为 2 轮（8 次）或并发，或加进度提示。
 - [ ] **ledger 重置工具**：topup 与 AI 调用会改变 HABA Token 余额，多轮演示后余额数字会滚动。需要一个 `make reset-ledger` 或脚本（重建 mysql / 清表），让演示从干净状态开始。
 - [ ] 钱包 connect UI 真接 Phantom / Solflare (现在签名是 server-side mock)
+
+### 第十轮自检待立项（按优先级）
+- [ ] **[P1] 起本地栈跑整体 E2E 验收**：本轮修复（尤其 x402 AP4 委托 wea 的新路径）未经 `scripts/x402_protocol_e2e.py` 验证；本地 Docker 未起。
+- [ ] **[P1] 部署配置补 `CONSOLE_MERCHANT_NAME` 等 env**：token console 去硬编码后依赖 env，缺失则显示默认占位。后续应实现 `GET /v1/merchant/profile` 让 console 动态读取。
+- [ ] **[P1] token worker 落地**：reconciler / invoice_generator / usage_aggregator / anomaly_detector 仍为 heartbeat stub；`payment_orders_mirror` 表无任何写入路径（与 x402 支付状态同步缺失）。
+- [ ] **[P1] x402 confirmer 链上读改委托 wea**：`main.py:557` confirmer loop 仍直连 Solana `get_signature_status`（AP4 读操作违规）；需 wea 先提供 `/tx/status/{sig}` 查询端点,跨模块改造。
+- [ ] **[P0-prod] wea KMS 真实集成**：`api.rs:46` callback_secret 仍明文 stub；生产前必须接入 AWS KMS ap-northeast-1 direct（见 memory `feedback_kms_aws_direct`）。
+- [ ] **[P2] token FX 汇率去硬编码**：`main.py` 硬编码 150 JPY/USDC（mock FX），`/v1/balance` 的 `jpy_equivalent` 对客户可见,需配置源或 FX 服务。
+- [ ] **[P2] token per-key rate limiter**：`agent_keys` 有 `rate_limit_rpm/tpm` 字段但无中间件读取；`auth.py:130` `_touch_last_used()` 定义但从不调用（last_used_at 永不更新）。
+- [ ] **[P2] wea depeg 守护接线**：`system_flags`（accepting_new_settlements / depeg_*）表存在但 worker 不读（DESIGN §8 缺失）。
+- [ ] **[P3] wea 生产硬化**：mTLS（现 routes 无鉴权）、多 RPC failover（`rpc_endpoints` 表已 seed 未接线）、listen 端口 env 可配置（现硬编码 0.0.0.0:8080）。
+- [ ] **[P3] 清理项**：x402 version 三处不一致(0.2/0.3/0.4)、poetry.lock 未提交、`signed_tx_hash` UNIQUE 仅 migration 有；haba `ProductGrid`/`DemoBadge` 死代码 + 注释 demo 字样；wea dead-code warnings。
 
 ### P4 — 范围外 / 长期
 - [ ] Solana validator on Apple Silicon (需要 host-side solana-cli + Devnet RPC 转发)

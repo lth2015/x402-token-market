@@ -60,7 +60,7 @@ export const x402TopupSteps: readonly X402PaymentStep[] = [
     toActor: "settler",
     label: "链上确认",
     note: "区块链确认（confirmed level，< 1s）",
-    detailZh: "demo 用 mock RPC；prod 用 confirmed 或 finalized 取决于客户配置。",
+    detailZh: "本地环境用 mock RPC；生产用 confirmed 或 finalized 取决于客户配置。",
   },
   {
     n: 7,
@@ -144,6 +144,6 @@ export const x402CheckoutSteps: readonly X402PaymentStep[] = [
     toActor: "customer",
     label: "订单确认",
     note: "HABA 收到入账回调，订单状态更新为 paid，消费者看到订单页",
-    detailZh: "demo 中订单号为 #ord_XXXX 占位，真实履约不发生。",
+    detailZh: "当前阶段订单号为 #ord_XXXX 占位，真实履约待履约服务上线后接入。",
   },
 ] as const satisfies readonly X402PaymentStep[];

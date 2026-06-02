@@ -29,7 +29,7 @@ export const marvieProducts: readonly MarvieProduct[] = [
     shortPitch: "0 kcal · 凉热饮直接滴，不结块",
     longDescription:
       "甜度约砂糖的 200 倍，液体形态最适合咖啡、红茶、酸奶等饮品。冷热水都能瞬间溶解，没有粉末甜味料偶尔出现的结块问题。",
-    inventoryDemo: [
+    inventorySnapshot: [
       { storeName: "ABC 药局梅田店", qty: 3 },
       { storeName: "ABC 药局难波店", qty: 0 },
     ],
@@ -50,7 +50,7 @@ export const marvieProducts: readonly MarvieProduct[] = [
     shortPitch: "1:1 替砂糖 · 烘焙 180℃ 不焦化",
     longDescription:
       "颗粒大小与砂糖一致，**直接 1:1 替换原食谱不用换勺子**。烘焙至 180℃ 不焦化，社内 50 人盲测后味评分 8.4/10。",
-    inventoryDemo: [
+    inventorySnapshot: [
       { storeName: "ABC 药局梅田店", qty: 8 },
       { storeName: "ABC 药局难波店", qty: 5 },
     ],

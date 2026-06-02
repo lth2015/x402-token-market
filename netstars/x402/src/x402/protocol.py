@@ -208,7 +208,7 @@ def assert_payload_matches_requirements(
 
     Raises ValueError on any mismatch.
     """
-    if payload.x402Version != requirements.x402Version if hasattr(requirements, "x402Version") else False:
+    if payload.x402Version != X402_VERSION:
         raise ValueError(
             f"x402 version mismatch: payload={payload.x402Version}, requirements assume {X402_VERSION}"
         )

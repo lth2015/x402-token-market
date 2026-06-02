@@ -18,6 +18,8 @@ Defences:
   boto3 KMS first
 - In-process LRU cache of (key_id → (secret, merchant_id, project_id, status))
   with 60-second TTL — bounds load on the agent_keys table
+- Per-key rate limiting: RPM via Redis sliding window; TPM accumulates in metering
+  settle path. Limit of 0 = unlimited (backward-compatible default).
 
 Internal-service shortcut: requests carrying X-Internal-Auth: <shared-secret>
 match INTERNAL_AUTH_SECRET env → resolve as (DEMO_MERCHANT_ID, "agk_internal").
@@ -25,14 +27,17 @@ This is used by /internal/credit (called by x402-api).
 """
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import hmac
+import math
 import os
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 from fastapi import HTTPException, Request
+from fastapi.responses import JSONResponse
 from sqlalchemy import select, update
 
 from . import db
@@ -55,6 +60,8 @@ class AuthContext:
     project_id: Optional[str]
     agent_key_id: str
     is_internal: bool = False
+    rate_limit_rpm: int = 0
+    rate_limit_tpm: int = 0
 
 
 # ── Plaintext secret loader (KMS-pluggable) ───────────────────────
@@ -76,6 +83,8 @@ class AgentKeyRecord:
     project_id: str
     merchant_id: str
     status: str
+    rate_limit_rpm: int = 0   # 0 = unlimited
+    rate_limit_tpm: int = 0   # 0 = unlimited; enforced in metering settle path
 
 
 async def _load_agent_key(engine, key_public: str) -> Optional[AgentKeyRecord]:
@@ -92,6 +101,8 @@ async def _load_agent_key(engine, key_public: str) -> Optional[AgentKeyRecord]:
                 db.agent_keys.c.project_id,
                 db.agent_keys.c.key_secret_enc,
                 db.agent_keys.c.status,
+                db.agent_keys.c.rate_limit_rpm,
+                db.agent_keys.c.rate_limit_tpm,
                 db.projects.c.merchant_id,
             )
             .select_from(
@@ -118,6 +129,8 @@ async def _load_agent_key(engine, key_public: str) -> Optional[AgentKeyRecord]:
         project_id=row.project_id,
         merchant_id=row.merchant_id,
         status=row.status,
+        rate_limit_rpm=int(row.rate_limit_rpm or 0),
+        rate_limit_tpm=int(row.rate_limit_tpm or 0),
     )
     _cache[key_public] = (now + CACHE_TTL_SECS, rec)
     return rec
@@ -138,6 +151,65 @@ async def _touch_last_used(engine, agent_key_id: str) -> None:
             )
     except Exception:  # noqa: BLE001
         pass
+
+
+async def _check_rpm_limit(redis, key_id: str, limit_rpm: int) -> tuple[bool, int]:
+    """
+    Sliding-window RPM check using Redis sorted set (score = unix timestamp).
+    Returns (allowed: bool, current_count: int).
+    Limit 0 = unlimited (always allowed).
+    """
+    if limit_rpm <= 0:
+        return True, 0
+    now = time.time()
+    window_start = now - 60.0
+    rkey = f"rl_rpm:{key_id}"
+    pipe = redis.pipeline(transaction=False)
+    # Remove entries older than the 60-second window
+    pipe.zremrangebyscore(rkey, "-inf", window_start)
+    # Add this request (score = timestamp, member = timestamp+random suffix)
+    pipe.zadd(rkey, {f"{now:.6f}": now})
+    # Count entries in window
+    pipe.zcard(rkey)
+    # Expire key after 120 s to avoid orphan keys
+    pipe.expire(rkey, 120)
+    results = await pipe.execute()
+    current = int(results[2])  # zcard result
+    return current <= limit_rpm, current
+
+
+async def _increment_tpm(redis, key_id: str, tokens: int) -> None:
+    """
+    Increment the per-key TPM counter in a 60-second rolling bucket.
+    Called from the metering settle path (fire-and-forget).
+    Uses a simple per-minute bucket key so it resets automatically.
+    """
+    if tokens <= 0:
+        return
+    bucket = int(time.time() // 60)  # 1-minute bucket
+    rkey = f"rl_tpm:{key_id}:{bucket}"
+    try:
+        await redis.incrby(rkey, tokens)
+        await redis.expire(rkey, 120)  # keep for 2 buckets
+    except Exception:  # noqa: BLE001
+        pass
+
+
+async def _check_tpm_limit(redis, key_id: str, limit_tpm: int) -> tuple[bool, int]:
+    """
+    Check if the current-minute TPM counter would exceed the limit.
+    Returns (allowed: bool, current_count: int). Limit 0 = unlimited.
+    """
+    if limit_tpm <= 0:
+        return True, 0
+    bucket = int(time.time() // 60)
+    rkey = f"rl_tpm:{key_id}:{bucket}"
+    try:
+        val = await redis.get(rkey)
+        current = int(val) if val else 0
+    except Exception:  # noqa: BLE001
+        return True, 0  # fail-open on Redis error
+    return current < limit_tpm, current
 
 
 # ── Signature verification ────────────────────────────────────────
@@ -224,11 +296,29 @@ async def verify_request(request: Request) -> AuthContext:
     if await _seen_nonce(redis, key_public, nonce):
         raise HTTPException(401, "Nonce replay detected")
 
-    # Stamp last_used_at (fire-and-forget; we don't await it here to avoid latency)
-    # Caller can schedule it as a background task if desired.
+    # Per-key RPM rate limit (sliding window via Redis sorted set).
+    # Checked after auth to avoid counting rejected requests.
+    allowed, current_rpm = await _check_rpm_limit(redis, rec.id, rec.rate_limit_rpm)
+    if not allowed:
+        retry_after = 60 - int(time.time() % 60) + 1
+        raise HTTPException(
+            429,
+            detail={
+                "error_code": "RATE_LIMIT_EXCEEDED",
+                "detail": f"RPM limit {rec.rate_limit_rpm} exceeded (current {current_rpm})",
+                "retry_after": retry_after,
+            },
+            headers={"Retry-After": str(retry_after)},
+        )
+
+    # Stamp last_used_at — fire-and-forget; never block the request path.
+    asyncio.ensure_future(_touch_last_used(request.app.state.db, rec.id))
+
     return AuthContext(
         merchant_id=rec.merchant_id,
         project_id=rec.project_id,
         agent_key_id=rec.id,
         is_internal=False,
+        rate_limit_rpm=rec.rate_limit_rpm,
+        rate_limit_tpm=rec.rate_limit_tpm,
     )

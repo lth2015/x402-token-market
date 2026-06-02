@@ -11,29 +11,71 @@
 // Both handlers push a CallRecord into `ctx.call_log` on exit so the WEA
 // console can render a live facilitator activity feed.
 
-use axum::{extract::State, http::StatusCode, response::{IntoResponse, Json, Response}};
+use axum::{
+    body::Body,
+    extract::{Path, State},
+    http::{Request, StatusCode},
+    middleware::Next,
+    response::{IntoResponse, Json, Response},
+};
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::{sync::Arc, time::Duration};
 
 use crate::console::{CallKind, CallRecord};
+use crate::depeg;
 use crate::AppCtx;
+
+// ── Internal-auth middleware ──────────────────────────────────────────────────
+//
+// Applied as a layer over all /facilitator/* routes. Rejects any request whose
+// `x-internal-auth` header does not match `ctx.internal_auth_secret`.
+// This gives uniform coverage of verify + settle + tx_status without
+// duplicating the check in every handler.
+pub async fn internal_auth_middleware(
+    State(ctx): State<Arc<AppCtx>>,
+    req: Request<Body>,
+    next: Next,
+) -> Response {
+    let provided = req
+        .headers()
+        .get("x-internal-auth")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("");
+    if provided != ctx.internal_auth_secret {
+        return (
+            StatusCode::UNAUTHORIZED,
+            Json(json!({"error": "unauthorized", "message": "invalid internal auth"})),
+        )
+            .into_response();
+    }
+    next.run(req).await
+}
 
 // ── Inbound wire format (matches netstars/x402 PaymentPayload schema) ──────
 #[derive(Debug, Deserialize, Clone)]
 pub struct PaymentRequirements {
+    // scheme, description, mime_type, max_timeout_seconds: required by the x402 protocol
+    // wire format even though this service doesn't use them directly. Keeping
+    // them allows the struct to deserialize any conformant PaymentRequirements
+    // object without rejecting unknown/extra fields.
+    #[allow(dead_code)]
     pub scheme:            String,
     pub network:           String,
     #[serde(rename = "maxAmountRequired")]
     pub max_amount_required: String,
     pub resource:          String,
+    #[allow(dead_code)]
     #[serde(default)]
     pub description:       String,
+    #[allow(dead_code)]
     #[serde(rename = "mimeType", default)]
     pub mime_type:         String,
     #[serde(rename = "payTo")]
     pub pay_to:            String,
+    // TODO(phase2): enforce timeout — reject settle requests older than maxTimeoutSeconds.
+    #[allow(dead_code)]
     #[serde(rename = "maxTimeoutSeconds", default)]
     pub max_timeout_seconds: i64,
     pub asset:             String,
@@ -57,6 +99,8 @@ pub struct SolanaExactPayload {
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct PaymentPayload {
+    // TODO(phase2): enforce x402_version compatibility check.
+    #[allow(dead_code)]
     #[serde(rename = "x402Version", default)]
     pub x402_version: i32,
     pub scheme:       String,
@@ -191,12 +235,26 @@ async fn settle_inner(
     ctx: &AppCtx,
     req: &FacilitatorRequest,
 ) -> (Response, bool, Option<String>, Option<String>, Option<String>) {
+    // ── Depeg guard: reject new settlements if protection is active ────────
+    if !depeg::is_accepting_settlements(&ctx.db).await {
+        tracing::warn!("facilitator.settle.rejected: depeg protection active");
+        let reason = "USDC depeg protection is active. New settlements suspended.".to_string();
+        let r = (StatusCode::SERVICE_UNAVAILABLE, Json(json!({
+            "error": "depeg_protection_active",
+            "message": reason,
+        }))).into_response();
+        return (r, false, None, Some(reason), None);
+    }
+
     let signed_tx_b64 = &req.payment_payload.payload.signed_tx_base64;
     let network = req.payment_requirements.network.clone();
 
-    let rpc_url = match network.as_str() {
-        "solana-devnet" => &ctx.solana_rpc_url_devnet,
-        "solana"        => &ctx.solana_rpc_url_mainnet,
+    // ── Pick RPC URL from the pool (Task 4: multi-endpoint failover) ───────
+    // For devnet/solana we pick from the pool; if the pool returns the env
+    // fallback it will route to the configured RPC node. For unrecognised
+    // networks we reject immediately.
+    match network.as_str() {
+        "solana-devnet" | "solana" => {}, // ok
         other => {
             let reason = format!("network {other:?} not supported");
             let r = Json(SettleResponse {
@@ -205,7 +263,11 @@ async fn settle_inner(
             }).into_response();
             return (r, false, None, Some(reason), None);
         }
-    };
+    }
+
+    // Pick best available RPC node; fallback to devnet env URL.
+    let rpc_url = ctx.rpc_pool.pick().await
+        .unwrap_or_else(|| ctx.solana_rpc_url_devnet.clone());
 
     // ── 1. Broadcast ──
     let send_body = json!({
@@ -216,7 +278,7 @@ async fn settle_inner(
             "preflightCommitment": "confirmed",
         }],
     });
-    let send_resp = ctx.http.post(rpc_url).json(&send_body).send().await;
+    let send_resp = ctx.http.post(&rpc_url).json(&send_body).send().await;
     let send_resp = match send_resp {
         Ok(r) => r,
         Err(e) => {
@@ -272,7 +334,7 @@ async fn settle_inner(
             "jsonrpc": "2.0", "id": 1, "method": "getSignatureStatuses",
             "params": [[signature], {"searchTransactionHistory": true}],
         });
-        let status_resp = match ctx.http.post(rpc_url).json(&status_body).send().await {
+        let status_resp = match ctx.http.post(&rpc_url).json(&status_body).send().await {
             Ok(r) => r,
             Err(e) => {
                 tracing::warn!(error=?e, attempt, "facilitator.settle.poll_unreachable");
@@ -348,6 +410,105 @@ fn ok_verify(is_valid: bool, reason: Option<String>, payer: Option<String>) -> R
 
 fn server_err(msg: &str) -> Response {
     (StatusCode::INTERNAL_SERVER_ERROR, Json(json!({"error":"internal","message":msg}))).into_response()
+}
+
+// ── GET /facilitator/tx/{signature} ─────────────────────────────────────────
+//
+// Cross-module contract (AP4 enforcement):
+// x402-api confirmer loop MUST NOT call Solana JSON-RPC directly. Instead it
+// delegates here so all chain access stays in wea.
+//
+// Contract:
+//   Path param  : signature — base58 Solana transaction signature (max 88 chars)
+//   Auth header : X-Internal-Auth: <INTERNAL_AUTH_SECRET>
+//   Response 200:
+//     { "signature": "...", "status": "pending"|"confirmed"|"finalized"|"failed",
+//       "slot": u64|null, "confirmations": u64|null, "err": string|null }
+//   Response 400: { "error": "bad_request", "message": "..." }
+//   Response 500: { "error": "internal", "message": "..." }
+//
+// "pending" means getSignatureStatuses returned null (not yet seen by RPC node).
+// "failed"  means the RPC returned a non-null err field.
+
+#[derive(Debug, Serialize)]
+pub struct TxStatusResponse {
+    pub signature:     String,
+    pub status:        &'static str,
+    pub slot:          Option<u64>,
+    pub confirmations: Option<u64>,
+    pub err:           Option<String>,
+}
+
+pub async fn tx_status(
+    State(ctx): State<Arc<AppCtx>>,
+    Path(signature): Path<String>,
+) -> Response {
+    // Auth is enforced by the internal_auth_middleware layer applied to the
+    // /facilitator/* route group in main.rs — no inline check needed here.
+    if signature.is_empty() || signature.len() > 88 {
+        return (StatusCode::BAD_REQUEST,
+            Json(json!({"error":"bad_request","message":"signature must be 1-88 chars"}))).into_response();
+    }
+    tx_status_inner(&ctx, signature).await
+}
+
+async fn tx_status_inner(ctx: &AppCtx, signature: String) -> Response {
+    // Pick RPC URL from the pool; fallback to env-configured devnet URL.
+    let rpc_url = ctx.rpc_pool.pick().await
+        .unwrap_or_else(|| ctx.solana_rpc_url_devnet.clone());
+
+    let body = json!({
+        "jsonrpc": "2.0", "id": 1,
+        "method": "getSignatureStatuses",
+        "params": [[signature], {"searchTransactionHistory": true}],
+    });
+    let resp = match ctx.http.post(&rpc_url).json(&body).send().await {
+        Ok(r) => r,
+        Err(e) => {
+            tracing::warn!(error=?e, %rpc_url, "tx_status.rpc_unreachable");
+            return server_err(&format!("RPC unreachable: {e}"));
+        }
+    };
+    let v: Value = match resp.json().await {
+        Ok(v) => v,
+        Err(e) => return server_err(&format!("RPC non-JSON: {e}")),
+    };
+
+    let arr = match v.pointer("/result/value").and_then(Value::as_array) {
+        Some(a) => a,
+        None    => return server_err("RPC response missing /result/value"),
+    };
+    let first = arr.first().cloned().unwrap_or(Value::Null);
+
+    if first.is_null() {
+        // Not yet seen by RPC node — transaction is still propagating.
+        return Json(TxStatusResponse {
+            signature, status: "pending", slot: None, confirmations: None, err: None,
+        }).into_response();
+    }
+
+    let slot          = first.get("slot").and_then(Value::as_u64);
+    let confirmations = first.get("confirmations").and_then(Value::as_u64);
+    let conf_status   = first.get("confirmationStatus").and_then(Value::as_str).unwrap_or("");
+    let err_val       = first.get("err").cloned().unwrap_or(Value::Null);
+
+    if !err_val.is_null() {
+        let err_str = if err_val.is_string() {
+            err_val.as_str().unwrap_or("unknown").to_owned()
+        } else {
+            err_val.to_string()
+        };
+        return Json(TxStatusResponse {
+            signature, status: "failed", slot, confirmations, err: Some(err_str),
+        }).into_response();
+    }
+
+    let status: &'static str = match conf_status {
+        "finalized" => "finalized",
+        "confirmed" => "confirmed",
+        _           => "pending",
+    };
+    Json(TxStatusResponse { signature, status, slot, confirmations, err: None }).into_response()
 }
 
 fn push_call(

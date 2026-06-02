@@ -1,7 +1,7 @@
 """SQLAlchemy Core table definitions for X402 gateway."""
 from __future__ import annotations
 
-from sqlalchemy import BigInteger, CheckConstraint, Column, DateTime, Index, Integer, LargeBinary, MetaData, String, Table, func
+from sqlalchemy import BigInteger, CheckConstraint, Column, DateTime, Index, Integer, LargeBinary, MetaData, String, Table, UniqueConstraint, func
 from sqlalchemy.dialects.mysql import JSON, MEDIUMTEXT, SMALLINT, VARCHAR
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
@@ -42,7 +42,7 @@ payment_proofs = Table(
     Column("id", BigInteger, primary_key=True, autoincrement=True),
     Column("payment_order_id", VARCHAR(40), nullable=False),
     Column("signed_tx_b64", MEDIUMTEXT, nullable=False),
-    Column("signed_tx_hash", String(64)),   # SHA-256(signed_tx_b64) — UNIQUE for replay protection
+    Column("signed_tx_hash", String(64), unique=True),   # SHA-256(signed_tx_b64) — UNIQUE for replay protection
     Column("parsed_tx", JSON),
     Column("verification_result", JSON, nullable=False),
     Column("submitted_at", DateTime(6), nullable=False, server_default=func.current_timestamp(6)),

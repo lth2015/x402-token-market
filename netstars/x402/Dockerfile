@@ -11,10 +11,14 @@ ENV POETRY_VERSION=1.8.3 \
 RUN pip install "poetry==${POETRY_VERSION}"
 
 WORKDIR /app
-COPY pyproject.toml ./
-# Generate lock + install (in real CI we'd commit poetry.lock; here we generate on build)
-RUN poetry lock --no-update 2>/dev/null || poetry lock
-RUN poetry install --only main --no-root
+COPY pyproject.toml poetry.lock* ./
+# Use committed poetry.lock for reproducible builds; fall back to generating one
+# if the lock file is not present (should not happen in CI — commit the lock file).
+RUN if [ -f poetry.lock ]; then \
+        poetry install --only main --no-root; \
+    else \
+        poetry lock --no-update && poetry install --only main --no-root; \
+    fi
 
 
 # ── Runtime stage ─────────────────────────────────────────────────

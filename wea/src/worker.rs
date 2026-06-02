@@ -20,7 +20,7 @@ use sha2::Sha256;
 use sqlx::{MySqlPool, Row};
 use std::{sync::Arc, time::Duration};
 
-use crate::{mock_rpc::MockRpc, models::{callback_status, status}};
+use crate::{kms::KmsClient, mock_rpc::MockRpc, models::{callback_status, status}};
 
 type HmacSha256 = Hmac<Sha256>;
 
@@ -32,10 +32,21 @@ pub struct Worker {
     db:   MySqlPool,
     rpc:  Arc<MockRpc>,
     http: reqwest::Client,
+    kms:  Arc<KmsClient>,
 }
 
 impl Worker {
+    /// Convenience constructor that uses identity (dev) KMS mode.
+    /// For production, use `new_with_kms` and pass a KMS client built via
+    /// `KmsClient::from_env().await` so the KMS_MODE env is respected.
+    /// Also used in integration tests that don't need real KMS.
+    #[allow(dead_code)]
     pub fn new(db: MySqlPool) -> Self {
+        Self::new_with_kms(db, Arc::new(KmsClient::dev()))
+    }
+
+    /// Production path: inject a pre-built KmsClient (allows KMS_MODE=aws).
+    pub fn new_with_kms(db: MySqlPool, kms: Arc<KmsClient>) -> Self {
         Self {
             db,
             rpc: Arc::new(MockRpc),
@@ -43,6 +54,7 @@ impl Worker {
                 .timeout(Duration::from_secs(10))
                 .build()
                 .expect("reqwest build"),
+            kms,
         }
     }
 
@@ -186,8 +198,23 @@ impl Worker {
         let tx_hash:          Option<String> = row.try_get("tx_hash")?;
         let confirmed_at:     Option<chrono::NaiveDateTime> = row.try_get("confirmed_at")?;
         let callback_url:     String = row.try_get("callback_url")?;
-        let secret_bytes:     Vec<u8> = row.try_get("callback_secret_enc")?;
+        let enc_bytes:        Vec<u8> = row.try_get("callback_secret_enc")?;
         let attempt_count:    i32 = row.try_get("callback_attempt_count")?;
+
+        // KMS-decrypt the stored callback secret before HMAC signing.
+        let secret_bytes = match self.kms.decrypt(&enc_bytes).await {
+            Ok(b) => b,
+            Err(e) => {
+                tracing::error!(settlement_id=%id, error=?e, "callback.kms_decrypt_failed");
+                // Release the in_flight lock so it can retry.
+                sqlx::query(r#"UPDATE settlements SET callback_status = ? WHERE id = ?"#)
+                    .bind(callback_status::PENDING)
+                    .bind(&id)
+                    .execute(&self.db)
+                    .await.ok();
+                return Err(e);
+            }
+        };
 
         // Mark in_flight inside the same tx, then commit so other workers
         // don't try to send it concurrently.
@@ -286,6 +313,7 @@ fn hmac_sha256_hex(key: &[u8], msg: &[u8]) -> String {
     mac.update(msg);
     hex::encode(mac.finalize().into_bytes())
 }
+
 
 // Bring NaiveDateTime → DateTime<Utc> trait into scope for the callback body.
 use chrono::TimeZone;

@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   Bell,
   Box,
-  CheckCircle,
+  Check,
   Mail,
   MessageSquare,
   Package,
@@ -52,8 +52,8 @@ export function SuccessStep({
   const placedAt = new Date(order.placedAt);
   const stepDates = {
     today: placedAt,
-    prep: addDays(placedAt, 1),
-    ship: addDays(placedAt, 2),
+    prep:  addDays(placedAt, 1),
+    ship:  addDays(placedAt, 2),
     arrive: addDays(placedAt, 4),
   };
 
@@ -64,64 +64,63 @@ export function SuccessStep({
 
   return (
     <div className="mt-8 space-y-5 animate-fade-up">
-      {/* Confirmation header */}
-      <div className="rounded-2xl border border-semantic-success/35 bg-semantic-success/5 p-8 text-center">
-        <div className="relative mx-auto flex h-16 w-16 items-center justify-center">
-          <span className="animate-pulse-ring absolute inline-block h-16 w-16 rounded-full border-2 border-emerald-400/50" />
-          <span className="relative inline-flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-lg">
-            <CheckCircle className="h-7 w-7 text-white" aria-hidden />
+
+      {/* ── Confirmation header ───────────────────────────────────────── */}
+      <div className="rounded-2xl border border-border-subtle bg-surface-elevated p-8 text-center shadow-e1 lg:p-10">
+
+        {/* Success mark — clean, not exuberant */}
+        <div className="relative mx-auto flex h-20 w-20 items-center justify-center">
+          <span className="animate-pulse-ring absolute inset-0 rounded-full border border-semantic-success/30" />
+          <span className="relative inline-flex h-16 w-16 items-center justify-center rounded-full bg-surface-deep border border-semantic-success/25">
+            <Check className="h-7 w-7 text-semantic-success" strokeWidth={2.5} aria-hidden />
           </span>
         </div>
-        <h3 className="mt-5 text-[20px] font-bold text-brand-ink">
-          订单已确认,感谢你的购买
+
+        <h3 className="mt-6 font-serif text-[24px] font-normal text-ink-primary">
+          订单已确认
         </h3>
-        <p className="mt-1.5 text-small text-ink-secondary">
-          指纹确认通过,USDC 已扣款。HABA 正在为你安排发货。
+        <p className="mt-2 font-sans text-small text-ink-secondary">
+          感谢你的购买 —— HABA 正在为你安排发货。
         </p>
 
-        <dl className="mx-auto mt-6 max-w-md space-y-2 text-left text-small">
+        {/* Order summary */}
+        <dl className="mx-auto mt-7 max-w-md space-y-0 text-left rounded-xl border border-border-subtle bg-surface-deep overflow-hidden">
           <SummaryRow
             label="订单号"
-            value={<span className="font-mono text-[12px]">{order.orderId}</span>}
+            value={<span className="font-mono text-[12px] tracking-wide">{order.orderId}</span>}
           />
           <SummaryRow
             label="支付金额"
             value={
-              <>
-                <span className="font-semibold">{formatJpy(order.totalJpy)}</span>
-                <span className="ml-1 text-caption font-normal text-ink-tertiary">
-                  · {order.amountUsdc.toFixed(2)} USDC
-                </span>
-              </>
+              <span className="font-sans font-semibold">{formatJpy(order.totalJpy)}</span>
             }
           />
           <SummaryRow
             label="送往"
             value={
-              <>
-                <div>
-                  {order.address.prefecture}
-                  {order.address.city} {order.address.street}
-                </div>
-                <div className="text-caption text-ink-tertiary">
-                  {order.address.recipient} · {order.address.phone}
-                </div>
-              </>
+              <span className="text-right">
+                <span className="block">{order.address.prefecture}{order.address.city}</span>
+                <span className="block font-sans text-caption text-ink-tertiary">{order.address.street}</span>
+              </span>
             }
+          />
+          <SummaryRow
+            label="收件人"
+            value={`${order.address.recipient} · ${order.address.phone}`}
           />
         </dl>
       </div>
 
-      {/* Lifecycle timeline */}
-      <div className="rounded-2xl border border-border-subtle bg-surface-base p-6 shadow-e1">
-        <h4 className="text-body font-bold text-brand-ink">订单进度</h4>
-        <ol className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-4">
+      {/* ── Order timeline ────────────────────────────────────────────── */}
+      <div className="rounded-2xl border border-border-subtle bg-surface-elevated p-6 shadow-e1">
+        <h4 className="font-sans text-small font-semibold text-ink-primary">订单进度</h4>
+        <ol className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <Step
             n={1}
             active
             title="已确认"
             date={stepDates.today}
-            icon={<CheckCircle className="h-4 w-4" aria-hidden />}
+            icon={<Check className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden />}
             note="刚刚"
           />
           <Step
@@ -129,7 +128,7 @@ export function SuccessStep({
             active={false}
             title="备货中"
             date={stepDates.prep}
-            icon={<Box className="h-4 w-4" aria-hidden />}
+            icon={<Box className="h-3.5 w-3.5" aria-hidden />}
             note="预计明日完成"
           />
           <Step
@@ -137,7 +136,7 @@ export function SuccessStep({
             active={false}
             title="已发货"
             date={stepDates.ship}
-            icon={<Package className="h-4 w-4" aria-hidden />}
+            icon={<Package className="h-3.5 w-3.5" aria-hidden />}
             note="ヤマト运输"
           />
           <Step
@@ -145,62 +144,62 @@ export function SuccessStep({
             active={false}
             title="送达预计"
             date={stepDates.arrive}
-            icon={<Truck className="h-4 w-4" aria-hidden />}
+            icon={<Truck className="h-3.5 w-3.5" aria-hidden />}
             note="3 个工作日内"
           />
         </ol>
-        <div className="mt-5 flex items-start gap-2 rounded-xl border border-border-subtle bg-surface-elevated px-4 py-3 text-small text-ink-secondary">
+
+        <div className="mt-5 flex items-start gap-2.5 rounded-xl border border-border-subtle bg-surface-deep px-4 py-3">
           {reminder.channel === "email" ? (
-            <Mail className="mt-0.5 h-4 w-4 shrink-0 text-brand-primary" aria-hidden />
+            <Mail className="mt-0.5 h-4 w-4 shrink-0 text-brand-primary/60" aria-hidden />
           ) : (
-            <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-brand-primary" aria-hidden />
+            <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-brand-primary/60" aria-hidden />
           )}
-          <span>
+          <span className="font-sans text-small text-ink-secondary">
             发货完成后,通知会发到{" "}
-            <span className="font-semibold text-brand-ink">{channelTarget}</span>
+            <span className="font-semibold text-ink-primary">{channelTarget}</span>
           </span>
         </div>
       </div>
 
-      {/* Reminder opt-in */}
-      <div className="rounded-2xl border border-brand-primary/20 bg-brand-primary/5 p-6">
-        <div className="flex items-start gap-3">
+      {/* ── Reminder opt-in ───────────────────────────────────────────── */}
+      <div className="rounded-2xl border border-brand-border bg-brand-subtle p-6">
+        <div className="flex items-start gap-3.5">
           <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-primary text-white">
             <Bell className="h-5 w-5" aria-hidden />
           </span>
           <div className="min-w-0 flex-1">
-            <h4 className="text-body font-bold text-brand-ink">需要定期补货提醒吗?</h4>
-            <p className="mt-1 text-small text-ink-secondary">
-              MARVIE 用完了再下单太麻烦 ——
-              让 HABA 在你快用完的时候提醒你一次,直接一键复购。
+            <h4 className="font-sans text-small font-semibold text-ink-primary">
+              需要定期补货提醒吗?
+            </h4>
+            <p className="mt-1 font-sans text-small text-ink-secondary">
+              MARVIE 快用完的时候提醒你一次 —— 一键复购,省时省力。
             </p>
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <span className="text-small text-ink-secondary">每</span>
+
+            <div className="mt-4 flex flex-wrap items-center gap-2.5">
+              <span className="font-sans text-small text-ink-secondary">每</span>
               {([4, 8, 12] as ReminderInterval[]).map((weeks) => (
                 <button
                   key={weeks}
                   type="button"
                   onClick={() =>
-                    setReminder((r) => ({
-                      ...r,
-                      intervalWeeks: weeks,
-                      enabled: true,
-                    }))
+                    setReminder((r) => ({ ...r, intervalWeeks: weeks, enabled: true }))
                   }
                   className={cn(
-                    "rounded-full border px-3.5 py-1.5 text-small font-semibold transition-colors",
+                    "rounded-full border px-4 py-1.5 font-sans text-small font-medium transition-colors duration-150",
                     reminder.intervalWeeks === weeks && reminder.enabled
                       ? "border-brand-primary bg-brand-primary text-white"
-                      : "border-border-default bg-surface-base text-ink-secondary hover:border-brand-primary/40 hover:text-brand-primary",
+                      : "border-border-default bg-surface-elevated text-ink-secondary hover:border-brand-primary/40 hover:text-brand-primary",
                   )}
                 >
                   {weeks} 周
                 </button>
               ))}
-              <span className="text-small text-ink-secondary">提醒我一次</span>
+              <span className="font-sans text-small text-ink-secondary">提醒一次</span>
             </div>
+
             {reminder.enabled && (
-              <div className="mt-4 flex flex-wrap items-center gap-2 text-small">
+              <div className="mt-4 flex flex-wrap items-center gap-2 font-sans text-small">
                 <span className="text-ink-secondary">通过</span>
                 {(["email", "sms"] as const).map((ch) => (
                   <button
@@ -208,36 +207,32 @@ export function SuccessStep({
                     type="button"
                     onClick={() => setReminder((r) => ({ ...r, channel: ch }))}
                     className={cn(
-                      "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-caption font-semibold transition-colors",
+                      "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-caption font-medium transition-colors duration-150",
                       reminder.channel === ch
                         ? "border-brand-primary bg-brand-primary/10 text-brand-primary"
                         : "border-border-default text-ink-tertiary hover:border-brand-primary/40 hover:text-brand-primary",
                     )}
                   >
-                    {ch === "email" ? (
-                      <Mail className="h-3.5 w-3.5" aria-hidden />
-                    ) : (
-                      <MessageSquare className="h-3.5 w-3.5" aria-hidden />
-                    )}
+                    {ch === "email"
+                      ? <Mail className="h-3.5 w-3.5" aria-hidden />
+                      : <MessageSquare className="h-3.5 w-3.5" aria-hidden />
+                    }
                     {ch === "email" ? "邮箱" : "短信"}
                   </button>
                 ))}
-                <span className="text-ink-tertiary">
-                  → {reminder.channel === "email"
-                    ? order.address.email || "(请补填邮箱)"
-                    : order.address.phone}
-                </span>
+                <span className="text-ink-tertiary">→ {channelTarget}</span>
                 <button
                   type="button"
                   onClick={commitReminder}
                   className="ml-auto rounded-xl bg-brand-primary px-4 py-2 text-small font-semibold text-white hover:bg-brand-primary-hover"
                 >
-                  {reminderSaved ? "已设置 ✓" : "确认提醒"}
+                  {reminderSaved ? "已设置" : "确认提醒"}
                 </button>
               </div>
             )}
+
             {reminderSaved && (
-              <p className="mt-3 text-caption text-semantic-success">
+              <p className="mt-3 font-sans text-caption text-semantic-success">
                 好的,{reminder.intervalWeeks} 周后会通过
                 {reminder.channel === "email" ? "邮箱" : "短信"}提醒你补货。
               </p>
@@ -246,17 +241,18 @@ export function SuccessStep({
         </div>
       </div>
 
-      <div className="flex flex-wrap justify-center gap-3">
+      {/* Actions */}
+      <div className="flex flex-wrap justify-center gap-3 pt-2">
         <Link
           href="/"
-          className="rounded-xl bg-brand-primary px-5 py-2.5 text-small font-semibold text-white hover:bg-brand-primary-hover"
+          className="rounded-xl bg-brand-primary px-6 py-2.5 font-sans text-small font-semibold text-white shadow-e1 hover:bg-brand-primary-hover hover:shadow-e2 transition-all duration-150"
         >
           继续购物
         </Link>
         <button
           type="button"
           onClick={onNewOrder}
-          className="rounded-xl border border-border-default bg-surface-base px-5 py-2.5 text-small font-medium text-ink-secondary hover:border-brand-primary/40 hover:text-brand-primary"
+          className="rounded-xl border border-border-default bg-surface-elevated px-6 py-2.5 font-sans text-small font-medium text-ink-secondary hover:border-brand-primary/40 hover:text-brand-primary transition-colors duration-150"
         >
           新建订单
         </button>
@@ -267,9 +263,9 @@ export function SuccessStep({
 
 function SummaryRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex items-baseline justify-between gap-3">
-      <dt className="text-ink-tertiary">{label}</dt>
-      <dd className="text-right text-brand-ink">{value}</dd>
+    <div className="flex items-baseline justify-between gap-3 px-5 py-3 border-b border-border-subtle last:border-0">
+      <dt className="font-sans text-small text-ink-tertiary shrink-0">{label}</dt>
+      <dd className="font-sans text-small text-ink-primary text-right">{value}</dd>
     </div>
   );
 }
@@ -292,32 +288,32 @@ function Step({
   return (
     <li
       className={cn(
-        "rounded-xl border p-4",
+        "rounded-xl border p-3.5",
         active
-          ? "border-semantic-success/40 bg-semantic-success/5"
-          : "border-border-subtle bg-surface-elevated",
+          ? "border-semantic-success/30 bg-semantic-success/5"
+          : "border-border-subtle bg-surface-deep",
       )}
     >
       <div
         className={cn(
-          "inline-flex h-7 w-7 items-center justify-center rounded-full text-white",
-          active ? "bg-semantic-success" : "bg-ink-tertiary/40",
+          "inline-flex h-7 w-7 items-center justify-center rounded-full",
+          active ? "bg-semantic-success text-white" : "bg-border-default text-ink-tertiary",
         )}
       >
         {icon}
       </div>
-      <p className="mt-3 text-caption font-bold uppercase tracking-widest text-ink-tertiary">
-        {`0${n}`}
+      <p className="mt-3 font-sans text-[10px] font-medium uppercase tracking-widest text-ink-tertiary">
+        {String(n).padStart(2, "0")}
       </p>
-      <p className="mt-0.5 text-small font-bold text-brand-ink">{title}</p>
-      <p className="text-caption text-ink-tertiary">
+      <p className="mt-0.5 font-sans text-small font-semibold text-ink-primary">{title}</p>
+      <p className="font-sans text-caption text-ink-tertiary">
         {date.toLocaleDateString("zh-CN", {
           month: "numeric",
           day: "numeric",
           weekday: "short",
         })}
       </p>
-      <p className="mt-1 text-[11px] text-ink-secondary">{note}</p>
+      <p className="mt-1 font-sans text-[11px] text-ink-secondary">{note}</p>
     </li>
   );
 }

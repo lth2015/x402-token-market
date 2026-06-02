@@ -177,7 +177,8 @@ services:
       dockerfile: Dockerfile
     environment:
       ENV: local
-      DATABASE_URL: mysql+aiomysql://token_app:token_app_dev@mysql:3306/token_qa
+      # sync pymysql driver — worker uses BlockingScheduler + sync SQLAlchemy Core
+      DATABASE_URL: mysql+pymysql://token_app:token_app_dev@mysql:3306/token_qa
       REDIS_URL: redis://redis:6379/1
       WORKER_MODE: all
     depends_on:
@@ -226,6 +227,10 @@ services:
       SOLANA_RPC_URL_MAINNET: ${SOLANA_RPC_URL_MAINNET:-https://api.mainnet-beta.solana.com}
       # Legacy async settlement queue (kept for compat)
       X402_CALLBACK_BASE_URL: http://x402-api:8080
+      # Depeg monitor price feed.
+      # "mock" (default, local dev): uses MockPriceFeed at price 1.0 — no external calls.
+      # "http" (production): uses HttpPriceFeed → CoinGecko simple/price endpoint.
+      DEPEG_PRICE_FEED: ${DEPEG_PRICE_FEED:-mock}
       # Wallet config — surfaced by /v1/_console/metrics so the WEA console
       # can render demo payer + recipient balances on Devnet.
       USDC_MINT: ${USDC_MINT:-4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU}

@@ -1,5 +1,5 @@
 /**
- * HABA demo · single source of truth for TypeScript types.
+ * HABA · single source of truth for TypeScript types.
  *
  * All types follow haba-technical-plan §2 verbatim. Concrete mock values
  * live in sibling files (merchant.ts / products.ts / scenarios.ts /
@@ -11,7 +11,7 @@
  */
 
 // ──────────────────────────────────────────────────────────────────
-// HABA merchant (single tenant in this demo)
+// HABA merchant (single tenant)
 // ──────────────────────────────────────────────────────────────────
 export type HabaMerchant = {
   id: string;                          // "mch_haba_001"
@@ -61,7 +61,7 @@ export type MarvieProduct = {
   imageEmoji: string;                  // 占位 emoji
   shortPitch: string;                  // 一句话卖点（卡片副标）
   longDescription: string;             // 详情段落
-  inventoryDemo?: { storeName: string; qty: number }[];   // B2B pharmacy 场景用
+  inventorySnapshot?: { storeName: string; qty: number }[];   // B2B pharmacy 场景用
 };
 
 // ──────────────────────────────────────────────────────────────────
@@ -164,7 +164,7 @@ export type B2BPartnerCase = {
   valueProp: string;                   // 一句话价值主张
   embedTechnique: EmbedTechnique;
   sampleScenarioId: HabaAgentScenario["id"];
-  monthlyCallVolumeDemo: number;       // demo 数字
+  monthlyCallVolume: number;           // 月均调用量（参考值）
   recommendedPlanId: TokenResalePlanId;
 };
 

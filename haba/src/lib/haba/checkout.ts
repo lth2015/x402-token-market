@@ -1,8 +1,8 @@
 /**
  * Checkout amount policy shared by the cart UI and checkout route.
  *
- * Demo transactions are intentionally kept below 10 USDC so the Devnet payer
- * wallet survives repeated executive demos while still producing real on-chain
+ * Checkout amounts are intentionally kept below 10 USDC so the Devnet payer
+ * wallet survives repeated runs while still producing real on-chain
  * evidence.
  */
 export const USDC_RATE_JPY = 150;

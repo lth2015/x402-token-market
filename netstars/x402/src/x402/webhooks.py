@@ -230,7 +230,7 @@ class Deliverer:
             if 200 <= status < 300:
                 await self._mark_delivered(row.id, status, resp_body_excerpt)
                 log.info("webhook.delivered", id=row.id, order=row.payment_order_id,
-                         event=row.event_type, status=status)
+                         event_type=row.event_type, status=status)
                 return
             if 400 <= status < 500 and status != 429:
                 # Client error — partner's endpoint says "never going to accept this"

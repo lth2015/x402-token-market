@@ -44,13 +44,14 @@ from solders.hash import Hash
 from solders.pubkey import Pubkey
 from sqlalchemy import select, text
 
-from . import db
+from . import __version__, db
 from .console_routes import ConsoleDeps, make_router as make_console_router
 from .orders import OrderService, OrderStateConflictError
 from .proof import ProofError, verify_proof
 from .protected_routes import ProtectedDeps, make_router as make_protected_router
 from .solana_rpc import SolanaRpc, SolanaRpcError
 from .tx_builder import TxBuildError, build_x402_payment_tx, keypair_from_b64
+from .wea_client import WeaFacilitatorClient, WeaFacilitatorError
 from .webhooks import (
     DEFAULT_SIGNING_SECRET,
     DEFAULT_TARGET_URL,
@@ -158,7 +159,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="X402 Gateway",
-    version="0.4.0",
+    version=__version__,
     docs_url="/docs" if ENV in ("local", "qa") else None,
     redoc_url=None,
     lifespan=lifespan,
@@ -199,7 +200,7 @@ async def require_internal(request: Request) -> None:
 # ── Health ─────────────────────────────────────────────────────────
 @app.get("/healthz")
 async def healthz():
-    return {"status": "ok", "service": "x402-api", "version": "0.2.0"}
+    return {"status": "ok", "service": "x402-api", "version": __version__}
 
 
 @app.get("/readyz")
@@ -287,6 +288,69 @@ async def create_payment(body: CreatePaymentIn, _: None = Depends(require_intern
     return order
 
 
+@app.get("/v1/payments")
+async def list_payments(
+    since: Optional[str] = None,
+    limit: int = 100,
+    _: None = Depends(require_internal),
+):
+    """
+    Read-only: list payment orders for reconciliation.
+
+    Used by token worker reconciler (AP2: cross-module via API only).
+    Query params:
+      since  — ISO 8601 UTC timestamp; only orders created at or after this time
+      limit  — max records returned (capped at 500)
+
+    Returns orders sorted by created_at ASC so reconciler can page forward.
+    """
+    effective_limit = min(max(1, limit), 500)
+    since_dt: Optional[datetime] = None
+    if since:
+        try:
+            since_dt = datetime.fromisoformat(since.replace("Z", "+00:00")).replace(tzinfo=None)
+        except ValueError as e:
+            raise HTTPException(400, f"invalid since timestamp: {e}") from e
+
+    t = db.payment_orders
+    q = (
+        select(
+            t.c.id,
+            t.c.merchant_id,
+            t.c.amount_usdc_micro,
+            t.c.status,
+            t.c.tx_hash,
+            t.c.confirmed_at,
+        )
+        .order_by(t.c.created_at.asc())
+        .limit(effective_limit)
+    )
+    if since_dt is not None:
+        q = q.where(t.c.created_at >= since_dt)
+
+    async with app.state.db.connect() as conn:
+        rows = (await conn.execute(q)).all()
+
+    def _fmt_dt(dt: Optional[datetime]) -> Optional[str]:
+        if dt is None:
+            return None
+        return dt.replace(tzinfo=timezone.utc).isoformat()
+
+    return {
+        "orders": [
+            {
+                "id": r.id,
+                "merchant_id": r.merchant_id,
+                "amount_usdc_micro": r.amount_usdc_micro,
+                "status": r.status,
+                "tx_hash": r.tx_hash,
+                "confirmed_at": _fmt_dt(r.confirmed_at),
+            }
+            for r in rows
+        ]
+    }
+
+
 @app.get("/v1/payments/{order_id}", response_model=PaymentOut)
 async def get_payment(order_id: str):
     async with app.state.db.connect() as conn:
@@ -352,23 +416,56 @@ async def submit_proof(order_id: str, body: SubmitProofIn):
         except OrderStateConflictError as e:
             raise HTTPException(409, f"{e}") from e
 
-    # 3. Broadcast to Solana RPC
+    # 3. Delegate broadcast to WEA facilitator (AP4: gateway never touches Solana directly).
+    # Reconstruct a minimal PaymentPayload + PaymentRequirements from the order so we
+    # can call wea.settle() — which handles the actual on-chain broadcast.
+    # NOTE: this legacy endpoint is DEPRECATED as of v0.4.0. New callers must use
+    # POST /v1/protected/checkout/order (standard x402 flow). This route is retained
+    # for ≥12-month API compatibility (AP6); only the internal implementation changes.
+    wea_payload = {
+        "x402Version": 1,
+        "scheme": "exact",
+        "network": order.get("network", X402_NETWORK),
+        "resource": order.get("resource") or "",
+        "payload": {"signedTxBase64": body.signed_tx_base64},
+    }
+    wea_requirements = {
+        "scheme": "exact",
+        "network": order.get("network", X402_NETWORK),
+        "maxAmountRequired": str(order["amount_usdc_micro"]),
+        "resource": order.get("resource") or "",
+        "payTo": order.get("recipient_address", DEPOSIT_RECIPIENT),
+        "asset": USDC_MINT,
+        "extra": {"nonce": order["nonce"]},
+    }
+    wea = WeaFacilitatorClient(app.state.http, base_url=WEA_API_BASE_URL)
     try:
-        rpc_sig = await app.state.solana_rpc.send_transaction(body.signed_tx_base64)
-    except SolanaRpcError as e:
-        # Mark order failed so it doesn't sit in pending forever
+        sresult = await wea.settle(payment_payload=wea_payload, requirements=wea_requirements)
+    except WeaFacilitatorError as e:
         async with app.state.db.begin() as conn:
             try:
                 await OrderService.transition(
                     conn, order_id, from_status="pending", to_status="failed",
-                    updates={"status_reason": f"rpc_send_failed: {e!s}"[:255]},
+                    updates={"status_reason": f"wea_settle_failed: {e!s}"[:255]},
                 )
             except OrderStateConflictError:
                 pass
         log.error("payment.broadcast_failed", order_id=order_id, error=str(e))
-        raise HTTPException(502, f"Solana RPC: {e}") from e
+        raise HTTPException(502, f"facilitator settle: {e}") from e
+    if not sresult.success:
+        async with app.state.db.begin() as conn:
+            try:
+                await OrderService.transition(
+                    conn, order_id, from_status="pending", to_status="failed",
+                    updates={"status_reason": f"wea_settle_rejected: {sresult.error_reason or ''}"},
+                )
+            except OrderStateConflictError:
+                pass
+        log.error("payment.broadcast_failed", order_id=order_id, error=sresult.error_reason)
+        raise HTTPException(502, f"facilitator settle rejected: {sresult.error_reason}")
+    rpc_sig = sresult.transaction
 
-    # 4. Sanity: the signature from the RPC should match what we parsed.
+    # 4. Sanity: wea-returned signature should match what we parsed locally.
     if rpc_sig != result.signature_b58:
         log.warning("payment.sig_mismatch", parsed=result.signature_b58, rpc=rpc_sig)
 
@@ -479,7 +576,7 @@ async def dev_webhook_sink(request: Request):
 async def root():
     return {
         "service": "x402-api",
-        "version": "0.3.0",
+        "version": __version__,
         "endpoints": [
             "POST /v1/protected/checkout/order         (standard x402: 402 → X-PAYMENT → 200)",
             "POST /internal/build-payment-payload      (DEV: build X-PAYMENT via demo wallet)",
@@ -553,29 +650,43 @@ async def _confirmer_tick(app: FastAPI) -> None:
 
 
 async def _confirmer_advance_one(app: FastAPI, order_id: str, tx_hash: str) -> None:
-    """Poll RPC for one order; advance state on success."""
-    status = await app.state.solana_rpc.get_signature_status(tx_hash)
-    if status is None:
-        return  # not yet seen by the network
-    confirm_level = status.get("confirmationStatus")
-    err = status.get("err")
-    if err is not None:
-        # Tx landed but failed (e.g. insufficient funds in source ATA)
+    """Poll WEA for one order's tx status; advance FSM on confirmation or failure.
+
+    AP4 compliant: x402 never queries Solana directly. All on-chain status
+    queries are delegated to WEA via GET /facilitator/tx/{signature}.
+    """
+    wea = WeaFacilitatorClient(
+        app.state.http,
+        base_url=WEA_API_BASE_URL,
+        internal_auth_secret=INTERNAL_AUTH_SECRET,
+    )
+    try:
+        tx_status = await wea.get_tx_status(tx_hash)
+    except WeaFacilitatorError as e:
+        log.warning("confirmer.wea_tx_status_error", order_id=order_id, tx_hash=tx_hash, err=str(e))
+        return  # transient; retry next tick
+
+    if tx_status.status == "pending":
+        return  # not yet seen / still processing
+
+    if tx_status.status == "failed" or tx_status.err is not None:
+        err_detail = tx_status.err or "unknown"
         failed_order: Optional[dict] = None
         async with app.state.db.begin() as conn:
             try:
                 failed_order = await OrderService.transition(
                     conn, order_id, from_status="broadcasting", to_status="failed",
-                    updates={"status_reason": f"on_chain_error: {str(err)[:200]}"},
+                    updates={"status_reason": f"on_chain_error: {str(err_detail)[:200]}"},
                 )
             except OrderStateConflictError:
                 pass
         if failed_order:
             await _enqueue_event(failed_order, "payment.failed")
-        log.warning("confirmer.tx_failed", order_id=order_id, tx_hash=tx_hash, err=str(err))
+        log.warning("confirmer.tx_failed", order_id=order_id, tx_hash=tx_hash, err=err_detail)
         return
-    if confirm_level not in ("confirmed", "finalized"):
-        return  # still processing
+
+    if tx_status.status not in ("confirmed", "finalized"):
+        return  # unknown status — treat as pending
 
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     async with app.state.db.begin() as conn:

@@ -18,7 +18,7 @@ export default function InvoicesPage() {
     { key: "period", header: "Period", width: "w-24", render: (r) => <span className="font-mono text-small">{r.period}</span> },
     { key: "id",     header: "Invoice ID",   render: (r) => <span className="font-mono text-[12px] text-ink-secondary">{r.id}</span> },
     { key: "total",  header: "Total",  align: "right", mono: true, render: (r) => `¥${r.totalJpy.toLocaleString()}` },
-    { key: "tx",     header: "On-chain tx", align: "right", mono: true, render: (r) => r.txCount },
+    { key: "tx",     header: "Settlements", align: "right", mono: true, render: (r) => r.txCount },
     { key: "calls",  header: "AI calls",    align: "right", mono: true, render: (r) => r.callCount.toLocaleString() },
     {
       key: "status",
@@ -55,8 +55,8 @@ export default function InvoicesPage() {
       <DataTable columns={cols} rows={invoices} caption="Past invoices" />
 
       <p className="mt-4 text-caption text-ink-tertiary">
-        Each invoice CSV includes all on-chain Solana tx hashes for the period, suitable
-        for accounting reconciliation. Real generation lands when the billing service
+        Each invoice CSV includes settlement reference numbers (決済参照番号) for the period,
+        suitable for accounting reconciliation. Real generation lands when the billing service
         (token-worker → invoice_generator) ships.
       </p>
     </main>

@@ -9,6 +9,7 @@ import { LiveActivityTicker } from "@/components/LiveActivityTicker";
 import { PageHeader } from "@/components/PageHeader";
 import { api } from "@/lib/api";
 import { getUsageMock } from "@/lib/mock";
+import { getMerchantConfigFromApi } from "@/lib/merchant-config";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +19,8 @@ export default async function DashboardPage() {
   let balance: Awaited<ReturnType<typeof api.balance>> | null = null;
   let activity: Awaited<ReturnType<typeof api.recentActivity>> = { items: [] };
   let backendError: string | null = null;
+  // Fetch merchant profile alongside balance and activity; never throws.
+  const [merchant] = await Promise.all([getMerchantConfigFromApi()]);
   try {
     [balance, activity] = await Promise.all([api.balance(), api.recentActivity(20)]);
   } catch (e: unknown) {
@@ -29,7 +32,7 @@ export default async function DashboardPage() {
     <main className="mx-auto max-w-7xl px-6 py-8 lg:px-12">
       <PageHeader
         title={t("title")}
-        subtitle="HABA / ハーバー研究所 · Production"
+        subtitle={`${merchant.displayName} · ${merchant.envLabel}`}
         right={<div className="text-caption text-ink-tertiary">Last 30 days</div>}
       />
 

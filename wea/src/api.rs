@@ -6,8 +6,14 @@
 //   GET  /v1/settlements/{id}   — query status (caller polls; canonical state
 //                                  is also pushed to `callback_url`)
 //
-// Auth: none in MVP. Production will be mTLS between x402 ↔ wea; the cert CN
-// gates this whole router. See wea/DESIGN.md §9.
+// Auth (interim): shared secret header `X-Internal-Auth` validates that the
+//   caller is x402-api. See AppCtx::internal_auth_secret.
+//   TODO(production): replace with mTLS — ALB injects X-Client-Cert-CN after
+//   TLS client-cert verification (DESIGN §9). mTLS + this shared secret gives
+//   defence in depth during the transition period.
+//
+// Depeg guard: POST /v1/settlements checks `accepting_new_settlements` system
+//   flag before inserting. If false (depeg protection engaged) → 503.
 
 use axum::{
     extract::{Path, State},
@@ -20,8 +26,9 @@ use sqlx::Row;
 use std::sync::Arc;
 use ulid::Ulid;
 
+use crate::depeg;
 use crate::models::{
-    callback_status, status, CreateSettlementRequest, CreateSettlementResponse,
+    status, CreateSettlementRequest, CreateSettlementResponse,
     GetSettlementResponse,
 };
 use crate::AppCtx;
@@ -30,8 +37,27 @@ use crate::AppCtx;
 /// it through broadcasting → confirmed → callback → done.
 pub async fn create_settlement(
     State(ctx): State<Arc<AppCtx>>,
-    Json(req): Json<CreateSettlementRequest>,
+    req_raw: axum::extract::Request,
 ) -> Response {
+    // ── Interim internal-auth guard (TODO: replace with mTLS, DESIGN §9) ──
+    let auth_ok = req_raw
+        .headers()
+        .get("x-internal-auth")
+        .and_then(|v| v.to_str().ok())
+        .map(|v| v == ctx.internal_auth_secret)
+        .unwrap_or(false);
+    if !auth_ok {
+        return (StatusCode::UNAUTHORIZED,
+            Json(json!({"error":"unauthorized","message":"missing or invalid X-Internal-Auth"}))).into_response();
+    }
+
+    // Parse body after consuming the request.
+    use axum::extract::FromRequest;
+    let req: CreateSettlementRequest = match axum::Json::<CreateSettlementRequest>::from_request(req_raw, &()).await {
+        Ok(axum::Json(r)) => r,
+        Err(e) => return bad(&format!("invalid request body: {e}")),
+    };
+
     if req.expected_amount_micro <= 0 {
         return bad("expected_amount_micro must be > 0");
     }
@@ -42,10 +68,30 @@ pub async fn create_settlement(
         return bad("callback_url must be http(s)://...");
     }
 
+    // ── Depeg guard ────────────────────────────────────────────────────────
+    if !depeg::is_accepting_settlements(&ctx.db).await {
+        tracing::warn!("create_settlement.rejected: depeg protection active");
+        return (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(json!({
+                "error":   "depeg_protection_active",
+                "message": "USDC depeg protection is engaged. New settlements are temporarily suspended. Contact Wea Japan operations."
+            })),
+        ).into_response();
+    }
+
     let id = format!("stl_{}", Ulid::new().to_string());
-    // DEV: KMS_MODE=dev → bytes ARE plaintext. Production will Encrypt via
-    // AWS KMS ap-northeast-1 here (mirrors token-api/KMS.md DevKmsClient).
-    let secret_bytes = req.callback_secret.as_bytes().to_vec();
+
+    // ── KMS encrypt callback_secret before persisting ─────────────────────
+    // KMS_MODE=dev → TAG_DEV(0x00) + plaintext bytes (identity, no AWS needed).
+    // KMS_MODE=aws → TAG_AWS(0x01) + KMS ciphertext (ap-northeast-1 CMK).
+    let secret_bytes = match ctx.kms.encrypt(req.callback_secret.as_bytes()).await {
+        Ok(b)  => b,
+        Err(e) => {
+            tracing::error!(error=?e, "kms.encrypt_failed");
+            return server_err(&format!("kms encrypt failed: {e}"));
+        }
+    };
 
     let res = sqlx::query(
         r#"
@@ -137,8 +183,6 @@ pub async fn get_settlement(
         callback_status:   row.try_get::<Option<String>, _>("callback_status").unwrap_or(None),
         callback_attempts: row.try_get::<i32, _>("callback_attempt_count").unwrap_or(0),
     };
-    // Suppress unused-warning for the import (only used through ::PENDING etc).
-    let _ = callback_status::PENDING;
     Json(body).into_response()
 }
 

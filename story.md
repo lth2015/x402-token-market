@@ -1,178 +1,341 @@
 <!--
-  story.md — X402 Token Market · HABA Demo 叙事脚本
-  用途：① 下午内部演示的串场故事　② GPT 图像生成（img2）的海报文案来源
-  范围：HABA × Netstars 联合项目内部 demo；含未公开商品规划与合作意向，外部披露以双方书面文件为准。
+  story.md — AI Commerce Demo · 商业叙事与 GPT img2 海报提示词
+  用途：内部演示串场、经营层说明、GPT img2 主视觉生成。
+  原则：故事面向商业观众；避免把后台机制和实现细节放到叙事前台。
 -->
 
-# 一勺甜，背后一条链
+# 一勺甜，背后一门新生意
 
-> **Logline（一句话）**
-> 女儿为糖尿病的母亲买一瓶代糖——这个最普通的下午，背后是一个会自己思考、自己付费、自己上链结算的 AI 商务生态在悄悄运转。
+> **Logline**
+> 一个女儿想给母亲买一瓶低卡甜味料。HABA 用 AI 把一次犹豫变成一次放心购买；Netstars 则把这类 AI 服务变成可计量、可结算、可复制的新商业基础设施。
 
 ---
 
-## 0. 这个故事要证明什么
+## 0. 这个故事真正要讲什么
 
-把抽象的「x402 Token Market」翻译成一句人话：
+这不是“技术跑通了”的故事，而是一个更容易让经营层买单的故事：
 
-> **AI 帮人做选择，帮人花钱，帮人结算——全程自动、可计量、可上链验证。**
+> **AI 不只是客服。AI 正在变成商户的新货架、新销售员、新收费入口。**
 
-四个相关方，各司其职，独立部署，只靠 API / 协议握手：
+HABA 的价值在前台：
 
-| 角色 | 在故事里是谁 | 干什么 |
-|---|---|---|
-| **HABA / ハーバー研究所** | 开店的人 | 卖健康食品、买 AI 能力、把 AI 能力再转售 |
-| **Netstars** | 收银台与账本 | x402 支付网关 + Token 计量与账本 |
-| **WEA Japan** | 跑腿上链的人 | 把每一笔结算真实广播到公链 |
-| **Solana** | 公开的真相 | USDC 稳定币在链上落定，谁都能查 |
+- 让消费者更快做选择；
+- 让健康食品的购买理由更清楚；
+- 让线下药局、医院营养科、营养师、电商合作方都能使用同一个顾问能力；
+- 把一次性的商品销售，扩展成持续发生的“AI 健康顾问”服务收入。
+
+Netstars 的价值在后台：
+
+- 把每一次 AI 服务调用变成可记录、可收费、可对账的商业动作；
+- 让商户不用自己搭一套复杂的支付和计量系统；
+- 让 AI 服务从“成本中心”变成“可以卖给伙伴的产品”。
+
+一句话：
+
+> **HABA 卖的是健康选择；Netstars 卖的是让 AI 服务可以规模化收费的能力。**
 
 ---
 
 ## 1. 登场人物
 
-- **美咲（Misaki）**，35 岁，东京。母亲查出糖尿病前期，她想买一瓶「能加进咖啡、也能下厨」的代糖，却被满货架的术语劝退。
-- **HABA AI Advisor**，看不见的店员。它不睡觉、不催单、不推销，只根据卡路里、甜度、使用场景三件事，挑出最合适的那一款。
-- **田中先生**，街角药局的药剂师。他不懂 AI，但他的收银屏幕背后，调用的正是同一个 HABA AI Advisor。
-- **那台机器**，没有名字。它是一个终端 Agent——余额快用完时，它自己掏钱、自己充值、继续干活，全程没有人碰键盘。
+- **美咲**：35 岁，东京。母亲最近开始控制糖分，她想买一瓶适合咖啡和料理的甜味料。
+- **HABA AI Advisor**：一个不催单、不堆术语的线上顾问。它把复杂的健康食品知识，翻译成消费者能马上理解的购买理由。
+- **HABA 业务团队**：他们关心的不只是卖出一瓶商品，而是能不能把 HABA 的健康建议能力，延伸到更多渠道。
+- **药局 / 医院营养科 / 营养师 / 合作电商**：这些伙伴不一定要懂 AI，但他们都需要一个可信、稳定、可嵌入的健康顾问。
+- **Netstars**：站在后台，把“每一次 AI 帮忙”变成清楚的账、稳定的结算和可复制的服务模式。
 
 ---
 
 ## 2. 主线故事
 
-### 幕一 · 一个普通的下午
+### 幕一 · 不是“买代糖”，是一次不确定的健康选择
 
-美咲坐在厨房的餐桌前，手机屏幕的光打在脸上。她想给母亲买代糖，但「赤藓糖醇」「甜菊糖苷」「升糖指数」这些词像一堵墙。
+下午三点，美咲站在厨房边，手里拿着母亲常喝的马克杯。
 
-她在 HABA 的页面上敲下一句最朴素的话：
+她不是不知道要买甜味料，她是不知道该相信哪一种。
 
-> 「我想给糖尿病家人买低卡甜味料，最好可以做料理也能直接放饮料里。」
+页面上有很多商品、很多词：低卡、甜度、料理、饮料、家庭使用。每个词都像有道理，但合在一起反而让人停住。
 
-屏幕右上角，一颗小小的绿色光点亮起——**HABA AI Advisor 醒了**。
+她在 HABA 页面输入一句很普通的话：
 
-### 幕二 · 看不见的店员开口
+> “我想给糖尿病家人买低卡甜味料，最好可以做料理，也能直接放饮料里。”
 
-几秒钟。Advisor 没有列术语，它直接递上两款 MARVIE 商品，每一款都附三条理由：**零卡路里**、**甜度是砂糖的 200 倍所以一两滴就够**、**冷热都能瞬溶**。
+这句话背后不是一个搜索请求，而是一个真实的购买犹豫。
 
-美咲松了口气，点下「全部加入购物车」。
+### 幕二 · HABA 的顾问，把犹豫变成信任
 
-> 而就在这一次回答完成的瞬间，页面顶端那枚 Token 余额，悄悄少了一点。
-> 那是 HABA 为这次「AI 思考」付出的成本——精确到个位、实时记账。美咲看不见，但账本记得清清楚楚。
+HABA AI Advisor 没有把美咲带进一堆专业解释。
 
-### 幕三 · 一笔钱，走完一条链
+它只回答三件事：
 
-美咲结账，选择「USDC 钱包支付」。
+1. 哪几款适合她的场景；
+2. 为什么适合；
+3. 怎么用更安心。
 
-进度条转起来——这一次不是动画在演戏，是真的在等：
+美咲看到的不是“AI 在工作”，而是一个品牌正在认真理解她。
 
-1. HABA 发起支付请求
-2. Netstars 的收银台返回金额、防重放随机数、收款地址
-3. 钱包在浏览器里签名，私钥从不离开本地
-4. WEA 接过结算单，把交易广播到 Solana
-5. 链上确认，不到一秒
-6. 回调层层返回，订单状态翻成「已支付」
+她把推荐商品加入购物车。这个动作很小，但商业意义很大：
 
-十几秒后，屏幕绽放一枚脉冲绿环：**订单已确认**。下面是一串谁都能复制去区块链浏览器验证的 **真实交易哈希**。
+> **一次原本可能流失的犹豫，被 HABA 转化成了一个更放心的购买决定。**
 
-> 美咲只看到「买好了」。她不知道，这一勺甜的背后，钱已经在一条公开的链上落定，永远查得到。
+### 幕三 · 好顾问不只服务一个页面
 
-### 幕四 · 同一个店员，换上四张脸
+镜头从美咲的厨房拉远。
 
-镜头拉远。
+同一个 Advisor 能出现在不同地方：
 
-街角，**田中先生**的药局。顾客掏出会员卡，扫码——他的收银屏幕弹出一模一样的推荐，只是这次穿着「药局前台」的皮肤。
+- 在街角药局，它帮药剂师向顾客解释“这款适合怎么用”；
+- 在医院营养科，它帮助营养师快速整理推荐依据；
+- 在合作电商，它成为商品详情页里的智能问答入口；
+- 在 HABA 自己的线上商店，它继续提高购买转化。
 
-医院的营养科、独立营养师的工作台、合作电商的首页挂件——**同一个 HABA AI Advisor，四种接入形态**。每一次调用，都记进 HABA 的月度套餐：`42 / 50,000`，数字在屏幕上真实地跳动。
+这里的重点不是“多做几个页面”，而是：
 
-> HABA 从 Netstars 买来 AI 能力，转身把它打包成「健康顾问」，按调用量卖给上游伙伴。
-> **Token 在这条链上被消费了两次。** 一买，一卖，飞轮转起来了。
+> **HABA 把自己的健康建议能力产品化了。**
 
-### 幕五 · 没有人在键盘前
+从前，HABA 卖商品。
 
-最后一个镜头，没有人。
+现在，HABA 也可以把“会推荐、会解释、会陪消费者做选择”的能力，作为服务交给伙伴使用。
 
-一台终端 Agent 在自动跑：读余额、连续发起十几次咨询、每一笔都精确扣费。跑到一半，余额跌破阈值——
+### 幕四 · 每一次 AI 帮忙，都应该变成一笔清楚的生意
 
-它没有报警，没有等人。它**自己**发起了一笔 10 USDC 的充值，链上确认，余额回满，然后**继续干活**。
+如果 AI Advisor 只是一段漂亮演示，它很难进入真实商业。
 
-终端里的日志一行行刷过，像心跳。
+真实商业会问：
 
-> 这是这个故事真正的结尾：当买方也是一台机器，整条链路——选择、计量、付费、上链——**不再需要人。**
+- 谁用了？
+- 用了多少？
+- 谁来付费？
+- 如何对账？
+- 如何给合作伙伴分摊成本？
+- 如何证明这不是一笔糊涂账？
+
+这就是 Netstars 出场的地方。
+
+Netstars 不站到消费者面前抢戏。它在后台把每一次 AI 服务变成清楚的商业记录：可计量、可收费、可结算、可追溯。
+
+HABA 不需要自己重新发明一套 AI 收费系统。伙伴也不需要理解背后的复杂机制。
+
+大家只需要知道：
+
+> **AI 每帮一次忙，商业系统就能稳稳接住一次价值。**
+
+### 幕五 · 从一次购物，到一个可复制的 Agent Commerce 模板
+
+故事最后，画面回到美咲。
+
+她只觉得自己买到了一瓶适合母亲的甜味料。
+
+但对 HABA 来说，这不是一笔普通订单。它证明了三件事：
+
+1. AI 能提高消费者信任；
+2. AI 能成为面向伙伴的服务产品；
+3. AI 服务可以被稳定计量和收费。
+
+对 Netstars 来说，这也不是一次普通支付。
+
+它证明的是：
+
+> **当 AI 开始替人做选择、替商户服务客户、替伙伴完成咨询，市场需要一条新的商业轨道。Netstars 可以成为这条轨道的运营方。**
 
 ---
 
-## 3. 演示串场对照表
+## 3. 演示串场
 
-| 幕 | 打开哪里 | 现场动作 | 观众该看到 |
+| 幕 | 打开哪里 | 现场动作 | 观众要记住 |
 |---|---|---|---|
-| 幕一 / 二 | HABA 首页 `:3001` | 点一个场景 → 点「真打一次」 | 真 Claude 回复 + 顶部 Token 余额实时下降 |
-| 幕三 | `/cart` | 加购物车 → 「USDC 钱包结账」 | 等 10–30s → 脉冲绿环 + **真 Devnet 交易哈希** + Explorer 验证按钮 |
-| 幕四 | `/b2b` | 切换 4 个 persona → 任一「真打一次」 | 月度调用数 `41 → 42` 实时跳动 |
-| 幕五 | `/agent` | Run「调到余额低 → 自动 topup」 | 终端日志连续调用 + 自动充值上链 |
-| 收尾 | Netstars Console `:3000` | 打开 Live Activity Ticker | 刚才每一笔，跨表面同步可见——**同一份账本** |
+| 幕一 / 二 | HABA 首页 | 输入健康食品需求，触发 Advisor 推荐 | AI 把犹豫变成购买信任 |
+| 幕三 | HABA 购物车 | 完成一次顺滑、安全的结账 | 消费者不需要理解后台，只需要感觉可靠 |
+| 幕四 | Token Console | 查看 AI 服务调用和账本 | AI 服务可以被计量、收费、对账 |
+| 幕五 | 后台运营台 | 展示服务调用、结算状态与业务闭环 | Netstars 提供的是可复制的商业基础设施 |
+| 收尾 | 回到故事页或海报 | 用一句话收束 | HABA 卖健康选择，Netstars 卖 AI 商务轨道 |
 
-> 演示提示：结账时的十几秒不是卡顿，是真在等 Solana 确认。大方地说出来——「我们正在等链上 confirmation」——那正是真实性的证据。
+现场讲法：
 
----
-
-## 4. 海报生成 Prompt（GPT 图像 / img2）
-
-> 统一基调：温暖、自然、健康；底层有一缕看不见的「数字电流」。
-> 主色板：**HABA 翠绿 `#0F9D58` + 奶油白 `#FAFAF7` + 森林墨绿 `#0B3D2E`**，点缀琥珀金 `#F59E0B`。
-> 排版：留白充足，不要赛博朋克，不要霓虹冷色；干净、明亮、有呼吸感。
-
-### 海报 A — 主视觉「一勺甜，背后一条链」
-
-```
-A warm, bright editorial poster, cream-white background. In the foreground,
-a single drop of clear liquid sweetener falling from a minimalist dropper
-bottle into a cup of coffee on a sunlit kitchen table. From the ripple in
-the coffee, a thin luminous emerald-green thread spirals outward and
-transforms into a delicate flowing circuit line that travels across the
-poster, linking four small glowing nodes labeled subtly: a storefront, a
-ledger/receipt, a courier in motion, and a transparent blockchain cube.
-Soft morning light, shallow depth of field, gentle film grain. Palette:
-emerald #0F9D58, cream #FAFAF7, forest ink #0B3D2E, amber #F59E0B accents.
-Calm, premium, healthy, human — NOT cyberpunk, NOT neon. Negative space at
-top for a title. 3:4 vertical poster.
-```
-
-### 海报 B — 「同一个店员，四张脸」
-
-```
-A clean four-panel grid poster on warm cream background. Each panel shows
-the same friendly abstract AI-assistant glyph (a soft emerald orb with a
-single calm highlight) wearing a different context: a home kitchen, a
-pharmacy counter, a hospital nutrition desk, an e-commerce storefront
-widget. A continuous thin green circuit line stitches all four panels
-together, implying one brain behind four faces. Flat, modern, editorial
-illustration style. Palette emerald #0F9D58 + cream + forest ink, amber
-accents. Bright, trustworthy, healthcare-grade. 4:3 horizontal.
-```
-
-### 海报 C — 「没有人在键盘前」（飞轮 / 自动化）
-
-```
-A minimalist conceptual poster: an empty wooden desk bathed in soft daylight,
-a glowing terminal screen showing flowing green log lines, and NO person in
-the chair. Above the desk, a translucent flywheel made of light slowly
-turning, its spokes formed by emerald data threads connecting USDC coins,
-a Token meter, and a Solana-like crystalline chain cube. Sense of quiet
-autonomy and momentum. Warm cream + emerald palette, amber glints. Premium,
-serene, slightly cinematic. NOT dark, NOT dystopian — bright and hopeful.
-3:4 vertical poster, generous top negative space for a headline.
-```
-
-### 备用标题词（叠加在海报上，任选）
-
-- 主标：**一勺甜，背后一条链**
-- 副标：AI 帮你选 · 帮你付 · 帮你上链
-- 英文：*One drop of sweetness. A whole chain behind it.*
+> “今天我们不把重点放在技术名词上。我们只看一件事：一个健康食品品牌，如何把 AI 顾问变成新的收入渠道；Netstars 如何把这个渠道背后的收费、结算和运营接住。”
 
 ---
 
-## 5. 一句话收尾（演示结束时说）
+## 4. 海报方向
 
-> 「美咲只想给妈妈买瓶好用的代糖。
-> 她得到了。
-> 而我们，在她看不见的地方，让 AI 完成了一次会思考、会付费、会上链的完整交易——
-> 这就是 X402 Token Market。」
+### 主标题
+
+**一勺甜，背后一门新生意**
+
+### 副标题
+
+AI 把犹豫变成信任，把服务变成收入。
+
+### 核心句
+
+**HABA 卖健康选择，Netstars 让 AI 服务可以规模化收费。**
+
+### 视觉基调
+
+- 温暖、明亮、健康、可信；
+- 商业感强，但不要金融冷感；
+- 像经营层会愿意放进会议材料的品牌海报；
+- 不要赛博朋克，不要黑底霓虹，不要代码雨；
+- 不要在图像里生成可读文字或 Logo，所有标题和品牌字建议后期叠加。
+
+---
+
+## 5. GPT img2 专用提示词
+
+> 使用建议：让 GPT img2 只生成“主视觉背景”，不要让模型生成中文标题。文字、Logo、流程标签后期用 PPT / HTML / Figma 叠加，准确度会高很多。
+
+### Prompt A · 主视觉海报「一勺甜，背后一门新生意」
+
+用途：主海报、封面页、演示开场。
+
+```text
+Create a premium commercial editorial poster background for a Japanese health and wellness brand.
+
+Scene:
+A warm sunlit kitchen in Tokyo in the late afternoon. On a wooden table, a ceramic cup of coffee sits beside a small elegant liquid sweetener bottle. A single clear drop is falling into the cup, creating a soft ripple. Near the table, a woman in her mid-30s gently holds a smartphone, looking relieved and quietly confident, as if she has just received a helpful product recommendation for her mother.
+
+Business metaphor:
+From the ripple in the cup, a very subtle emerald line of light flows outward, not technical or futuristic, more like a graceful service pathway. It quietly connects small abstract hints of commerce: a product shelf, a receipt, a pharmacy counter, and a partner storefront. These elements should be symbolic and minimal, not literal diagrams.
+
+Mood:
+Warm, trustworthy, premium, human, healthy, optimistic. The feeling should be "a consumer hesitation became a confident purchase" and "a brand service became a new business channel."
+
+Style:
+High-end editorial advertising, soft natural light, shallow depth of field, refined Japanese wellness aesthetic, realistic but slightly idealized, clean composition, elegant negative space for a headline.
+
+Palette:
+HABA emerald green, warm cream, soft white, natural wood, forest ink, tiny amber highlights.
+
+Composition:
+Horizontal 16:9 poster. Leave generous clean negative space on the left or upper-left for later typography overlay. Do not place any text in the image.
+
+Strict negative instructions:
+No readable text, no logos, no brand names, no UI screens with legible words, no blockchain icons, no coins, no robots, no cyberpunk, no neon, no dark tech background, no code, no circuit-board aesthetic, no medical fear imagery.
+```
+
+推荐叠字：
+
+- 主标：一勺甜，背后一门新生意
+- 副标：AI 把犹豫变成信任，把服务变成收入
+- 小字：HABA 卖健康选择，Netstars 让 AI 服务可以规模化收费
+
+---
+
+### Prompt B · 商业飞轮「同一个顾问，四个收入入口」
+
+用途：解释 HABA 为什么不只是做一个聊天入口，而是在产品化顾问能力。
+
+```text
+Create a bright premium business poster background showing one AI-powered wellness advisor becoming a repeatable service across multiple commercial channels.
+
+Scene:
+A refined Japanese wellness brand environment, presented as four connected real-world moments in one elegant composition:
+1. a home kitchen where a consumer checks a product recommendation on a phone,
+2. a small pharmacy counter where a pharmacist assists a customer,
+3. a hospital nutrition consultation desk with a dietitian reviewing product guidance,
+4. an e-commerce product page represented abstractly as a clean tablet or display.
+
+Unifying idea:
+All four scenes are gently connected by the same thin emerald service line, implying one trusted advisor behind multiple business channels. The line should feel organic and premium, not like a technical circuit.
+
+Mood:
+Commercial, trustworthy, scalable, calm, boardroom-ready. It should communicate "one advisor capability can be packaged and sold through partners."
+
+Style:
+Clean editorial collage, realistic with subtle illustration polish, premium Japanese corporate presentation style, soft daylight, cream background, restrained shadows, no clutter.
+
+Palette:
+Emerald green, cream white, soft blue accents, warm neutral wood, small amber highlights.
+
+Composition:
+Horizontal 16:9. Leave a clear title area at the top. Use visual hierarchy so the home consumer moment feels emotional, and the three partner channels feel like business expansion.
+
+Strict negative instructions:
+No readable text, no logos, no brand names, no charts with numbers, no crypto imagery, no coins, no robots, no code, no neon, no cyberpunk, no exaggerated sci-fi devices, no busy dashboard screens.
+```
+
+推荐叠字：
+
+- 主标：同一个顾问，四个收入入口
+- 副标：线上商店、药局、营养科、合作电商，共用一套 HABA 健康建议能力
+- 小字：从商品销售，到服务分发
+
+---
+
+### Prompt C · Netstars 商业基础设施「看不见的收银台」
+
+用途：讲 Netstars 的价值，不讲后台机制细节。
+
+```text
+Create an executive-grade commercial infrastructure poster background.
+
+Scene:
+A calm, bright operations room or modern finance office. In the foreground, a clean table has a paper receipt, a product sample, and a tablet showing abstract, non-readable business activity. In the background, several soft translucent service paths connect a wellness brand, a partner pharmacy, an online storefront, and a settlement desk. Everything feels organized, reliable, and premium.
+
+Metaphor:
+Netstars is the invisible cashier and operating backbone behind AI services. Show clarity, trust, reconciliation, and repeatable business operations without showing technical machinery.
+
+Mood:
+Confident, commercial, enterprise-ready, calm, precise. It should feel like "this can be sold to real merchants and finance teams."
+
+Style:
+Premium corporate editorial photography mixed with subtle 3D/illustrative accents. Bright light theme, not a tech noir scene. Sophisticated Japanese enterprise aesthetic.
+
+Palette:
+Soft white, pale blue, emerald green, slate ink, restrained violet accent, subtle warm highlights.
+
+Composition:
+Horizontal 16:9. Leave negative space on the right for title and subtitle overlay. Keep the center visually clean.
+
+Strict negative instructions:
+No readable text, no logos, no brand names, no cryptocurrency symbols, no chain icons, no code, no server racks, no dark data center, no cyberpunk, no neon, no robots, no excessive dashboard details.
+```
+
+推荐叠字：
+
+- 主标：看不见的收银台
+- 副标：每一次 AI 帮忙，都变成清楚的账、稳定的结算和可复制的服务
+- 小字：Netstars 让 AI 服务进入真实商业
+
+---
+
+### Prompt D · 经营层收尾「从一次购买，到一条新赛道」
+
+用途：演示最后一页、愿景页。
+
+```text
+Create a polished executive vision poster background about AI commerce becoming a new business rail.
+
+Scene:
+A split-depth composition: in the foreground, a simple human consumer moment, a cup of coffee and a wellness product on a warm table. In the middle distance, elegant partner environments fade in softly: a pharmacy, a nutrition desk, and an online shop. In the far background, an abstract clean commercial network expands outward like a calm sunrise, suggesting scale and opportunity.
+
+Message:
+One ordinary purchase can reveal a new business category: AI-assisted choices, partner-distributed services, and invisible commercial operations.
+
+Mood:
+Visionary but grounded, warm but businesslike, premium but not flashy. Hopeful, credible, boardroom-ready.
+
+Style:
+High-end strategy presentation cover art, editorial realism, soft gradients from natural light, minimal symbolic elements, refined composition.
+
+Palette:
+Cream, emerald, soft sky blue, forest ink, warm amber. Avoid one-color monotony.
+
+Composition:
+Horizontal 16:9, with large clean negative space for a powerful headline. No embedded text.
+
+Strict negative instructions:
+No readable text, no logos, no brand names, no technical diagrams, no crypto visuals, no coins, no robots, no code, no dark sci-fi, no neon, no cluttered business charts.
+```
+
+推荐叠字：
+
+- 主标：从一次购买，到一条新赛道
+- 副标：Agent Commerce 不是未来概念，而是商户今天可以开始计量和收费的服务能力
+- 小字：健康选择只是入口，AI 服务商业化才是主线
+
+---
+
+## 6. 一句话收尾
+
+> “美咲只是想给妈妈买一瓶更安心的甜味料。HABA 给了她一个可信的选择；Netstars 让这次 AI 服务背后的价值可以被记录、收费、结算，并复制到更多商户和伙伴场景里。这就是 Agent Commerce 从概念走向生意的第一步。”

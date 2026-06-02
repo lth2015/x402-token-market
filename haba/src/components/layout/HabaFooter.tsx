@@ -1,18 +1,19 @@
 import { getTranslations } from "next-intl/server";
 
 /**
- * Page footer — HABA disclaimer + copyright. Clean consumer footer.
+ * Page footer — editorial clean, HABA disclaimer.
+ * Matches warm cream design language.
  */
 export async function HabaFooter() {
   const t = await getTranslations("footer");
   return (
-    <footer className="mt-24 border-t border-border-subtle bg-surface-base">
-      <div className="mx-auto max-w-6xl px-6 py-10 lg:px-12">
-        <div className="flex flex-col gap-1.5 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
-          <p className="max-w-2xl text-[11px] leading-relaxed text-ink-tertiary">
+    <footer className="mt-16 border-t border-border-subtle bg-surface-deep">
+      <div className="mx-auto max-w-5xl px-5 py-10 lg:px-8">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
+          <p className="max-w-2xl font-sans text-[11px] leading-relaxed text-ink-tertiary/80">
             {t("disclaimer")}
           </p>
-          <p className="shrink-0 text-[11px] text-ink-tertiary">
+          <p className="shrink-0 font-sans text-[11px] tracking-wide text-ink-tertiary/60">
             © HABA / ハーバー研究所
           </p>
         </div>

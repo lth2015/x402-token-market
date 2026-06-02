@@ -37,7 +37,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import desc, select, text
 
 from . import db
-from .auth import AuthContext, verify_request
+from .auth import AuthContext, _increment_tpm, verify_request
 from .kms import make_kms_client
 from .ledger import InsufficientBalanceError, LedgerService
 from .providers import (
@@ -74,6 +74,12 @@ X402_API_BASE_URL = os.environ.get("X402_API_BASE_URL", "http://x402-api:8080")
 
 # 1 USDC = 1,000,000 AI Token. (See token/DESIGN.md §2)
 TOKEN_PER_USDC_MICRO = 1  # i.e. 1 token per 1 USDC-micro
+
+# FX: JPY per 1 USDC.
+# Production: replace with a real-time FX service feed (e.g. fixer.io, ECB).
+# For now this is a configuration value injected via FX_JPY_PER_USDC env var.
+# Default 150 is a fallback only — never rely on it for revenue-critical math.
+FX_JPY_PER_USDC: float = float(os.environ.get("FX_JPY_PER_USDC", "150"))
 
 
 @asynccontextmanager
@@ -187,7 +193,7 @@ async def balance(auth: AuthContext = Depends(verify_request)):
     async with app.state.db.connect() as conn:
         bal = await LedgerService.get_balance(conn, auth.merchant_id)
     usdc_eq = float(bal) / 1_000_000
-    jpy_eq = usdc_eq * 150  # mock FX
+    jpy_eq = usdc_eq * FX_JPY_PER_USDC  # config-driven FX; see FX_JPY_PER_USDC env var
     return BalanceOut(
         balance_token=str(int(bal)),
         usdc_equivalent=f"{usdc_eq:.4f}",
@@ -406,16 +412,15 @@ async def _persist_request_row(
                 provider=provider_vendor,
                 prompt_tokens=prompt_tokens,
                 completion_tokens=completion_tokens,
+                cached_input_tokens=cached_input_tokens,
                 cost_token=Decimal(cost_token),
                 cost_usdc_equiv_micro=cost_token,  # 1 Token = 1 micro-USDC
                 status=status,
                 error_class=error_class,
                 latency_ms=latency_ms,
                 trace_id=trace_id,
-                metadata={
-                    "cached_input_tokens": cached_input_tokens,
-                    **extra_meta,
-                },
+                request_hash=request_hash,
+                metadata=extra_meta,
             ))
     except Exception as e:  # noqa: BLE001
         log.warning("requests.persist_failed", err=str(e), request_id=request_id)
@@ -448,6 +453,25 @@ async def chat(
         temperature=body.temperature,
         system=body.system,
     )
+
+    # 0. Per-key TPM pre-flight (check before any provider call to save cost).
+    #    RPM is already enforced in verify_request; TPM needs the token count.
+    from .auth import _check_tpm_limit
+    if auth.rate_limit_tpm > 0:
+        tpm_ok, current_tpm = await _check_tpm_limit(
+            app.state.redis, auth.agent_key_id, auth.rate_limit_tpm,
+        )
+        if not tpm_ok:
+            retry_after = 60 - int(time.time() % 60) + 1
+            raise HTTPException(
+                429,
+                detail={
+                    "error_code": "RATE_LIMIT_EXCEEDED",
+                    "detail": f"TPM limit {auth.rate_limit_tpm} exceeded (current minute {current_tpm})",
+                    "retry_after": retry_after,
+                },
+                headers={"Retry-After": str(retry_after)},
+            )
 
     # 1. Pre-flight 402 check: refuse if balance can't cover worst-case cost
     estimated = estimate_from_request(norm)
@@ -582,6 +606,13 @@ async def chat(
             "payment_intent": None,
         }) from e
 
+    # 3b. Accumulate TPM counter (fire-and-forget; enforced on next pre-flight).
+    # Total tokens = prompt + completion; used to enforce rate_limit_tpm per key.
+    import asyncio as _asyncio
+    _asyncio.ensure_future(_increment_tpm(
+        app.state.redis, auth.agent_key_id, usage_prompt + usage_completion,
+    ))
+
     # 4. Persist request audit row
     await _persist_request_row(
         request_id=request_id, auth=auth, model=body.model,
@@ -616,6 +647,61 @@ async def chat(
     }
 
 
+# ── Merchant profile ───────────────────────────────────────────────
+class MerchantProfileOut(BaseModel):
+    merchant_id: str
+    display_name: str
+    abbr: str
+    env_label: str
+    legal_name: Optional[str] = None
+    tax_id: Optional[str] = None
+    currency_pref: str = "JPY"
+    status: str = "active"
+
+
+@app.get("/v1/merchant/profile", response_model=MerchantProfileOut)
+async def merchant_profile(auth: AuthContext = Depends(verify_request)):
+    """
+    Return display and billing fields for the authenticated merchant.
+    Used by the Token Console (BFF) to show org name and env label dynamically.
+    Internal-auth callers are rejected (this endpoint is for merchant-facing keys only).
+    """
+    if auth.is_internal:
+        raise HTTPException(403, "Use a merchant API key, not an internal token")
+
+    async with app.state.db.connect() as conn:
+        row = (await conn.execute(
+            select(
+                db.merchants.c.id,
+                db.merchants.c.name,
+                db.merchants.c.legal_name,
+                db.merchants.c.tax_id,
+                db.merchants.c.currency_pref,
+                db.merchants.c.status,
+            )
+            .where(db.merchants.c.id == auth.merchant_id)
+        )).first()
+
+    if row is None:
+        raise HTTPException(404, f"Merchant {auth.merchant_id!r} not found")
+
+    name = row.name or "Unknown"
+    # Derive abbreviation: first letter of each word, up to 4 chars
+    abbr = "".join(w[0] for w in name.split() if w)[:4].upper() or name[:4].upper()
+    env_label = ENV if ENV != "local" else "local"
+
+    return MerchantProfileOut(
+        merchant_id=row.id,
+        display_name=name,
+        abbr=abbr,
+        env_label=env_label,
+        legal_name=row.legal_name,
+        tax_id=row.tax_id,
+        currency_pref=row.currency_pref or "JPY",
+        status=row.status or "active",
+    )
+
+
 @app.get("/")
 async def root():
     return {
@@ -624,6 +710,7 @@ async def root():
         "endpoints": [
             "GET  /v1/balance",
             "GET  /v1/recent-activity",
+            "GET  /v1/merchant/profile",
             "POST /v1/token-purchase  (delegates to x402)",
             "POST /v1/merchant-checkout (product settlement, no Token credit)",
             "POST /internal/credit    (called by x402)",

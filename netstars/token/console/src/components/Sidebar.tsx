@@ -57,9 +57,9 @@ export function Sidebar({ backendOk }: { backendOk: boolean }) {
           className="flex items-center gap-1.5 hover:text-brand-primary"
           target="_blank"
           rel="noreferrer"
-          title="HABA AI Commerce demo site (independent deployment)"
+          title="Consumer site (independent deployment)"
         >
-          HABA AI Commerce → <ExternalLink className="h-3 w-3" />
+          Consumer Site → <ExternalLink className="h-3 w-3" />
         </a>
         <a
           href="https://developer.netstars.jp"

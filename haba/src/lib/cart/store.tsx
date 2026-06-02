@@ -14,10 +14,10 @@ import { getCheckoutClampState } from "@/lib/haba/checkout";
 
 /**
  * Consumer cart — client-side only. Persisted to localStorage so a refresh
- * during a demo doesn't drop the items. Items are stored by SKU id; the
+ * doesn't drop the items. Items are stored by SKU id; the
  * MarvieProduct itself is looked up on the fly from the static catalog.
  *
- * USDC checkout amount follows the shared demo payment policy in
+ * USDC checkout amount follows the checkout policy in
  * `@/lib/haba/checkout`.
  */
 const STORAGE_KEY = "haba.cart.v1";

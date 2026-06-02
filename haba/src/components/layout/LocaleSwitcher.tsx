@@ -67,16 +67,16 @@ export function LocaleSwitcher() {
         disabled={pending}
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-caption transition-colors",
+          "inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1.5 text-caption transition-colors",
           open
             ? "border-brand-primary/40 bg-brand-primary/5 text-brand-primary"
             : "border-border-subtle bg-surface-base text-ink-secondary hover:border-brand-primary/40 hover:text-brand-primary",
           pending && "opacity-60",
         )}
       >
-        <Globe className="h-3 w-3" aria-hidden />
-        <span className="font-medium">{active.native}</span>
-        <ChevronDown className={cn("h-3 w-3 transition-transform", open && "rotate-180")} aria-hidden />
+        <Globe className="h-3 w-3 shrink-0" aria-hidden />
+        <span className="whitespace-nowrap font-medium">{active.native}</span>
+        <ChevronDown className={cn("h-3 w-3 shrink-0 transition-transform", open && "rotate-180")} aria-hidden />
       </button>
 
       {open && (
