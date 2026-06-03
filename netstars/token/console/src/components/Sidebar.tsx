@@ -12,6 +12,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, BarChart3, Coins, KeyRound, Cpu,
   FileText, Settings, ShieldCheck, Network, ExternalLink,
+  TrendingUp, Users, Receipt,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +24,9 @@ const PRIMARY: Item[] = [
   { href: "/tokens",    label: "Tokens",     Icon: Coins },
   { href: "/api-keys",  label: "API Keys",   Icon: KeyRound },
   { href: "/models",    label: "Models",     Icon: Cpu },
+  { href: "/revenue",   label: "Revenue",    Icon: TrendingUp },
+  { href: "/merchants", label: "Merchants",  Icon: Users },
+  { href: "/billing",   label: "Billing",    Icon: Receipt },
   { href: "/invoices",  label: "Invoices",   Icon: FileText },
   { href: "/protocol",  label: "Protocol",   Icon: Network },
 ];

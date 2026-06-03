@@ -10,8 +10,5 @@
 
 export * from "./types";
 export { habaMerchant } from "./merchant";
-export {
-  marvieProducts,
-  getProductById,
-  getProductBySku,
-} from "./products";
+export { marvieProducts, getProductById, getProductBySku } from "./products";
+export * from "./enterprise";

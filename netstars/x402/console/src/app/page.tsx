@@ -99,7 +99,7 @@ export default function ConsolePage() {
         if (!lastHeader) {
           setLastResult({
             ok: false, scenario: "replay",
-            error: "先按一次 “Normal payment” 让控制台记住一个真实的 X-PAYMENT,然后才能演示重放。",
+            error: "Run 'Normal payment' first so the console captures a real X-PAYMENT, then try replay.",
             steps: [],
           });
           return;
@@ -237,8 +237,7 @@ function DemoColumn({
     <section className="space-y-4">
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-e1">
         <div className="flex items-baseline justify-between">
-          <h2 className="text-[12px] font-bold uppercase tracking-widest text-slate-500">Demo scenarios</h2>
-          <p className="text-[11px] text-slate-400">点一下,看协议如何反应</p>
+          <h2 className="text-[12px] font-bold uppercase tracking-widest text-slate-500">Protocol Operations</h2>
         </div>
 
         <div className="mt-5 space-y-2.5">
@@ -246,43 +245,43 @@ function DemoColumn({
             running={running === "normal"} disabled={!!running}
             onClick={() => onRun("normal")} tone="primary"
             icon={<PlayCircle className="h-4 w-4" />}
-            title="Normal payment(真扣 USDC)"
-            subtitle="402 → 客户端签名 → X-PAYMENT → verify → Solana settle → 200"
+            title="Process Payment"
+            subtitle="402 → client signs → X-PAYMENT → verify → Solana settle → 200"
           />
           <ScenarioButton
             running={running === "replay"} disabled={!!running || !lastHeader}
             onClick={() => onRun("replay")} tone="danger"
             icon={<RotateCcw className="h-4 w-4" />}
-            title={lastHeader ? "Replay attack(重发刚才那笔 X-PAYMENT)" : "Replay attack(先按上面 Normal 再来)"}
-            subtitle="期望:Gateway 用 signed_tx_hash UNIQUE 挡掉,409 REPLAY"
+            title={lastHeader ? "Replay Detection" : "Replay Detection (run Process Payment first)"}
+            subtitle="Guards against double-spend via signed_tx uniqueness"
           />
           <ScenarioButton
             running={running === "expired"} disabled={!!running}
             onClick={() => onRun("expired")} tone="danger"
             icon={<AlertOctagon className="h-4 w-4" />}
-            title="Expired order(过期后再付款)"
-            subtitle="期望:requirements.expiresAt 过期后 retry,410 EXPIRED"
+            title="Expiry Enforcement"
+            subtitle="Rejects payment submissions past the order expiry window"
           />
           <ScenarioButton
             running={running === "tamper-resource"} disabled={!!running}
             onClick={() => onRun("tamper-resource")} tone="danger"
             icon={<ShieldOff className="h-4 w-4" />}
-            title="Tamper resource(改 payload.resource)"
-            subtitle="期望:Resource binding 失败,402 REQUIREMENTS_MISMATCH"
+            title="Resource Binding Check"
+            subtitle="Verifies payment is bound to the exact target resource"
           />
           <ScenarioButton
             running={running === "tamper-network"} disabled={!!running}
             onClick={() => onRun("tamper-network")} tone="danger"
             icon={<ShieldOff className="h-4 w-4" />}
-            title="Tamper network(devnet → mainnet)"
-            subtitle="期望:Network 字段对不上,402 REQUIREMENTS_MISMATCH"
+            title="Network Mismatch Check"
+            subtitle="Rejects cross-network replay (devnet vs mainnet)"
           />
           <ScenarioButton
             running={running === "malformed"} disabled={!!running}
             onClick={() => onRun("malformed")} tone="danger"
             icon={<AlertOctagon className="h-4 w-4" />}
-            title="Malformed X-PAYMENT(随便塞 base64)"
-            subtitle="期望:解码失败,402 X_PAYMENT_INVALID"
+            title="Malformed Header Rejection"
+            subtitle="Rejects non-conforming X-PAYMENT header payloads"
           />
         </div>
 
@@ -332,16 +331,16 @@ function ResultPanel({ result }: { result: ScenarioResult }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-e1 animate-flow-in">
       <div className="flex items-center justify-between">
-        <h3 className="text-[12px] font-bold uppercase tracking-widest text-slate-500">最近一次场景结果</h3>
+        <h3 className="text-[12px] font-bold uppercase tracking-widest text-slate-500">Operation result</h3>
         <Pill
           tone={result.ok ? "ok" : "danger"}
           icon={result.ok ? <CheckCircle2 className="h-3 w-3" /> : <ShieldOff className="h-3 w-3" />}
-          label={result.ok ? "符合预期" : "未达成预期"}
+          label={result.ok ? "Success" : "Failed"}
         />
       </div>
       <p className="mt-2 text-[12px] text-slate-500">
         scenario · <span className="font-semibold text-slate-700">{result.scenario}</span>
-        {result.expected && <> · 期望 <span className="text-slate-600">{result.expected}</span></>}
+        {result.expected && <> · expected: <span className="text-slate-600">{result.expected}</span></>}
       </p>
       {result.error && <p className="mt-2 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-[12px] text-rose-700">{result.error}</p>}
 
@@ -376,13 +375,13 @@ function EventColumn({ events, cfg }: { events: Event[]; cfg?: Metrics["config"]
     <section className="space-y-3">
       <div className="flex items-baseline justify-between">
         <h2 className="text-[12px] font-bold uppercase tracking-widest text-slate-500">Live protocol timeline</h2>
-        <p className="text-[11px] text-slate-400">每 2 秒刷新 · x402-api /v1/_console/events</p>
+        <p className="text-[11px] text-slate-400">Refreshes every 2s · x402-api /v1/_console/events</p>
       </div>
       {events.length === 0 ? (
         <div className="grid-bg rounded-2xl border border-dashed border-slate-200 bg-white p-12 text-center">
           <Activity className="mx-auto h-8 w-8 text-slate-300" aria-hidden />
-          <p className="mt-3 text-[13px] text-slate-600">还没有 402 协议事件</p>
-          <p className="mt-1 text-[11px] text-slate-400">按左边 “Normal payment” 触发一次,timeline 会立刻出现</p>
+          <p className="mt-3 text-[13px] text-slate-600">No x402 protocol events yet</p>
+          <p className="mt-1 text-[11px] text-slate-400">Click "Normal payment" on the left — the timeline will appear immediately</p>
         </div>
       ) : (
         <div className="space-y-3">{events.map(e => <EventCard key={e.order_id} ev={e} cfg={cfg} />)}</div>
@@ -441,14 +440,14 @@ function EventCard({ ev, cfg }: { ev: Event; cfg?: Metrics["config"] }) {
           <TimelineStep tone="rose" label="③ Settlement failed" extra={ev.status_reason} />
         )}
         {proofs.length === 0 && (
-          <TimelineStep tone="slate" label="② 等待 X-PAYMENT 重试…" extra="客户端尚未带 proof 重新请求" />
+          <TimelineStep tone="slate" label="② Waiting for X-PAYMENT retry…" extra="Client has not yet submitted proof" />
         )}
       </ol>
 
       {explorer && (
         <a href={explorer} target="_blank" rel="noreferrer"
            className="mt-4 inline-flex items-center gap-1.5 text-[12px] font-semibold text-blue-600 hover:text-blue-700 hover:underline">
-          打开 Solana Explorer <ExternalLink className="h-3 w-3" />
+          View on Solana Explorer <ExternalLink className="h-3 w-3" />
         </a>
       )}
     </article>

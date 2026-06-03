@@ -33,7 +33,7 @@ export async function POST() {
     scenario: "tamper-resource",
     steps: [
       {
-        name: "篡改 payload.resource 为别的 URL,提交",
+        name: "Tamper payload.resource to a different URL and submit",
         status: r.status === 402 ? "ok" : "fail",
         detail: { http: r.status, body: r.body, tampered_to: "/v1/protected/something-else", took_ms: Date.now() - t },
       },

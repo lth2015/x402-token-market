@@ -321,6 +321,7 @@ async def list_payments(
             t.c.status,
             t.c.tx_hash,
             t.c.confirmed_at,
+            t.c.resource,
         )
         .order_by(t.c.created_at.asc())
         .limit(effective_limit)
@@ -345,6 +346,7 @@ async def list_payments(
                 "status": r.status,
                 "tx_hash": r.tx_hash,
                 "confirmed_at": _fmt_dt(r.confirmed_at),
+                "resource": r.resource,
             }
             for r in rows
         ]

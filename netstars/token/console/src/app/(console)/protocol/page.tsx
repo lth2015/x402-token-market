@@ -56,7 +56,7 @@ export default async function ProtocolPage() {
         />
         <Tip
           title="Netstars' role"
-          body="The gateway: HMAC-authenticated SDK on one side, Wea custodial settlement on the other. We own the ledger, idempotency, FSM, observability, and the 法人番号-compliant invoice that finance teams need."
+          body="The gateway: HMAC-authenticated SDK on one side, Wea custodial settlement on the other. We own the ledger, idempotency, FSM, observability, and the corporate-number-compliant invoice that finance teams need."
         />
       </section>
     </main>

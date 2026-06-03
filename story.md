@@ -2,141 +2,132 @@
   story.md — AI Commerce Demo · 商业叙事与 GPT img2 海报提示词
   用途：内部演示串场、经营层说明、GPT img2 主视觉生成。
   原则：故事面向商业观众；避免把后台机制和实现细节放到叙事前台。
+  版本：v2.0 · 2026-06-03 · 切换为企业端 AI Agent 跨境电商叙事
 -->
 
-# 一勺甜，背后一门新生意
+# 凌晨三点，Agent 还在工作
 
 > **Logline**
-> 一个女儿想给母亲买一瓶低卡甜味料。HABA 用 AI 把一次犹豫变成一次放心购买；Netstars 则把这类 AI 服务变成可计量、可结算、可复制的新商业基础设施。
+> 一家跨境电商品牌的 AI Agent 在深夜独立处理定价、文案、物流三条业务线。
+> 消耗的每一个 Token，都在后台变成一笔清楚的账。
+> 人睡着，生意还在转。
 
 ---
 
 ## 0. 这个故事真正要讲什么
 
-这不是“技术跑通了”的故事，而是一个更容易让经营层买单的故事：
+这不是"AI 跑通了"的故事，而是一个更容易让经营层买单的故事：
 
-> **AI 不只是客服。AI 正在变成商户的新货架、新销售员、新收费入口。**
+> **企业最贵的成本，不是 AI 调用费用，而是让人在凌晨三点做那些 AI 完全可以做的事。**
 
-HABA 的价值在前台：
+HABA 的 AI Agent 在深夜自主完成了三件事：
 
-- 让消费者更快做选择；
-- 让健康食品的购买理由更清楚；
-- 让线下药局、医院营养科、营养师、电商合作方都能使用同一个顾问能力；
-- 把一次性的商品销售，扩展成持续发生的“AI 健康顾问”服务收入。
+- 扫描竞品定价，输出 SKU 调价建议；
+- 生成英文 + 日文产品文案；
+- 比较 DHL / EMS / SAL 时效与成本，给出方案。
 
-Netstars 的价值在后台：
+这三件事，以往需要团队在早上花两小时完成。现在，Agent 在夜间完成，早上团队打开仪表盘，结论已经在那里了。
 
-- 把每一次 AI 服务调用变成可记录、可收费、可对账的商业动作；
-- 让商户不用自己搭一套复杂的支付和计量系统；
-- 让 AI 服务从“成本中心”变成“可以卖给伙伴的产品”。
+但这里还有一个更深的问题：
+
+> **当 AI 开始替企业承担真实业务工作，谁来记录它消耗了多少，谁来收费，谁来对账？**
+
+Netstars 的答案是：每一次 AI 调用，都变成一条清楚的商业记录。
+可计量、可收费、可结算、可复制到下一家商户。
 
 一句话：
 
-> **HABA 卖的是健康选择；Netstars 卖的是让 AI 服务可以规模化收费的能力。**
+> **HABA 用 AI 让运营提效；Netstars 让这份提效可以被计量和定价，成为真正的商业产品。**
 
 ---
 
 ## 1. 登场人物
 
-- **美咲**：35 岁，东京。母亲最近开始控制糖分，她想买一瓶适合咖啡和料理的甜味料。
-- **HABA AI Advisor**：一个不催单、不堆术语的线上顾问。它把复杂的健康食品知识，翻译成消费者能马上理解的购买理由。
-- **HABA 业务团队**：他们关心的不只是卖出一瓶商品，而是能不能把 HABA 的健康建议能力，延伸到更多渠道。
-- **药局 / 医院营养科 / 营养师 / 合作电商**：这些伙伴不一定要懂 AI，但他们都需要一个可信、稳定、可嵌入的健康顾问。
-- **Netstars**：站在后台，把“每一次 AI 帮忙”变成清楚的账、稳定的结算和可复制的服务模式。
+- **HABA 运营团队**：东京，跨境电商品牌，主营健康食品。团队很小，但业务覆盖日本、东南亚多个渠道。他们需要 AI 来做夜间的例行工作。
+- **Cross-border E-commerce Agent**：一个运行在 HABA 企业仪表盘上的 AI 工作者。它不请假，不疲劳，Token 不足会自动补充。
+- **Token 账本**：HABA 购买的 AI 使用额度，以亿为单位，由 Netstars 平台管理。每一次 Agent 调用都从中扣减，实时可见。
+- **Netstars 平台**：站在后台，把每一次 AI 服务调用变成平台收入，变成可交付给 HABA 的账单，变成可复制给下一家商户的服务模板。
 
 ---
 
 ## 2. 主线故事
 
-### 幕一 · 不是“买代糖”，是一次不确定的健康选择
+### 幕一 · 深夜，Agent 开始工作
 
-下午三点，美咲站在厨房边，手里拿着母亲常喝的马克杯。
+办公室关灯了。
 
-她不是不知道要买甜味料，她是不知道该相信哪一种。
+HABA 的东京团队在下班前打开企业仪表盘，把三项工作交给 AI Agent：
 
-页面上有很多商品、很多词：低卡、甜度、料理、饮料、家庭使用。每个词都像有道理，但合在一起反而让人停住。
+> 1. 竞品定价分析，输出 SKU 调价建议
+> 2. 新品英文 + 日文文案生成
+> 3. DHL / EMS / SAL 时效对比，推荐方案
 
-她在 HABA 页面输入一句很普通的话：
+窗外，东京的灯光依旧亮着。仪表盘上，"Running…" 的状态灯慢慢跳动。
 
-> “我想给糖尿病家人买低卡甜味料，最好可以做料理，也能直接放饮料里。”
+这不是演示。Agent 在调用真实的 GPT-4.1，消耗的是真实的 Token。
 
-这句话背后不是一个搜索请求，而是一个真实的购买犹豫。
+### 幕二 · Token 在流动，数字在缩小
 
-### 幕二 · HABA 的顾问，把犹豫变成信任
+仪表盘右上角，一个数字在悄悄变化：
 
-HABA AI Advisor 没有把美咲带进一堆专业解释。
+> **847,200,000 / 1,000,000,000 Tokens · 84.7% 已用**
 
-它只回答三件事：
+三项任务结束后，团队在仪表盘上看到的不是"AI 完成了"，而是：
 
-1. 哪几款适合她的场景；
-2. 为什么适合；
-3. 怎么用更安心。
+- 输入 4,200 Token，输出 2,800 Token，本次调用消耗 7,800 Token
+- 余额实时更新
+- 本月已用量、本周趋势、今日消耗，全在一张图里
 
-美咲看到的不是“AI 在工作”，而是一个品牌正在认真理解她。
+这是 AI 从"成本模糊地带"走进"可管理商业资产"的那一刻。
 
-她把推荐商品加入购物车。这个动作很小，但商业意义很大：
+### 幕三 · 80%，触发器打开
 
-> **一次原本可能流失的犹豫，被 HABA 转化成了一个更放心的购买决定。**
+凌晨，余额跌过了 80% 使用率的阈值。
 
-### 幕三 · 好顾问不只服务一个页面
+没有人在场，但系统记住了规则：
 
-镜头从美咲的厨房拉远。
+> 余额低于 20%，触发自动充值，固定金额 100,000,000 Token。
 
-同一个 Advisor 能出现在不同地方：
+补充请求在后台安静发出。没有弹窗打扰任何人。
+Token 账户悄悄充满，Agent 继续工作。
 
-- 在街角药局，它帮药剂师向顾客解释“这款适合怎么用”；
-- 在医院营养科，它帮助营养师快速整理推荐依据；
-- 在合作电商，它成为商品详情页里的智能问答入口；
-- 在 HABA 自己的线上商店，它继续提高购买转化。
+### 幕四 · 一次支付，全程不需要人
 
-这里的重点不是“多做几个页面”，而是：
+充值背后，是一笔真实的支付：
 
-> **HABA 把自己的健康建议能力产品化了。**
+- 协议：x402
+- 结算网络：Solana Devnet
+- 金额：$100.00 USDC
+- 时间：420 毫秒
 
-从前，HABA 卖商品。
+没有人工审批，没有等待银行转账，没有手动对账。
 
-现在，HABA 也可以把“会推荐、会解释、会陪消费者做选择”的能力，作为服务交给伙伴使用。
+企业仪表盘记录了这一步：
+**Auto Topup complete · x402 on Solana**
 
-### 幕四 · 每一次 AI 帮忙，都应该变成一笔清楚的生意
+### 幕五 · 早上，团队打开仪表盘
 
-如果 AI Advisor 只是一段漂亮演示，它很难进入真实商业。
+九点，HABA 运营团队喝着咖啡打开仪表盘。
 
-真实商业会问：
+三项工作的结论已经在那里。
+充值记录整齐排列在 Auto Topup History 页面。
+Token 余额绿色，健康。
 
-- 谁用了？
-- 用了多少？
-- 谁来付费？
-- 如何对账？
-- 如何给合作伙伴分摊成本？
-- 如何证明这不是一笔糊涂账？
+他们唯一需要做的，是把 Agent 输出的文案发给设计团队，把定价建议开会讨论。
 
-这就是 Netstars 出场的地方。
+深夜发生的一切，已经清楚地变成了早上可以直接使用的商业结论。
 
-Netstars 不站到消费者面前抢戏。它在后台把每一次 AI 服务变成清楚的商业记录：可计量、可收费、可结算、可追溯。
+### 幕六 · Netstars 看到了什么
 
-HABA 不需要自己重新发明一套 AI 收费系统。伙伴也不需要理解背后的复杂机制。
+切换到 Netstars 平台视角。
 
-大家只需要知道：
+MTD 收入曲线在爬升，每一次 HABA 的 Agent 调用都是一个数据点。
+商户列表里，HABA 排在本月活跃商户的前列。
+GPT-4.1 调用占平台总量的 67%。
 
-> **AI 每帮一次忙，商业系统就能稳稳接住一次价值。**
+这不是一个商户的故事，这是一个平台正在证明的商业模型：
 
-### 幕五 · 从一次购物，到一个可复制的 Agent Commerce 模板
-
-故事最后，画面回到美咲。
-
-她只觉得自己买到了一瓶适合母亲的甜味料。
-
-但对 HABA 来说，这不是一笔普通订单。它证明了三件事：
-
-1. AI 能提高消费者信任；
-2. AI 能成为面向伙伴的服务产品；
-3. AI 服务可以被稳定计量和收费。
-
-对 Netstars 来说，这也不是一次普通支付。
-
-它证明的是：
-
-> **当 AI 开始替人做选择、替商户服务客户、替伙伴完成咨询，市场需要一条新的商业轨道。Netstars 可以成为这条轨道的运营方。**
+> **当越来越多的商户把 AI 用于真实业务，每一次调用都会变成平台的收入，变成对下一家商户可以演示的成功案例。**
 
 ---
 
@@ -144,15 +135,15 @@ HABA 不需要自己重新发明一套 AI 收费系统。伙伴也不需要理�
 
 | 幕 | 打开哪里 | 现场动作 | 观众要记住 |
 |---|---|---|---|
-| 幕一 / 二 | HABA 首页 | 输入健康食品需求，触发 Advisor 推荐 | AI 把犹豫变成购买信任 |
-| 幕三 | HABA 购物车 | 完成一次顺滑、安全的结账 | 消费者不需要理解后台，只需要感觉可靠 |
-| 幕四 | Token Console | 查看 AI 服务调用和账本 | AI 服务可以被计量、收费、对账 |
-| 幕五 | 后台运营台 | 展示服务调用、结算状态与业务闭环 | Netstars 提供的是可复制的商业基础设施 |
-| 收尾 | 回到故事页或海报 | 用一句话收束 | HABA 卖健康选择，Netstars 卖 AI 商务轨道 |
+| 幕一 / 二 | HABA `/dashboard` | 点击三个 Agent 任务，看 Token 实时消耗 | AI 真实调用，成本实时可见 |
+| 幕三 | HABA `/budget` | 展示 80% 阈值触发器和预算进度条 | 企业可以设置规则，让 AI 自我管理 |
+| 幕四 | HABA `/topup` | 查看充值记录，点击"Authorize Topup" | x402 支付在 Solana 上完成，420ms，无需人工 |
+| 幕五 | HABA `/dashboard` | 展示 Agent 输出和 Token 余额恢复 | 深夜的 AI 工作，早上变成可用结论 |
+| 幕六 | Netstars `/revenue` + `/merchants` | 展示 MTD 收入曲线和商户排行 | Netstars 看到的是整个平台的 AI 商业化飞轮 |
 
 现场讲法：
 
-> “今天我们不把重点放在技术名词上。我们只看一件事：一个健康食品品牌，如何把 AI 顾问变成新的收入渠道；Netstars 如何把这个渠道背后的收费、结算和运营接住。”
+> "今天我们不讲架构，只看一件事：一家跨境电商的 AI Agent 在深夜独立完成了三项业务。每一次调用都变成了一笔清楚的账，自动结算，早上团队什么都不用做，只需要看结论。这是 AI 从演示走进真实运营的样子。"
 
 ---
 
@@ -160,182 +151,323 @@ HABA 不需要自己重新发明一套 AI 收费系统。伙伴也不需要理�
 
 ### 主标题
 
-**一勺甜，背后一门新生意**
+**凌晨三点，Agent 还在工作**
 
 ### 副标题
 
-AI 把犹豫变成信任，把服务变成收入。
+AI 替企业做的每一件事，都是一笔清楚的账。
 
 ### 核心句
 
-**HABA 卖健康选择，Netstars 让 AI 服务可以规模化收费。**
+**不是 AI 帮了忙，而是 AI 已经在顶班。**
 
 ### 视觉基调
 
-- 温暖、明亮、健康、可信；
-- 商业感强，但不要金融冷感；
-- 像经营层会愿意放进会议材料的品牌海报；
-- 不要赛博朋克，不要黑底霓虹，不要代码雨；
-- 不要在图像里生成可读文字或 Logo，所有标题和品牌字建议后期叠加。
+- 温暖夜间感：深夜东京办公室，但温暖，不是冷蓝；
+- 商业感强，有仪表盘感，但不是科幻场景；
+- 像经营层会愿意放进董事会材料的商业叙事海报；
+- 不要赛博朋克，不要黑底霓虹，不要代码雨，不要机器人手臂；
+- 不要在图像里生成可读文字或数字，所有标题后期叠加。
 
 ---
 
 ## 5. GPT img2 专用提示词
 
-> 使用建议：让 GPT img2 只生成“主视觉背景”，不要让模型生成中文标题。文字、Logo、流程标签后期用 PPT / HTML / Figma 叠加，准确度会高很多。
+> 使用建议：GPT img2 只生成"主视觉背景"，不要让模型生成中文标题或数字。
+> 文字、Logo、流程标签后期用 PPT / HTML / Figma 叠加，准确度会高很多。
 
-### Prompt A · 主视觉海报「一勺甜，背后一门新生意」
+---
+
+### Prompt A · 主视觉「凌晨三点，Agent 还在工作」
 
 用途：主海报、封面页、演示开场。
 
 ```text
-Create a premium commercial editorial poster background for a Japanese health and wellness brand.
+Create a premium commercial poster background for an enterprise AI productivity brand.
 
 Scene:
-A warm sunlit kitchen in Tokyo in the late afternoon. On a wooden table, a ceramic cup of coffee sits beside a small elegant liquid sweetener bottle. A single clear drop is falling into the cup, creating a soft ripple. Near the table, a woman in her mid-30s gently holds a smartphone, looking relieved and quietly confident, as if she has just received a helpful product recommendation for her mother.
-
-Business metaphor:
-From the ripple in the cup, a very subtle emerald line of light flows outward, not technical or futuristic, more like a graceful service pathway. It quietly connects small abstract hints of commerce: a product shelf, a receipt, a pharmacy counter, and a partner storefront. These elements should be symbolic and minimal, not literal diagrams.
+A modern Japanese company office at 3 AM. The open-plan workspace is mostly dark,
+but a single curved ultrawide monitor glows warmly at an empty desk — no person present.
+The screen shows a softly lit dashboard with gently animated status indicators
+(subtle pulsing green dots, soft amber progress arcs). On the desk: a ceramic coffee cup,
+a notebook left open, reading glasses resting on top — signs that a human was here
+and will return. A city glow from the floor-to-ceiling windows behind casts a soft
+warm wash of amber and deep blue. The feeling is not eerie but peaceful and purposeful:
+work is happening on its own, calmly and reliably.
 
 Mood:
-Warm, trustworthy, premium, human, healthy, optimistic. The feeling should be "a consumer hesitation became a confident purchase" and "a brand service became a new business channel."
+Warm, intelligent, trustworthy, quietly impressive. "The AI never sleeps, so you can."
+The feeling should be: a business is running itself, smoothly, while humans rest.
 
 Style:
-High-end editorial advertising, soft natural light, shallow depth of field, refined Japanese wellness aesthetic, realistic but slightly idealized, clean composition, elegant negative space for a headline.
+High-end Japanese corporate editorial. Cinematic realism, natural ambient lighting,
+45mm lens perspective. Think Monocle magazine meets Bloomberg editorial photography.
+Warm color temperature. No harsh shadows, no cold tech glow.
 
 Palette:
-HABA emerald green, warm cream, soft white, natural wood, forest ink, tiny amber highlights.
+Deep midnight blue and forest green for the window background. Warm amber and cream
+for desk light. Soft emerald status glow on the screen. No neon.
 
 Composition:
-Horizontal 16:9 poster. Leave generous clean negative space on the left or upper-left for later typography overlay. Do not place any text in the image.
+Horizontal 16:9. Leave generous clean space on the left third for headline overlay.
+The monitor and desk occupy the right two-thirds. Quiet, refined, spacious.
 
 Strict negative instructions:
-No readable text, no logos, no brand names, no UI screens with legible words, no blockchain icons, no coins, no robots, no cyberpunk, no neon, no dark tech background, no code, no circuit-board aesthetic, no medical fear imagery.
+No readable text or numbers on any screen. No robots or mechanical arms. No code
+or terminal windows. No cryptocurrency symbols or coins. No neon or cyberpunk.
+No stock photo clichés. No excessive lens flare. No people.
 ```
 
 推荐叠字：
-
-- 主标：一勺甜，背后一门新生意
-- 副标：AI 把犹豫变成信任，把服务变成收入
-- 小字：HABA 卖健康选择，Netstars 让 AI 服务可以规模化收费
+- 主标：凌晨三点，Agent 还在工作
+- 副标：AI 替企业做的每一件事，都是一笔清楚的账
+- 小字：HABA Enterprise · AI Usage Dashboard
 
 ---
 
-### Prompt B · 商业飞轮「同一个顾问，四个收入入口」
+### Prompt B · Token 消耗「每一次调用，都算数」
 
-用途：解释 HABA 为什么不只是做一个聊天入口，而是在产品化顾问能力。
+用途：解释"AI 调用是可计量资产"这个商业概念。
 
 ```text
-Create a bright premium business poster background showing one AI-powered wellness advisor becoming a repeatable service across multiple commercial channels.
+Create a refined financial data visualization poster background representing
+AI token consumption as a measurable, valuable enterprise resource.
 
 Scene:
-A refined Japanese wellness brand environment, presented as four connected real-world moments in one elegant composition:
-1. a home kitchen where a consumer checks a product recommendation on a phone,
-2. a small pharmacy counter where a pharmacist assists a customer,
-3. a hospital nutrition consultation desk with a dietitian reviewing product guidance,
-4. an e-commerce product page represented abstractly as a clean tablet or display.
-
-Unifying idea:
-All four scenes are gently connected by the same thin emerald service line, implying one trusted advisor behind multiple business channels. The line should feel organic and premium, not like a technical circuit.
+An abstract yet warm composition. Imagine a large transparent ring or arc — like
+a premium watch dial or a Japanese paper lantern from the inside — that is
+approximately 85% filled with a warm amber-to-emerald gradient glow.
+The unfilled 15% glows gently in pale white, suggesting remaining capacity.
+The ring floats in a soft deep background: midnight blue fading to warm charcoal.
+Around the ring, tiny precise data points drift like fireflies — each one representing
+a single AI request. They trail subtle paths of light, delicate and purposeful.
+Beneath the ring, the floor feels like polished dark wood or a premium conference table
+surface, reflecting the soft glow upward.
 
 Mood:
-Commercial, trustworthy, scalable, calm, boardroom-ready. It should communicate "one advisor capability can be packaged and sold through partners."
+Premium, precise, calm, businesslike. The feeling should be "enterprise assets
+under control" not "blockchain excitement." It should feel like an Audemars Piguet
+watch dial meets a Japanese management report.
 
 Style:
-Clean editorial collage, realistic with subtle illustration polish, premium Japanese corporate presentation style, soft daylight, cream background, restrained shadows, no clutter.
+Abstract editorial with product photography refinement. Dimensional, subtle, no flat
+vector aesthetics. Warm ambient lighting from within the visualization itself.
 
 Palette:
-Emerald green, cream white, soft blue accents, warm neutral wood, small amber highlights.
+Midnight blue background, warm amber glow at 85% fill mark, emerald for the leading
+edge, pale cream for empty capacity, soft white data particle trails.
 
 Composition:
-Horizontal 16:9. Leave a clear title area at the top. Use visual hierarchy so the home consumer moment feels emotional, and the three partner channels feel like business expansion.
+Vertical A3 poster ratio or square. The ring centered slightly above mid-frame.
+Leave the lower quarter clean for title and copy overlay.
 
 Strict negative instructions:
-No readable text, no logos, no brand names, no charts with numbers, no crypto imagery, no coins, no robots, no code, no neon, no cyberpunk, no exaggerated sci-fi devices, no busy dashboard screens.
+No readable numbers, text, or labels anywhere. No cryptocurrency coins. No bar charts.
+No robots. No code. No circuit boards. No cyberpunk. No cold blue data center aesthetic.
 ```
 
 推荐叠字：
-
-- 主标：同一个顾问，四个收入入口
-- 副标：线上商店、药局、营养科、合作电商，共用一套 HABA 健康建议能力
-- 小字：从商品销售，到服务分发
+- 主标：每一次调用，都算数
+- 副标：AI Token 消耗实时可见，从模糊成本变成可管理的企业资产
+- 小字：847,200,000 / 1,000,000,000 Tokens · 84.7% used this month
 
 ---
 
-### Prompt C · Netstars 商业基础设施「看不见的收银台」
+### Prompt C · 自动充值「规则设好，系统自己跑」
 
-用途：讲 Netstars 的价值，不讲后台机制细节。
+用途：演示 Auto Topup 触发逻辑和企业级自动化的价值。
 
 ```text
-Create an executive-grade commercial infrastructure poster background.
+Create a premium enterprise automation concept poster background.
 
 Scene:
-A calm, bright operations room or modern finance office. In the foreground, a clean table has a paper receipt, a product sample, and a tablet showing abstract, non-readable business activity. In the background, several soft translucent service paths connect a wellness brand, a partner pharmacy, an online storefront, and a settlement desk. Everything feels organized, reliable, and premium.
-
-Metaphor:
-Netstars is the invisible cashier and operating backbone behind AI services. Show clarity, trust, reconciliation, and repeatable business operations without showing technical machinery.
+A split composition. On the left: a refined Japanese office detail — a clean desk
+with a single lamp, a hand resting near a laptop trackpad, a person in business casual
+leaning back with eyes closed, resting — the human is at peace, not monitoring.
+On the right: a softly glowing operational panel floats in the air — not futuristic
+but elegant, like a high-end aircraft instrument cluster with gentle amber and green
+status lights. A thin line of light, warm and organic (like a thread of gold leaf),
+connects the resting human to the operating panel, suggesting: "the system handles it."
+In the far background through large windows, the night city skyline of Tokyo glows
+warmly. Somewhere in the panel's soft glow, a gentle arc completes itself, suggesting
+a rule has triggered and a process is quietly finishing.
 
 Mood:
-Confident, commercial, enterprise-ready, calm, precise. It should feel like "this can be sold to real merchants and finance teams."
+Calm, confident, automated, premium. The feeling should be "enterprise-grade peace
+of mind." The human can rest because the system is reliable.
 
 Style:
-Premium corporate editorial photography mixed with subtle 3D/illustrative accents. Bright light theme, not a tech noir scene. Sophisticated Japanese enterprise aesthetic.
+Cinematic Japanese editorial. 50mm lens equivalent. Warm night light. Monocle aesthetic.
+No sci-fi elements, no cold interface glow, no drama.
 
 Palette:
-Soft white, pale blue, emerald green, slate ink, restrained violet accent, subtle warm highlights.
+Warm amber desk lamp glow, deep navy window, soft emerald status light,
+cream and forest ink for the human elements.
 
 Composition:
-Horizontal 16:9. Leave negative space on the right for title and subtitle overlay. Keep the center visually clean.
+16:9 horizontal, the resting human on the left third, the operational panel occupying
+the center and right, with Tokyo at night as the background layer.
+Leave top-left corner clean for headline.
 
 Strict negative instructions:
-No readable text, no logos, no brand names, no cryptocurrency symbols, no chain icons, no code, no server racks, no dark data center, no cyberpunk, no neon, no robots, no excessive dashboard details.
+No readable text, numbers, or status labels. No robots or mechanical automation imagery.
+No cryptocurrency icons. No neon. No cold blue. No futuristic HUD overlays. No code.
 ```
 
 推荐叠字：
-
-- 主标：看不见的收银台
-- 副标：每一次 AI 帮忙，都变成清楚的账、稳定的结算和可复制的服务
-- 小字：Netstars 让 AI 服务进入真实商业
+- 主标：规则设好，系统自己跑
+- 副标：余额低于 20%，自动触发充值 · 无需人工审批 · 凌晨也准时
+- 小字：Auto Topup · 100,000,000 Tokens · $100.00 USDC
 
 ---
 
-### Prompt D · 经营层收尾「从一次购买，到一条新赛道」
+### Prompt D · x402 支付「420ms，不需要人」
 
-用途：演示最后一页、愿景页。
+用途：演示 x402 + Solana 支付的速度和确定性。
 
 ```text
-Create a polished executive vision poster background about AI commerce becoming a new business rail.
+Create a minimal premium payment confirmation poster background.
 
 Scene:
-A split-depth composition: in the foreground, a simple human consumer moment, a cup of coffee and a wellness product on a warm table. In the middle distance, elegant partner environments fade in softly: a pharmacy, a nutrition desk, and an online shop. In the far background, an abstract clean commercial network expands outward like a calm sunrise, suggesting scale and opportunity.
-
-Message:
-One ordinary purchase can reveal a new business category: AI-assisted choices, partner-distributed services, and invisible commercial operations.
+An extreme close-up of a MacBook — the Touch ID bar glows with a soft warm light
+as a thumb barely makes contact. The fingerprint glow is amber and precise.
+Above the laptop, floating in soft focus, is a small frosted glass card —
+elegant, translucent, like a high-end hotel keycard — showing the abstract form
+of a payment confirmation. No readable text, only the shape: two rows of information,
+a large amount field, a network indicator, a subtle checkmark beginning to appear.
+The background is a premium dark surface: deep forest green velvet or polished dark
+Japanese oak. A single beam of warm directional light hits the thumb and the card.
+Everything else falls into gentle darkness.
 
 Mood:
-Visionary but grounded, warm but businesslike, premium but not flashy. Hopeful, credible, boardroom-ready.
+Decisive, secure, premium, instant. The feeling should be "the most important business
+decision was made with one touch." Like Apple Pay for enterprise blockchain settlements.
 
 Style:
-High-end strategy presentation cover art, editorial realism, soft gradients from natural light, minimal symbolic elements, refined composition.
+Product photography meets editorial advertising. Shot on 85mm at f/1.4.
+Warm, deliberate, confident. Not a consumer bank ad — an enterprise infrastructure
+brand statement.
 
 Palette:
-Cream, emerald, soft sky blue, forest ink, warm amber. Avoid one-color monotony.
+Deep forest green or charcoal background. Warm amber fingerprint glow.
+Frosted glass card in soft white. One thin emerald line suggesting confirmed status.
 
 Composition:
-Horizontal 16:9, with large clean negative space for a powerful headline. No embedded text.
+16:9 horizontal or vertical A3. Thumb and card in the center-right.
+Large clean dark space on the left for headline. Extreme negative space.
 
 Strict negative instructions:
-No readable text, no logos, no brand names, no technical diagrams, no crypto visuals, no coins, no robots, no code, no dark sci-fi, no neon, no cluttered business charts.
+No readable text, numbers, wallet addresses, or QR codes. No cryptocurrency coin icons.
+No blockchain diagrams. No dramatic tech explosion effects. No cold blue. No neon.
+No overly commercial bank-ad feel.
 ```
 
 推荐叠字：
+- 主标：420ms，不需要人
+- 副标：x402 协议 · Solana Devnet · USDC 结算
+- 小字：One touch. Real settlement. On-chain.
 
-- 主标：从一次购买，到一条新赛道
-- 副标：Agent Commerce 不是未来概念，而是商户今天可以开始计量和收费的服务能力
-- 小字：健康选择只是入口，AI 服务商业化才是主线
+---
+
+### Prompt E · 平台视角「每一笔账，都在这里」
+
+用途：切换到 Netstars 视角，展示平台收入和商户规模。
+
+```text
+Create a premium enterprise platform revenue dashboard poster background.
+
+Scene:
+A large, beautifully lit operations display wall in a modern Japanese corporate
+environment — think Bloomberg NOC meets Muji office. On the wall, a wide dashboard
+glows softly with abstract data: a revenue trend line climbing from left to right
+across the full width, rendered in electric teal on deep navy. Below it, soft card
+panels glow with abstract metrics — no readable numbers, just the visual rhythm of
+financial health: green up-arrows, stable bars, warm pulse dots. In the foreground,
+a single standing silhouette — back to us, hands behind back, watching the display
+with quiet confidence. The room has clean architectural lines, warm floor lighting,
+and large frosted glass partitions to the side.
+
+Mood:
+Authoritative, calm, scalable, enterprise-grade. The feeling should be "we see
+everything, we control everything, and the numbers are moving in the right direction."
+Not boastful — just quietly confident, like a well-run central bank.
+
+Style:
+Architectural editorial photography. Wide angle, clean lines. The kind of image
+a SaaS company would use as its Series B announcement visual. Premium Japanese
+corporate design sensibility.
+
+Palette:
+Deep navy background, electric teal revenue line, warm amber secondary accents,
+soft white card glow, cool slate for the silhouette.
+
+Composition:
+16:9 panoramic. Dashboard wall fills the upper two-thirds. The silhouette in the
+lower-center foreground anchors the human element. Top-left clean for headline.
+
+Strict negative instructions:
+No readable numbers, currency amounts, or text on any screen. No cryptocurrency
+visuals. No robots. No code or terminal windows. No cyberpunk neon.
+No messy data clutter.
+```
+
+推荐叠字：
+- 主标：每一笔账，都在这里
+- 副标：从 HABA 的一次 Agent 调用，到平台的实时收入曲线
+- 小字：Netstars Token Platform · MTD Revenue · 142 Active Merchants
+
+---
+
+### Prompt F · 收尾愿景「不是未来，是今天」
+
+用途：演示最后一页，经营层收尾，传递"这是可以现在开始的生意"。
+
+```text
+Create a visionary yet grounded business poster background for an AI commerce platform.
+
+Scene:
+Dawn breaking over Tokyo. Shot from inside a high-rise office looking out through
+floor-to-ceiling windows. The city transitions from deep night blue to warm amber
+sunrise on the horizon. In the foreground, a clean desk is illuminated by the
+rising light: a coffee cup with steam, a laptop just waking up, a notebook open
+to a blank page. On the laptop screen, the faintest glow suggests a dashboard
+coming to life — no readable content, just the warm green pulse of a system
+that has been working all night and is ready to present its results.
+The mood is not relief after a crisis — it is the quiet satisfaction of a system
+that worked exactly as designed, overnight, without intervention.
+
+Mood:
+Hopeful, credible, earned, businesslike. Not utopian — practical and confident.
+The message should feel like: "This is already working. You can start today."
+
+Style:
+Sunrise editorial photography. 24mm wide lens. Natural light mixed with screen glow.
+The kind of image that would appear on the cover of Nikkei Business or Harvard
+Business Review Japan. Authoritative but warm.
+
+Palette:
+Deep night blue transitioning to warm amber and cream on the horizon.
+Forest green screen pulse. Soft white desk elements.
+Golden hour light washing across the foreground.
+
+Composition:
+16:9 wide. Sunrise occupies the upper half. The desk and laptop in the lower
+foreground. Leave the right third clean and dark for a large headline.
+No human in frame — the story is about the system, not any single person.
+
+Strict negative instructions:
+No readable text or numbers. No cryptocurrency icons. No robots or mechanical imagery.
+No neon. No cold blue tech aesthetic. No dramatic action or urgency.
+No people, no faces. No stock photo sunrise clichés.
+```
+
+推荐叠字：
+- 主标：不是未来，是今天
+- 副标：Agent Commerce 从概念走进每日运营。深夜发生的，早上就是结论。
+- 小字：HABA × Netstars · AI Token Billing Platform
 
 ---
 
 ## 6. 一句话收尾
 
-> “美咲只是想给妈妈买一瓶更安心的甜味料。HABA 给了她一个可信的选择；Netstars 让这次 AI 服务背后的价值可以被记录、收费、结算，并复制到更多商户和伙伴场景里。这就是 Agent Commerce 从概念走向生意的第一步。”
+> "HABA 的 AI Agent 在深夜独立完成了定价、文案、物流三项工作。消耗的每一个 Token 都有记录，结算全部在链上完成，早上团队打开仪表盘，什么都已经好了。这就是 Agent Commerce 从演示变成日常运营的样子。Netstars 让这件事不只发生在 HABA，而是可以交付给下一家、再下一家商户的商业产品。"

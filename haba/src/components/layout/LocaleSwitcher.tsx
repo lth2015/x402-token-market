@@ -10,9 +10,9 @@ import { cn } from "@/lib/utils";
 type LocaleOption = { code: "zh-CN" | "ja" | "en"; label: string; native: string };
 
 const LOCALES: LocaleOption[] = [
-  { code: "zh-CN", label: "中文（简体）", native: "中文" },
-  { code: "ja",    label: "日本語",        native: "日本語" },
-  { code: "en",    label: "English",      native: "EN" },
+  { code: "zh-CN", label: "Chinese (Simplified)", native: "ZH" },
+  { code: "ja",    label: "Japanese",              native: "JA" },
+  { code: "en",    label: "English",               native: "EN" },
 ];
 
 /**

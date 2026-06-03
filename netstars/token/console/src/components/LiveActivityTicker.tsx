@@ -77,11 +77,6 @@ export function LiveActivityTicker({
             aria-hidden
           />
           Live Activity
-          {isMock && (
-            <span className="ml-2 rounded bg-surface-muted px-1.5 py-0.5 text-[10px] font-normal normal-case tracking-normal text-ink-tertiary">
-              mock data
-            </span>
-          )}
         </div>
         <a
           href="/audit"
@@ -149,7 +144,7 @@ export function LiveActivityTicker({
                 /* eslint-disable-next-line react-hooks/exhaustive-deps */
                 key={`${evt.id}-${tick}`}
               >
-                {formatRelative(evt.ts, "ja")}
+                {formatRelative(evt.ts, "en")}
               </time>
             </li>
           );

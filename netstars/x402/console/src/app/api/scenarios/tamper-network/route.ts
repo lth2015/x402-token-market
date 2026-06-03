@@ -31,7 +31,7 @@ export async function POST() {
     scenario: "tamper-network",
     steps: [
       {
-        name: "篡改 payload.network 为 solana(mainnet),提交",
+        name: "Tamper payload.network to solana (mainnet) and submit",
         status: r.status === 402 ? "ok" : "fail",
         detail: { http: r.status, body: r.body, tampered_to: "solana", took_ms: Date.now() - t },
       },

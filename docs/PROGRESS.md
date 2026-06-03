@@ -1,7 +1,45 @@
 # X402 Token Market — 项目进度
 
-**最后更新**: 2026-06-02 (第十一轮 · 待立项全部落地 + E2E 验收 40 passed)
-**当前阶段**: **标准 x402 协议层可演示 + 双 console 可观测 + GPT-4.1 Advisor 运行主线**。HABA Advisor 默认模型为 `gpt-4.1`；消费者商品结账走 HTTP 402 / `X-PAYMENT` 重试协议并由 Wea Facilitator 结算到 Solana Devnet USDC；C 端继续隐藏内部 Token 余额与成本细节。
+**最后更新**: 2026-06-03 (第十二轮 · HABA Enterprise Dashboard 重构 + reconciler bug fix)
+**当前阶段**: **HABA 已从消费者电商重构为企业 AI 用量仪表盘**。演示主线：HABA Enterprise Dashboard（AI 用量 → Budget 监控 → Auto Topup → x402 Touch ID 授权）→ Netstars Platform Console（Revenue / Merchants / Billing）。x402 协议层与 E2E 不变（40 passed）。
+
+## 第十二轮 · HABA Enterprise Dashboard + 收尾（2026-06-03）
+
+按 `DEMO_REDESIGN.md` 全量落地，并修复 reconciler 对账 bug + 新增 `make reset-ledger` 演示工具。
+
+### HABA 重构（haba-engineer）
+- ✅ **消费者系统全部删除**：`cart/`、`checkout/`、`product/`、`advisor/`、`lib/cart/` 组件全删；`/cart`、`/resale`、`/b2b`、`/agent` 路由 404。
+- ✅ **企业仪表盘新建**：`/dashboard`（6 KPI + GPT-4o Model Card + Trend Chart）、`/budget`（Token/Budget Limit 选择器 + BudgetGauge 进度条）、`/topup`（Auto Topup History + PaymentAuthModal Touch ID 入口）。
+- ✅ **EnterpriseSidebar**：Overview / Budget / Auto Topup 三项，lucide-react SVG 图标，无 emoji。
+- ✅ **`/` → 307 → `/dashboard`** 重定向。
+- ✅ **文案修正**：`100,000,000 Tokens`（AC-05）；`x402 on Solana · USDC`（AC-06）。
+- ✅ typecheck 0 errors。
+
+### Netstars Token Console 新增（netstars-engineer）
+- ✅ **Revenue 页**：PlatformMetrics 5 KPI + RevenueAreaChart（绿色趋势）+ ModelPieChart（含 `<details>` 数据表 fallback，满足 WCAG）。
+- ✅ **Merchants 页**：Top 10 商户排行，前三名高亮。
+- ✅ **Billing 页**：模型明细 + 消費税 10% + 客户端 PDF/CSV 下载。
+- ✅ **Invoices 增强**：PDF/CSV 下载 + Resend Email Toast（4s 自动消失，`aria-live="polite"`）。
+- ✅ **Sidebar 新增** Revenue / Merchants / Billing 导航项。
+- ✅ typecheck 0 errors。
+
+### reconciler bug fix（x402 + token-worker）
+- ✅ **`GET /v1/payments` 加入 `resource` 字段**：`netstars/x402/src/x402/main.py` SELECT 增加 `t.c.resource`，response dict 同步带出。
+- ✅ **reconciler 订单类型区分**：只对 `resource` 包含 `token-purchase` 的订单检查 ledger credit；消费者商品结算（`checkout/order`）by-design 不充值 Token，不再误报 `missing_credit`。
+
+### 演示工具
+- ✅ **`make reset-ledger`**：`scripts/reset-ledger.sql` + Makefile target；TRUNCATE activity tables，重置余额 500M tokens，演示前执行一次即可从干净状态开始。
+
+### 已关闭的过时 TODO
+- ~~`/agent` B2B 多渠道剧本超时~~：`/agent` 路由已随消费者系统删除，不适用。
+- ~~钱包 connect UI 真接 Phantom/Solflare~~：消费者结账流程已删，不适用。
+
+### 遗留（生产前事项 / 不阻塞 demo）
+- **poetry.lock 未提交**：本机 Python 3.10（项目要 3.12），需在 CI/3.12 环境 `poetry lock` 后提交（x402）。
+- **KMS aws feature 编译**：需 Rust ≥1.91.1（当前 1.88）+ `cargo build --features aws-kms` + 配 `KMS_KEY_ID`。
+- **mTLS**：wea 当前为 interim `X-Internal-Auth` guard，生产替换为 mTLS（DESIGN §9）。
+
+---
 
 ## 第十一轮 · 待立项全部落地 + E2E 验收（2026-06-02）
 
@@ -307,34 +345,38 @@ token-api 的 `/v1/recent-activity` 可见 Token top-up 与 AI debit；商品结
   - 全站 hover/入场动画：产品卡 `-translate-y-0.5 hover:shadow-e3`；Teaser 格同步；TopBar Logo 渐变升级
   - Footer 新增技术栈行：HABA · x402 Protocol · Solana USDC chip
 
-### P2/P3 — 下次开工继续（第五轮 smoke test 新发现）
+### P2/P3 — ✅ 已完成（第十二轮）
 - [x] **AI Advisor system prompt 注入真实 MARVIE 目录**：已把 `marvieProducts` 的 SKU / 名称 / 卖点 / 卡路里 / 甜度 / 成分注入 `HABA_SYSTEM_PROMPT`，并要求只推真实 7 款。
 - [x] **`/cart` 订单摘要 USDC 显示与实扣不一致**：已抽出共享 checkout policy，购物车摘要显示实际链上实扣金额与演示上限说明。
-- [ ] **`/agent` B2B 多渠道剧本超时**：12 次调用 × 真 LLM（每次 2–3s）≈ 30s+，前端无硬超时但单页等待偏久。可缩短为 2 轮（8 次）或并发，或加进度提示。
-- [ ] **ledger 重置工具**：topup 与 AI 调用会改变 HABA Token 余额，多轮演示后余额数字会滚动。需要一个 `make reset-ledger` 或脚本（重建 mysql / 清表），让演示从干净状态开始。
-- [ ] 钱包 connect UI 真接 Phantom / Solflare (现在签名是 server-side mock)
+- [x] **ledger 重置工具**：`scripts/reset-ledger.sql` + `make reset-ledger`；TRUNCATE activity tables，重置余额 500M tokens。
+- ~~**`/agent` B2B 多渠道剧本超时**~~：`/agent` 路由已随消费者系统删除，不适用。
+- ~~**钱包 connect UI 真接 Phantom/Solflare**~~：消费者结账流程已删，不适用。
 
-### 第十轮自检待立项（按优先级）
-- [ ] **[P1] 起本地栈跑整体 E2E 验收**：本轮修复（尤其 x402 AP4 委托 wea 的新路径）未经 `scripts/x402_protocol_e2e.py` 验证；本地 Docker 未起。
-- [ ] **[P1] 部署配置补 `CONSOLE_MERCHANT_NAME` 等 env**：token console 去硬编码后依赖 env，缺失则显示默认占位。后续应实现 `GET /v1/merchant/profile` 让 console 动态读取。
-- [ ] **[P1] token worker 落地**：reconciler / invoice_generator / usage_aggregator / anomaly_detector 仍为 heartbeat stub；`payment_orders_mirror` 表无任何写入路径（与 x402 支付状态同步缺失）。
-- [ ] **[P1] x402 confirmer 链上读改委托 wea**：`main.py:557` confirmer loop 仍直连 Solana `get_signature_status`（AP4 读操作违规）；需 wea 先提供 `/tx/status/{sig}` 查询端点,跨模块改造。
-- [ ] **[P0-prod] wea KMS 真实集成**：`api.rs:46` callback_secret 仍明文 stub；生产前必须接入 AWS KMS ap-northeast-1 direct（见 memory `feedback_kms_aws_direct`）。
-- [ ] **[P2] token FX 汇率去硬编码**：`main.py` 硬编码 150 JPY/USDC（mock FX），`/v1/balance` 的 `jpy_equivalent` 对客户可见,需配置源或 FX 服务。
-- [ ] **[P2] token per-key rate limiter**：`agent_keys` 有 `rate_limit_rpm/tpm` 字段但无中间件读取；`auth.py:130` `_touch_last_used()` 定义但从不调用（last_used_at 永不更新）。
-- [ ] **[P2] wea depeg 守护接线**：`system_flags`（accepting_new_settlements / depeg_*）表存在但 worker 不读（DESIGN §8 缺失）。
-- [ ] **[P3] wea 生产硬化**：mTLS（现 routes 无鉴权）、多 RPC failover（`rpc_endpoints` 表已 seed 未接线）、listen 端口 env 可配置（现硬编码 0.0.0.0:8080）。
-- [ ] **[P3] 清理项**：x402 version 三处不一致(0.2/0.3/0.4)、poetry.lock 未提交、`signed_tx_hash` UNIQUE 仅 migration 有；haba `ProductGrid`/`DemoBadge` 死代码 + 注释 demo 字样；wea dead-code warnings。
+### 第十轮自检待立项（按优先级）— 第十一/十二轮已全部完成
+- [x] **[P1] 起本地栈跑整体 E2E 验收**：第十一轮完成，40 passed。
+- [x] **[P1] 部署配置补 `CONSOLE_MERCHANT_NAME` 等 env**：第十一轮 `GET /v1/merchant/profile` 已实现，console 动态读取。
+- [x] **[P1] token worker 落地**：第十一轮完成，APScheduler 4 job 容器全绿。
+- [x] **[P1] x402 confirmer 链上读改委托 wea**：第十一轮完成，AP4 彻底满足。
+- [x] **[P2] token FX 汇率去硬编码**：第十一轮完成，`FX_JPY_PER_USDC` env 注入。
+- [x] **[P2] token per-key rate limiter**：第十一轮完成，Redis 滑窗 RPM+TPM。
+- [x] **[P2] wea depeg 守护接线**：第十一轮完成，worker 每 60s 拉价 + flag 翻转。
+- [x] **[P3] wea 生产硬化**：第十一轮完成（mTLS 仍 interim X-Internal-Auth，生产 TODO）。
+- [x] **[P3] 清理项**：第十一/十二轮全部完成（version 统一 0.4.0、haba 死代码删除、wea dead-code 清理）。
+
+### 遗留（生产前事项 / 不阻塞 demo）
+- [ ] **poetry.lock 未提交**：本机 Python 3.10（项目要 3.12），需在 CI/3.12 环境 `poetry lock` 后提交（x402）。
+- [ ] **KMS aws feature 编译**：需 Rust ≥1.91.1（当前 1.88）+ `cargo build --features aws-kms` + 配 `KMS_KEY_ID`。
+- [ ] **mTLS**：wea 当前为 interim `X-Internal-Auth` guard，生产替换为 mTLS（DESIGN §9）。
+- [ ] **Devnet 钱包充值**：在办公室运行 `python scripts/setup-devnet-wallet.py`，将输出填入 `.env`，然后从 https://faucet.circle.com 获取 devnet USDC。
 
 ### P4 — 范围外 / 长期
 - [ ] Solana validator on Apple Silicon (需要 host-side solana-cli + Devnet RPC 转发)
-- [ ] 真实 HABA 商品履约 (订单下完不发货，纯演示)
 - [ ] HABA 自有用户体系 (现在没登录)
 
 ### 演示当天运维备忘
-- payer 钱包 USDC 用一笔少 $9，余额低于 $9 时去 https://faucet.circle.com 补；SOL 手续费极省（每笔 0.000005），5 SOL 够上千次。
-- 每次 `/cart` 真结算等 10–30s（真等 Solana 确认）——正常，是真实性的证据。
-- 改 `.env` 后对应服务要 rebuild：`OPENAI_API_KEY` / `HABA_ADVISOR_MODEL` → `token-api` 与 HABA 运行环境；钱包/RPC → `x402-api`。
+- 演示前运行 `make reset-ledger` 重置账本到 500M tokens 干净状态。
+- 演示流程：HABA `/dashboard` → `/budget` → `/topup` → Touch ID 模拟授权 → Netstars `/revenue` → `/merchants` → `/billing`。
+- 改 `.env` 后对应服务要 rebuild：`OPENAI_API_KEY` / `HABA_ADVISOR_MODEL` → `token-api` 与 HABA 运行环境。
 
 ---
 

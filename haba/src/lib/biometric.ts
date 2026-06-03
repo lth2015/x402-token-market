@@ -82,7 +82,7 @@ export async function requestBiometric(
         user: {
           id: userIdBuf,
           name: `haba-pay-${Date.now()}`,
-          displayName: `HABA 支付确认 · ${amountLabel}`,
+          displayName: `HABA Payment · ${amountLabel}`,
         },
         pubKeyCredParams: [
           { type: "public-key", alg: -7 },   // ES256

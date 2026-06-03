@@ -1,25 +1,11 @@
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
-import { Bodoni_Moda, Jost } from "next/font/google";
+import { Jost } from "next/font/google";
 import "./globals.css";
 
-import { HabaTopBar } from "@/components/layout/HabaTopBar";
-import { HabaFooter } from "@/components/layout/HabaFooter";
-import { CartProvider } from "@/lib/cart/store";
+import { EnterpriseSidebar } from "@/components/enterprise/EnterpriseSidebar";
 
-// Display serif — Bodoni Moda: high-contrast editorial, luxury feel
-// Only preload regular + medium weight (critical for hero); italic loaded too for Bodoni flair
-const bodoniModa = Bodoni_Moda({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
-  variable: "--font-bodoni",
-  display: "swap",
-  preload: true,
-});
-
-// Body sans — Jost: geometric, clean, pairs perfectly with Bodoni
 const jost = Jost({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
@@ -29,27 +15,23 @@ const jost = Jost({
 });
 
 export const metadata: Metadata = {
-  title: "HABA — あなたの甘味顾问",
-  description:
-    "HABA / ハーバー研究所 — AI 個人健康甜味顧問 · MARVIE 全系列 · 控糖 · 低卡 · 料理搭配",
+  title: "HABA Enterprise — AI Token Platform",
+  description: "HABA Enterprise · AI Token Billing Dashboard · GPT-4o Usage Monitoring",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
   const messages = await getMessages();
   return (
-    <html
-      lang={locale}
-      className={`${bodoniModa.variable} ${jost.variable}`}
-      suppressHydrationWarning
-    >
+    <html lang={locale} className={jost.variable} suppressHydrationWarning>
       <body className="font-sans antialiased">
         <NextIntlClientProvider messages={messages}>
-          <CartProvider>
-            <HabaTopBar />
-            {children}
-            <HabaFooter />
-          </CartProvider>
+          <div className="flex h-screen overflow-hidden">
+            <EnterpriseSidebar />
+            <div className="flex flex-1 flex-col overflow-y-auto">
+              {children}
+            </div>
+          </div>
         </NextIntlClientProvider>
       </body>
     </html>

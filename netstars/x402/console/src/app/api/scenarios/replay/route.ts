@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({} as { x_payment_header?: string; idempotency_key?: string }));
   if (!body.x_payment_header || !body.idempotency_key) {
-    return NextResponse.json({ ok: false, error: "先按一次 Normal payment 让 console 记住一个 X-PAYMENT" }, { status: 400 });
+    return NextResponse.json({ ok: false, error: "Run Normal payment first so the console can capture a valid X-PAYMENT" }, { status: 400 });
   }
   const t = Date.now();
   const r = await retryWithProof({
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     scenario: "replay",
     steps: [
       {
-        name: "重发同一个 X-PAYMENT 到同一资源",
+        name: "Resend the same X-PAYMENT to the same resource",
         status: r.status === 409 ? "ok" : "fail",
         detail: { http: r.status, body: r.body, took_ms: Date.now() - t },
       },

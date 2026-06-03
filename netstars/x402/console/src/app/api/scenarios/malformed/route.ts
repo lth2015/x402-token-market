@@ -21,7 +21,7 @@ export async function POST() {
     scenario: "malformed",
     steps: [
       {
-        name: "提交一段不能解码成 JSON 的 base64",
+        name: "Submit base64 that cannot be decoded as JSON",
         status: r.status === 402 ? "ok" : "fail",
         detail: { http: r.status, body: r.body, took_ms: Date.now() - t },
       },

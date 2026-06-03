@@ -14,7 +14,7 @@ export async function HabaFooter() {
             {t("disclaimer")}
           </p>
           <p className="shrink-0 font-sans text-[11px] tracking-wide text-ink-tertiary/60">
-            © HABA / ハーバー研究所
+            © HABA Enterprise
           </p>
         </div>
       </div>

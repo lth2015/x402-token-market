@@ -115,6 +115,11 @@ haba-up: ## Build + start HABA site via docker compose (:3001)
 	docker compose up -d --build haba-site
 	@echo "→ HABA AI Commerce: http://localhost:3001"
 
+# ── Demo utilities ────────────────────────────────────────────────
+reset-ledger: ## Reset token ledger to clean demo state (500M tokens, clears activity)
+	docker compose exec -T mysql mysql -u token_app -ptoken_app_dev token_qa < scripts/reset-ledger.sql
+	@echo "→ token ledger reset to 500M tokens; activity tables cleared"
+
 # ── House-keeping ─────────────────────────────────────────────────
 clean: ## Remove containers + volumes (DESTROYS LOCAL DATA)
 	docker compose down -v

@@ -22,7 +22,7 @@ export async function POST() {
     demoExpirySeconds: 2,
   });
   steps.push({
-    name: "① 创建 2 秒过期的 PaymentRequirements",
+    name: "① Create PaymentRequirements with 2-second expiry",
     status: ch.status === 402 && !!ch.body?.accepts?.[0] ? "ok" : "fail",
     detail: { http: ch.status, requirements: ch.body?.accepts?.[0] },
   });
@@ -32,7 +32,7 @@ export async function POST() {
 
   const built = await buildPaymentHeader(ch.body.accepts[0]!);
   steps.push({
-    name: "② 在过期前构造有效 X-PAYMENT",
+    name: "② Build valid X-PAYMENT before expiry",
     status: built.status === 200 && !!built.body?.x_payment_header ? "ok" : "fail",
     detail: { http: built.status, payer: built.body?.payer, nonce: built.body?.nonce },
   });
@@ -55,7 +55,7 @@ export async function POST() {
     && "error" in retry.body
     && retry.body.error === "EXPIRED";
   steps.push({
-    name: "③ 等 3 秒后 retry,Gateway 拒绝过期订单",
+    name: "③ Wait 3 seconds then retry — Gateway rejects expired order",
     status: expired ? "ok" : "fail",
     detail: { http: retry.status, body: retry.body },
   });

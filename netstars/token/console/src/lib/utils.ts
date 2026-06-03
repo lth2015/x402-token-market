@@ -5,17 +5,15 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatRelative(iso: string, locale: "ja" | "en" = "ja"): string {
+export function formatRelative(iso: string, _locale: "ja" | "en" = "en"): string {
   const now = Date.now();
   const t = new Date(iso).getTime();
   const diff = Math.max(0, Math.floor((now - t) / 1000));
-  if (diff < 5) return locale === "ja" ? "たった今" : "just now";
-  if (diff < 60) return locale === "ja" ? `${diff} 秒前` : `${diff}s ago`;
-  if (diff < 3600) return locale === "ja" ? `${Math.floor(diff / 60)} 分前` : `${Math.floor(diff / 60)}m ago`;
-  if (diff < 86400) return locale === "ja" ? `${Math.floor(diff / 3600)} 時間前` : `${Math.floor(diff / 3600)}h ago`;
-  return new Intl.DateTimeFormat(locale === "ja" ? "ja-JP" : "en-US", {
-    dateStyle: "short", timeStyle: "short",
-  }).format(t);
+  if (diff < 5) return "just now";
+  if (diff < 60) return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  return new Intl.DateTimeFormat("en-US", { dateStyle: "short", timeStyle: "short" }).format(t);
 }
 
 export function formatJPY(n: number): string {

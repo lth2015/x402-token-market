@@ -24,7 +24,7 @@ export async function POST(req: Request) {
   const t1 = Date.now();
   const ch = await fetchChallenge({ amountUsdcMicro: amount, idempotencyKey: idem, description: "Console · normal payment" });
   steps.push({
-    name: "① POST 受保护资源(无 X-PAYMENT)",
+    name: "① POST protected resource (no X-PAYMENT)",
     status: ch.status === 402 ? "ok" : "fail",
     detail: { http: ch.status, www_authenticate: ch.headers["www-authenticate"] ?? null, requirements: ch.body?.accepts?.[0], took_ms: Date.now() - t1 },
   });
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
   const t2 = Date.now();
   const built = await buildPaymentHeader(reqs);
   steps.push({
-    name: "② 客户端签名 → 拿到 X-PAYMENT",
+    name: "② Client signs → X-PAYMENT obtained",
     status: built.status === 200 ? "ok" : "fail",
     detail: { http: built.status, payer: built.body?.payer, nonce: built.body?.nonce, took_ms: Date.now() - t2 },
   });
@@ -55,7 +55,7 @@ export async function POST(req: Request) {
     try { receipt = JSON.parse(Buffer.from(receiptB64, "base64").toString("utf-8")); } catch { /* ignore */ }
   }
   steps.push({
-    name: "③ 带 X-PAYMENT retry → Gateway → WEA verify → Solana settle",
+    name: "③ Retry with X-PAYMENT → Gateway → WEA verify → Solana settle",
     status: retry.status === 200 ? "ok" : "fail",
     detail: { http: retry.status, body: retry.body, settlement_receipt: receipt, took_ms: Date.now() - t3 },
   });

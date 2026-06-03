@@ -163,8 +163,13 @@ def job_reconciler() -> None:
                 conn.execute(stmt)
                 upserted += 1
 
-                # Consistency check: confirmed orders should have a ledger credit
-                if order.get("status") == "confirmed":
+                # Consistency check: only token-purchase orders should have a ledger credit.
+                # Consumer product checkout orders (resource contains "checkout/order") are
+                # settled in USDC by design — they never produce a token ledger credit.
+                resource = order.get("resource") or ""
+                is_token_purchase = "token-purchase" in resource
+
+                if order.get("status") == "confirmed" and is_token_purchase:
                     ledger_row = conn.execute(
                         select(worker_db.token_ledger_entries.c.id)
                         .where(
@@ -181,7 +186,8 @@ def job_reconciler() -> None:
                             payment_order_id=order_id,
                             merchant_id=order.get("merchant_id"),
                             amount_usdc_micro=order.get("amount_usdc_micro"),
-                            note="x402 confirmed but no ledger credit found — investigate",
+                            resource=resource,
+                            note="token-purchase x402 confirmed but no ledger credit found — investigate",
                         )
                         discrepancies += 1
                     else:

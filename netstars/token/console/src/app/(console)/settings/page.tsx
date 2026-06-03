@@ -99,7 +99,7 @@ async function AccountPanel() {
       <dl>
         <Row label="Organization name" value={merchant.displayName} />
         <Row
-          label="Legal name (社名)"
+          label="Legal Name"
           value={
             merchant.legalName
               ? merchant.legalName
@@ -107,7 +107,7 @@ async function AccountPanel() {
           }
         />
         <Row
-          label="Tax ID (法人番号)"
+          label="Tax ID (Corporate No.)"
           value={
             merchant.taxId
               ? <code className="font-mono text-[12px]">{merchant.taxId}</code>
