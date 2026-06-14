@@ -110,7 +110,7 @@ export function PaymentAuthModal({ open, onClose }: PaymentAuthModalProps) {
             onClick={handleAuthorize}
             className={cn(
               "flex w-full items-center justify-center gap-2.5 rounded-xl px-5 py-3.5",
-              "bg-brand-primary text-white font-medium text-small shadow-e1",
+              "bg-brand-primary !text-white font-medium text-small shadow-e1",
               "transition-all hover:bg-brand-primary-hover hover:shadow-e2 active:scale-[0.98]",
             )}
           >
