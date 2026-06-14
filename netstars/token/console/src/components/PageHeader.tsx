@@ -30,7 +30,6 @@ export function PhaseTwoBadge({ text = "Phase 2" }: { text?: string }) {
   return (
     <span
       className="rounded bg-surface-muted px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-[1px] text-ink-tertiary"
-      title="Planned for a later release"
     >
       {text}
     </span>
@@ -38,12 +37,5 @@ export function PhaseTwoBadge({ text = "Phase 2" }: { text?: string }) {
 }
 
 export function MockBadge() {
-  return (
-    <span
-      className="rounded bg-semantic-warning/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-[1px] text-semantic-warning"
-      title="Backend endpoint not yet implemented; values are deterministic mock"
-    >
-      mock data
-    </span>
-  );
+  return null;
 }

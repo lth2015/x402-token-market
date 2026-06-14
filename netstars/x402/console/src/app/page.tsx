@@ -136,7 +136,7 @@ export default function ConsolePage() {
       <ArchitectureCrumb current="gateway" />
       <MetricStrip metrics={metrics} />
       <main className="mx-auto grid max-w-7xl gap-6 px-6 py-8 lg:grid-cols-[minmax(380px,1fr)_minmax(0,1.7fr)]">
-        <DemoColumn running={running} lastResult={lastResult} lastHeader={lastHeader} onRun={runScenario} />
+        <OperationsColumn running={running} lastResult={lastResult} lastHeader={lastHeader} onRun={runScenario} />
         <EventColumn events={events} cfg={metrics?.config} />
       </main>
       <Footer />
@@ -154,7 +154,7 @@ function Header({ gatewayOk, cfg }: { gatewayOk: boolean; cfg?: Metrics["config"
             <Cpu className="h-5 w-5" aria-hidden />
           </div>
           <div>
-            <h1 className="text-[17px] font-bold tracking-tight text-slate-900">NetStars X402 Console</h1>
+            <h1 className="text-[17px] font-bold tracking-tight text-slate-900">Netstars x402 Console</h1>
             <p className="text-[11px] uppercase tracking-widest text-slate-400">
               Standard x402 protocol · Solana USDC settlement
             </p>
@@ -225,7 +225,7 @@ function Pill({ tone, icon, label }: { tone: "ok" | "warn" | "danger" | "info"; 
 }
 
 // ──────────────────────────────────────────────────────────────────
-function DemoColumn({
+function OperationsColumn({
   running, lastResult, lastHeader, onRun,
 }: {
   running: Scenario | null;
@@ -339,7 +339,7 @@ function ResultPanel({ result }: { result: ScenarioResult }) {
         />
       </div>
       <p className="mt-2 text-[12px] text-slate-500">
-        scenario · <span className="font-semibold text-slate-700">{result.scenario}</span>
+        operation · <span className="font-semibold text-slate-700">{result.scenario}</span>
         {result.expected && <> · expected: <span className="text-slate-600">{result.expected}</span></>}
       </p>
       {result.error && <p className="mt-2 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-[12px] text-rose-700">{result.error}</p>}

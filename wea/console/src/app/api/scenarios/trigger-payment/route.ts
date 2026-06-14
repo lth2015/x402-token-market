@@ -60,7 +60,7 @@ export async function POST() {
     ok: retry.status === 200,
     steps: [
       { name: "① 402 challenge (gateway)",         status: ch.status === 402 ? "ok" : "fail",    took_ms: t2 - t1, http: ch.status },
-      { name: "② Build X-PAYMENT (demo wallet)",   status: build.ok        ? "ok" : "fail",      took_ms: t3 - t2, payer: built.payer, nonce: built.nonce },
+      { name: "② Build X-PAYMENT (payment signer)", status: build.ok        ? "ok" : "fail",      took_ms: t3 - t2, payer: built.payer, nonce: built.nonce },
       { name: "③ Gateway → WEA verify → WEA settle → Solana", status: retry.status === 200 ? "ok" : "fail", took_ms: Date.now() - t3, http: retry.status, body },
     ],
     settlement: body,

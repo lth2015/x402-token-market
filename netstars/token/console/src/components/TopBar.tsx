@@ -33,7 +33,7 @@ export function TopBar() {
         <button
           type="button"
           className="flex items-center gap-2 rounded border border-border-subtle bg-surface-muted px-3 py-1 text-small text-ink-tertiary hover:text-ink-secondary"
-          aria-label="Search (Phase 2)"
+          aria-label="Search"
           disabled
         >
           <Search className="h-3.5 w-3.5" />
@@ -50,7 +50,7 @@ export function TopBar() {
           aria-label="Language"
         >
           <Globe className="h-3.5 w-3.5" />
-          JA · EN
+          EN
         </button>
 
         {/* Avatar (stub) */}

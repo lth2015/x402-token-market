@@ -16,7 +16,7 @@ const jost = Jost({
 
 export const metadata: Metadata = {
   title: "HABA Enterprise — AI Token Platform",
-  description: "HABA Enterprise · AI Token Billing Dashboard · GPT-4o Usage Monitoring",
+  description: "HABA Enterprise · AI Token Billing Dashboard · GPT-4.1 Usage Monitoring",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

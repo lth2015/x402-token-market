@@ -112,7 +112,7 @@ function Header({ weaOk, role }: { weaOk: boolean; role?: string }) {
     <header className="border-b border-slate-200 bg-white">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
         <div className="flex items-center gap-3">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600 text-white shadow-sm">
+          <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-700 text-white shadow-sm">
             <Network className="h-5 w-5" aria-hidden />
           </div>
           <div>

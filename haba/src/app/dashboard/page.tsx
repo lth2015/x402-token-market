@@ -105,7 +105,7 @@ export default function DashboardPage() {
   // topup
   const [topupSteps, setTopupSteps]     = useState<StepState[]>(["pending", "pending", "pending"]);
   const [topupRunning, setTopupRunning] = useState(false);
-  const [topupMode, setTopupMode]       = useState<"x402" | "demo" | null>(null);
+  const [topupMode, setTopupMode]       = useState<"x402" | "direct" | null>(null);
   const autoTopupFired                  = useRef(false);
 
   // toast
@@ -141,7 +141,7 @@ export default function DashboardPage() {
     try {
       const res = await fetch("/api/enterprise/topup", { method: "POST" });
       const data = await res.json() as {
-        ok: boolean; mode: "x402" | "demo";
+        ok: boolean; mode: "x402" | "direct";
         steps: { name: string; status: "done" | "error" }[];
         tokens_credited: number;
       };
@@ -152,7 +152,7 @@ export default function DashboardPage() {
 
       if (data.ok) {
         setTopupMode(data.mode);
-        const modeLabel = data.mode === "x402" ? "x402 · Solana" : "complete";
+        const modeLabel = data.mode === "x402" ? "x402 · Solana" : "Auto Topup";
         setToast(`+100,000,000 Tokens topped up (${modeLabel})`);
         await fetchBalance(); // immediate refresh
       }

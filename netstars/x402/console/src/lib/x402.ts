@@ -54,7 +54,7 @@ export async function fetchChallenge(opts: { amountUsdcMicro: number; idempotenc
     body: {
       amount_usdc_micro: opts.amountUsdcMicro,
       idempotency_key: opts.idempotencyKey,
-      description: opts.description ?? "Console demo",
+      description: opts.description ?? "x402 payment verification",
       ...(opts.demoExpirySeconds !== undefined ? { _demo_expiry_seconds: opts.demoExpirySeconds } : {}),
     },
   }) as unknown as ReturnType<typeof fetchChallenge>;
@@ -78,7 +78,7 @@ export async function retryWithProof(opts: {
     body: {
       amount_usdc_micro: opts.amountUsdcMicro,
       idempotency_key: opts.idempotencyKey,
-      description: opts.description ?? "Console demo",
+      description: opts.description ?? "x402 payment verification",
       ...(opts.demoExpirySeconds !== undefined ? { _demo_expiry_seconds: opts.demoExpirySeconds } : {}),
     },
     headers: { "X-PAYMENT": opts.xPaymentHeader },

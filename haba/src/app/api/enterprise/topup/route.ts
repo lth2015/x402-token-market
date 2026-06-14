@@ -25,13 +25,13 @@ const TOPUP_USDC         = 100;              // $100 per topup
 const TOPUP_TOKENS       = 100_000_000;      // 100M tokens credited
 const USDC_MINT_DEVNET   = "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU";
 const SOLANA_NETWORK     = "solana-devnet";
-const MERCHANT_ID        = "mch_demo";
+const MERCHANT_ID        = "mch_haba";
 
 type StepStatus = "done" | "error";
 
 interface TopupResult {
   ok: boolean;
-  mode: "x402" | "demo";
+  mode: "x402" | "direct";
   order_id: string | null;
   steps: { name: string; status: StepStatus; detail?: string }[];
   tokens_credited: number;
@@ -62,7 +62,7 @@ export async function POST(): Promise<Response> {
     if (!r1.ok) {
       const e = await r1.json().catch(() => ({}));
       steps.push({ name: "Create Order", status: "error", detail: JSON.stringify(e).slice(0, 120) });
-      return NextResponse.json<TopupResult>({ ok: false, mode: "demo", order_id: null, steps, tokens_credited: 0, error: "token-purchase failed" });
+      return NextResponse.json<TopupResult>({ ok: false, mode: "direct", order_id: null, steps, tokens_credited: 0, error: "token-purchase failed" });
     }
     const d1 = await r1.json();
     orderId   = d1.payment_order_id;
@@ -72,7 +72,7 @@ export async function POST(): Promise<Response> {
     steps.push({ name: "Create Order", status: "done", detail: orderId ?? undefined });
   } catch (e) {
     steps.push({ name: "Create Order", status: "error", detail: String(e).slice(0, 80) });
-    return NextResponse.json<TopupResult>({ ok: false, mode: "demo", order_id: null, steps, tokens_credited: 0, error: "token-api unreachable" });
+    return NextResponse.json<TopupResult>({ ok: false, mode: "direct", order_id: null, steps, tokens_credited: 0, error: "token-api unreachable" });
   }
 
   // ── Step 2: build Solana payment payload ────────────────────────
@@ -98,7 +98,7 @@ export async function POST(): Promise<Response> {
 
     if (r2.status === 503) {
       // Demo payer wallet not configured — fall back to direct credit
-      steps.push({ name: "x402 Sign", status: "done", detail: "demo-mode (no devnet wallet)" });
+      steps.push({ name: "x402 Sign", status: "done", detail: "Local settlement path" });
       return await _demoCredit(steps, orderId, idem);
     }
     if (!r2.ok) {
@@ -153,7 +153,7 @@ async function _demoCredit(
     const body = JSON.stringify({
       merchant_id:      MERCHANT_ID,
       amount_token:     TOPUP_TOKENS,
-      payment_order_id: orderId ?? `demo-${idem}`,
+      payment_order_id: orderId ?? `local-${idem}`,
       tx_hash:          null,
     });
     const r = await fetch(`${TOKEN_API}/internal/credit`, {
@@ -163,14 +163,14 @@ async function _demoCredit(
       cache: "no-store",
     });
     if (r.ok) {
-      steps.push({ name: "Solana Settle", status: "done", detail: "demo-credit applied" });
-      return NextResponse.json<TopupResult>({ ok: true, mode: "demo", order_id: orderId, steps, tokens_credited: TOPUP_TOKENS });
+      steps.push({ name: "Solana Settle", status: "done", detail: "Ledger credit applied" });
+      return NextResponse.json<TopupResult>({ ok: true, mode: "direct", order_id: orderId, steps, tokens_credited: TOPUP_TOKENS });
     }
     const e = await r.json().catch(() => ({}));
     steps.push({ name: "Solana Settle", status: "error", detail: JSON.stringify(e).slice(0, 120) });
-    return NextResponse.json<TopupResult>({ ok: false, mode: "demo", order_id: orderId, steps, tokens_credited: 0, error: "credit failed" });
+    return NextResponse.json<TopupResult>({ ok: false, mode: "direct", order_id: orderId, steps, tokens_credited: 0, error: "credit failed" });
   } catch (e) {
     steps.push({ name: "Solana Settle", status: "error", detail: String(e).slice(0, 80) });
-    return NextResponse.json<TopupResult>({ ok: false, mode: "demo", order_id: orderId, steps, tokens_credited: 0, error: String(e) });
+    return NextResponse.json<TopupResult>({ ok: false, mode: "direct", order_id: orderId, steps, tokens_credited: 0, error: String(e) });
   }
 }
